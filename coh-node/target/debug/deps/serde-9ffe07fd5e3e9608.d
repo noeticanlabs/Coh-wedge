@@ -1,0 +1,12 @@
+C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\deps\serde-9ffe07fd5e3e9608.d: C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh\ wedge\coh-node\target\debug\build\serde-9b76ea22f6fba3a5\out/private.rs
+
+C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\deps\libserde-9ffe07fd5e3e9608.rmeta: C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh\ wedge\coh-node\target\debug\build\serde-9b76ea22f6fba3a5\out/private.rs
+
+C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\lib.rs:
+C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\integer128.rs:
+C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\mod.rs:
+C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\de.rs:
+C:\Users\truea\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\serde-1.0.228\src\private\ser.rs:
+C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh\ wedge\coh-node\target\debug\build\serde-9b76ea22f6fba3a5\out/private.rs:
+
+# env-dep:OUT_DIR=C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\target\\debug\\build\\serde-9b76ea22f6fba3a5\\out

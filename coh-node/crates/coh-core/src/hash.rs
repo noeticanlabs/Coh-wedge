@@ -1,5 +1,8 @@
-﻿use crate::types::Hash32;
+use crate::types::Hash32;
 use sha2::{Sha256, Digest};
+
+pub const DIGEST_DOMAIN_TAG: &[u8] = b"COH_V1_CHAIN";
+pub const MERKLE_DOMAIN_TAG: &[u8] = b"COH_V1_MERKLE";
 
 pub fn sha256(bytes: &[u8]) -> Hash32 {
     let mut hasher = Sha256::new();
@@ -10,21 +13,27 @@ pub fn sha256(bytes: &[u8]) -> Hash32 {
     Hash32(arr)
 }
 
-pub fn domain_hash(tag: &[u8], payload: &[u8]) -> Hash32 {
+pub fn compute_chain_digest(prev_digest: Hash32, canonical_json_bytes: &[u8]) -> Hash32 {
+    // SHA256(DIGEST_DOMAIN_TAG || "|" || chain_digest_prev || "|" || canonical_json(prehash_view))
     let mut hasher = Sha256::new();
-    hasher.update(tag);
-    hasher.update(payload);
+    hasher.update(DIGEST_DOMAIN_TAG);
+    hasher.update(b"|");
+    hasher.update(&prev_digest.0);
+    hasher.update(b"|");
+    hasher.update(canonical_json_bytes);
     let result = hasher.finalize();
     let mut arr = [0u8; 32];
     arr.copy_from_slice(&result);
     Hash32(arr)
 }
 
-pub fn update_chain_digest(prev: Hash32, canonical_receipt_bytes: &[u8]) -> Hash32 {
+pub fn compute_merkle_inner(left: Hash32, right: Hash32) -> Hash32 {
     let mut hasher = Sha256::new();
-    hasher.update(crate::policy::CHAIN_TAG);
-    hasher.update(&prev.0);
-    hasher.update(canonical_receipt_bytes);
+    hasher.update(MERKLE_DOMAIN_TAG);
+    hasher.update(b"|");
+    hasher.update(&left.0);
+    hasher.update(b"|");
+    hasher.update(&right.0);
     let result = hasher.finalize();
     let mut arr = [0u8; 32];
     arr.copy_from_slice(&result);
