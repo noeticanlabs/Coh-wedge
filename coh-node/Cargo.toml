@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/coh-core", "crates/coh-cli"]
+members = ["crates/coh-core", "crates/coh-cli", "crates/coh-python"]
 resolver = "2"
 
 [workspace.package]

@@ -1,57 +1,1386 @@
-   0.073474800s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint: stale: changed "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\src\\lib.rs"
-   0.073514200s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint:           (vs) "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\target\\debug\\.fingerprint\\coh-core-0c55d6dbe97ea63f\\dep-lib-coh_core"
-   0.073523900s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 13420266534, nanos: 482093100 } < FileTime { seconds: 13420266604, nanos: 615783900 }
-   0.073716200s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("coh_core", ["lib"], "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\src\\lib.rs", Edition2021) }
-   0.073757400s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\target\\debug\\.fingerprint\\coh-core-0c55d6dbe97ea63f\\dep-lib-coh_core", reference_mtime: FileTime { seconds: 13420266534, nanos: 482093100 }, stale: "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\src\\lib.rs", stale_mtime: FileTime { seconds: 13420266604, nanos: 615783900 } }))
-   0.085689300s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint: stale: changed "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\src\\lib.rs"
-   0.085711200s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint:           (vs) "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\target\\debug\\.fingerprint\\coh-core-6338a59c63fe06a1\\dep-test-lib-coh_core"
-   0.085721500s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint:                FileTime { seconds: 13420266534, nanos: 482093100 } < FileTime { seconds: 13420266604, nanos: 615783900 }
-   0.085850600s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { name_inferred: true, ..: lib_target("coh_core", ["lib"], "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\src\\lib.rs", Edition2021) }
-   0.085875500s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleItem(ChangedFile { reference: "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\target\\debug\\.fingerprint\\coh-core-6338a59c63fe06a1\\dep-test-lib-coh_core", reference_mtime: FileTime { seconds: 13420266534, nanos: 482093100 }, stale: "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\src\\lib.rs", stale_mtime: FileTime { seconds: 13420266604, nanos: 615783900 } }))
-   0.086742400s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_build_slab"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_build_slab", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_build_slab.rs", Edition2021) }
-   0.086771900s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_build_slab"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.087659500s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_canon"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_canon", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_canon.rs", Edition2021) }
-   0.087684300s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_canon"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.088627600s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_math"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_math", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_math.rs", Edition2021) }
-   0.088652100s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_math"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.089576000s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_overflow"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_overflow", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_overflow.rs", Edition2021) }
-   0.089601600s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_overflow"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.090556200s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_tamper"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_tamper", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_tamper.rs", Edition2021) }
-   0.090579300s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_tamper"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.091425700s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_verify_chain"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_verify_chain", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_verify_chain.rs", Edition2021) }
-   0.091449300s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_verify_chain"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.092308500s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_verify_micro"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_verify_micro", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_verify_micro.rs", Edition2021) }
-   0.092332400s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_verify_micro"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.093241700s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_verify_slab"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_verify_slab", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_verify_slab.rs", Edition2021) }
-   0.093264100s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_verify_slab"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.094167700s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="accuracy_test_suite"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "accuracy_test_suite", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\accuracy_test_suite.rs", Edition2021) }
-   0.094191100s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="accuracy_test_suite"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.095109600s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="benchmark"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "benchmark", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\benchmark.rs", Edition2021) }
-   0.095136800s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="benchmark"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.096268800s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="benchmark_ai_demo"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "benchmark_ai_demo", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\benchmark_ai_demo.rs", Edition2021) }
-   0.096299500s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="benchmark_ai_demo"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.097270300s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="benchmark_integrity"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "benchmark_integrity", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\benchmark_integrity.rs", Edition2021) }
-   0.097305300s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="benchmark_integrity"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.098511800s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="gen_ai_fixtures"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "gen_ai_fixtures", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\gen_ai_fixtures.rs", Edition2021) }
-   0.098581400s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="gen_ai_fixtures"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.099972400s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="integrity_demo_gen"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "integrity_demo_gen", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\integrity_demo_gen.rs", Edition2021) }
-   0.100011700s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="integrity_demo_gen"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.102606800s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="real_agent_integration"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "real_agent_integration", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\real_agent_integration.rs", Edition2021) }
-   0.102681800s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="real_agent_integration"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.103907800s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="stress_test"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "stress_test", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\stress_test.rs", Edition2021) }
-   0.103939500s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="stress_test"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.105038400s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="verify_chain"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "verify_chain", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\verify_chain.rs", Edition2021) }
-   0.105070400s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="verify_chain"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.105988300s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="verify_single"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "verify_single", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\verify_single.rs", Edition2021) }
-   0.106056300s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="verify_single"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.111898700s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="coh-validator"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli)/Check { test: false }/TargetInner { name: "coh-validator", doc: true, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-cli\\src\\main.rs", Edition2021) }
-   0.111965200s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="coh-validator"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.123243400s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="coh-validator"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli)/Check { test: true }/TargetInner { name: "coh-validator", doc: true, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-cli\\src\\main.rs", Edition2021) }
-   0.123289400s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="coh-validator"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.125268800s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="test_cli"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli)/Check { test: true }/TargetInner { kind: "test", name: "test_cli", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-cli\\tests\\test_cli.rs", Edition2021) }
-   0.125312900s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="test_cli"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
-   0.126845300s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="test_fixtures"}: cargo::core::compiler::fingerprint: fingerprint dirty for coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli)/Check { test: true }/TargetInner { kind: "test", name: "test_fixtures", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-cli\\tests\\test_fixtures.rs", Edition2021) }
-   0.126882600s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="test_fixtures"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { unit: UnitIndex(15) })
+    Updating crates.io index
+     Locking 13 packages to latest compatible versions
+      Adding autocfg v1.5.0
+      Adding indoc v2.0.7
+      Adding memoffset v0.9.1
+      Adding once_cell v1.21.4
+      Adding portable-atomic v1.13.1
+      Adding pyo3 v0.23.5 (available: v0.28.3)
+      Adding pyo3-build-config v0.23.5
+      Adding pyo3-ffi v0.23.5
+      Adding pyo3-macros v0.23.5
+      Adding pyo3-macros-backend v0.23.5
+      Adding rustversion v1.0.22
+      Adding target-lexicon v0.12.16
+      Adding unindent v0.2.4
+   0.781384800s  INFO prepare_target{force=false package_id=coh v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-python) target="coh"}: cargo::core::compiler::fingerprint: fingerprint error for coh v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-python)/Check { test: false }/TargetInner { ..: lib_target("coh", ["cdylib"], "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-python\\src\\lib.rs", Edition2021) }
+   0.781445400s  INFO prepare_target{force=false package_id=coh v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-python) target="coh"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-088738a1d0fd185a\lib-coh`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.793731900s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("coh_core", ["lib"], "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\src\\lib.rs", Edition2021) }
+   0.793765700s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-eb9de30dab316023\lib-coh_core`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_libgit2_prerelease
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: git_midx_writer_dump
+  18: git_filter_source_repo
+  19: git_midx_writer_dump
+  20: BaseThreadInitThunk
+  21: RtlUserThreadStart
+   0.835628500s  INFO prepare_target{force=false package_id=serde v1.0.228 target="serde"}: cargo::core::compiler::fingerprint: fingerprint error for serde v1.0.228/Check { test: false }/TargetInner { ..: lib_target("serde", ["lib"], "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\serde-1.0.228\\src\\lib.rs", Edition2021) }
+   0.835673200s  INFO prepare_target{force=false package_id=serde v1.0.228 target="serde"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\serde-de53a3dd87f81052\lib-serde`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.911098700s  INFO prepare_target{force=false package_id=thiserror v2.0.18 target="thiserror"}: cargo::core::compiler::fingerprint: fingerprint error for thiserror v2.0.18/Check { test: false }/TargetInner { ..: lib_target("thiserror", ["lib"], "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\thiserror-2.0.18\\src\\lib.rs", Edition2021) }
+   0.911169100s  INFO prepare_target{force=false package_id=thiserror v2.0.18 target="thiserror"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\thiserror-b398dc7878b80c24\lib-thiserror`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.912754300s  INFO prepare_target{force=false package_id=pyo3 v0.23.5 target="pyo3"}: cargo::core::compiler::fingerprint: fingerprint error for pyo3 v0.23.5/Check { test: false }/TargetInner { ..: lib_target("pyo3", ["lib"], "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pyo3-0.23.5\\src\\lib.rs", Edition2021) }
+   0.912792700s  INFO prepare_target{force=false package_id=pyo3 v0.23.5 target="pyo3"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\pyo3-6d6b78dd89a1e228\lib-pyo3`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_libgit2_prerelease
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: git_midx_writer_dump
+  18: git_filter_source_repo
+  19: git_midx_writer_dump
+  20: BaseThreadInitThunk
+  21: RtlUserThreadStart
+   0.913811000s  INFO prepare_target{force=false package_id=libc v0.2.184 target="libc"}: cargo::core::compiler::fingerprint: fingerprint error for libc v0.2.184/Check { test: false }/TargetInner { ..: lib_target("libc", ["lib"], "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\libc-0.2.184\\src\\lib.rs", Edition2021) }
+   0.913857900s  INFO prepare_target{force=false package_id=libc v0.2.184 target="libc"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\libc-dee07fc058748b72\lib-libc`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.915110800s  INFO prepare_target{force=false package_id=memoffset v0.9.1 target="memoffset"}: cargo::core::compiler::fingerprint: fingerprint error for memoffset v0.9.1/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("memoffset", ["lib"], "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\memoffset-0.9.1\\src\\lib.rs", Edition2015) }
+   0.915128300s  INFO prepare_target{force=false package_id=memoffset v0.9.1 target="memoffset"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\memoffset-13d40e43d5424662\lib-memoffset`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.916449300s  INFO prepare_target{force=false package_id=once_cell v1.21.4 target="once_cell"}: cargo::core::compiler::fingerprint: fingerprint error for once_cell v1.21.4/Check { test: false }/TargetInner { ..: lib_target("once_cell", ["lib"], "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\once_cell-1.21.4\\src\\lib.rs", Edition2021) }
+   0.916466900s  INFO prepare_target{force=false package_id=once_cell v1.21.4 target="once_cell"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\once_cell-579279579f18ba8b\lib-once_cell`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.917066400s  INFO prepare_target{force=false package_id=pyo3 v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for pyo3 v0.23.5/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pyo3-0.23.5\\build.rs", Edition2021) }
+   0.917082500s  INFO prepare_target{force=false package_id=pyo3 v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\pyo3-89a2192202fb9658\run-build-script-build-script-build`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_libgit2_prerelease
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: <unknown>
+  19: git_midx_writer_dump
+  20: git_filter_source_repo
+  21: git_midx_writer_dump
+  22: BaseThreadInitThunk
+  23: RtlUserThreadStart
+   0.917226100s  INFO prepare_target{force=false package_id=pyo3 v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for pyo3 v0.23.5/Build/TargetInner { ..: custom_build_target("build-script-build", "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pyo3-0.23.5\\build.rs", Edition2021) }
+   0.917239200s  INFO prepare_target{force=false package_id=pyo3 v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\pyo3-c87d99f22207e2cf\build-script-build-script-build`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_libgit2_prerelease
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: <unknown>
+  19: git_midx_writer_dump
+  20: git_filter_source_repo
+  21: git_midx_writer_dump
+  22: BaseThreadInitThunk
+  23: RtlUserThreadStart
+   0.917600700s  INFO prepare_target{force=false package_id=pyo3-build-config v0.23.5 target="pyo3_build_config"}: cargo::core::compiler::fingerprint: fingerprint error for pyo3-build-config v0.23.5/Build/TargetInner { ..: lib_target("pyo3_build_config", ["lib"], "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pyo3-build-config-0.23.5\\src\\lib.rs", Edition2021) }
+   0.917615800s  INFO prepare_target{force=false package_id=pyo3-build-config v0.23.5 target="pyo3_build_config"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\pyo3-build-config-f0ee113b8a3a92ac\lib-pyo3_build_config`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_filter_source_repo
+  15: git_libgit2_prerelease
+  16: <unknown>
+  17: <unknown>
+  18: <unknown>
+  19: <unknown>
+  20: git_midx_writer_dump
+  21: git_filter_source_repo
+  22: git_midx_writer_dump
+  23: BaseThreadInitThunk
+  24: RtlUserThreadStart
+   0.918336000s  INFO prepare_target{force=false package_id=pyo3-build-config v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for pyo3-build-config v0.23.5/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pyo3-build-config-0.23.5\\build.rs", Edition2021) }
+   0.918351600s  INFO prepare_target{force=false package_id=pyo3-build-config v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\pyo3-build-config-6881e4536dcaf086\run-build-script-build-script-build`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_filter_source_repo
+  15: git_filter_source_repo
+  16: git_filter_source_repo
+  17: git_libgit2_prerelease
+  18: <unknown>
+  19: <unknown>
+  20: <unknown>
+  21: <unknown>
+  22: git_midx_writer_dump
+  23: git_filter_source_repo
+  24: git_midx_writer_dump
+  25: BaseThreadInitThunk
+  26: RtlUserThreadStart
+   0.919866200s  INFO prepare_target{force=false package_id=pyo3-ffi v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for pyo3-ffi v0.23.5/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pyo3-ffi-0.23.5\\build.rs", Edition2021) }
+   0.919883200s  INFO prepare_target{force=false package_id=pyo3-ffi v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\pyo3-ffi-9135c17d92c1ffb8\run-build-script-build-script-build`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_filter_source_repo
+  15: git_libgit2_prerelease
+  16: <unknown>
+  17: <unknown>
+  18: <unknown>
+  19: <unknown>
+  20: git_midx_writer_dump
+  21: git_filter_source_repo
+  22: git_midx_writer_dump
+  23: BaseThreadInitThunk
+  24: RtlUserThreadStart
+   0.920125600s  INFO prepare_target{force=false package_id=pyo3-ffi v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for pyo3-ffi v0.23.5/Build/TargetInner { ..: custom_build_target("build-script-build", "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pyo3-ffi-0.23.5\\build.rs", Edition2021) }
+   0.920156400s  INFO prepare_target{force=false package_id=pyo3-ffi v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\pyo3-ffi-d1797413126e8ada\build-script-build-script-build`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_filter_source_repo
+  15: git_libgit2_prerelease
+  16: <unknown>
+  17: <unknown>
+  18: <unknown>
+  19: <unknown>
+  20: git_midx_writer_dump
+  21: git_filter_source_repo
+  22: git_midx_writer_dump
+  23: BaseThreadInitThunk
+  24: RtlUserThreadStart
+   0.920808300s  INFO prepare_target{force=false package_id=pyo3-ffi v0.23.5 target="pyo3_ffi"}: cargo::core::compiler::fingerprint: fingerprint error for pyo3-ffi v0.23.5/Check { test: false }/TargetInner { ..: lib_target("pyo3_ffi", ["lib"], "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pyo3-ffi-0.23.5\\src\\lib.rs", Edition2021) }
+   0.920826400s  INFO prepare_target{force=false package_id=pyo3-ffi v0.23.5 target="pyo3_ffi"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\pyo3-ffi-8532bd38eddea1df\lib-pyo3_ffi`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.921216200s  INFO prepare_target{force=false package_id=pyo3-macros v0.23.5 target="pyo3_macros"}: cargo::core::compiler::fingerprint: fingerprint error for pyo3-macros v0.23.5/Build/TargetInner { for_host: true, proc_macro: true, ..: lib_target("pyo3_macros", ["proc-macro"], "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pyo3-macros-0.23.5\\src\\lib.rs", Edition2021) }
+   0.921231600s  INFO prepare_target{force=false package_id=pyo3-macros v0.23.5 target="pyo3_macros"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\pyo3-macros-eee2a4cfc942d125\lib-pyo3_macros`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.921528400s  INFO prepare_target{force=false package_id=pyo3-macros-backend v0.23.5 target="pyo3_macros_backend"}: cargo::core::compiler::fingerprint: fingerprint error for pyo3-macros-backend v0.23.5/Build/TargetInner { ..: lib_target("pyo3_macros_backend", ["lib"], "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pyo3-macros-backend-0.23.5\\src\\lib.rs", Edition2021) }
+   0.921544100s  INFO prepare_target{force=false package_id=pyo3-macros-backend v0.23.5 target="pyo3_macros_backend"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\pyo3-macros-backend-04775cf0cc18479e\lib-pyo3_macros_backend`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_libgit2_prerelease
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: <unknown>
+  19: git_midx_writer_dump
+  20: git_filter_source_repo
+  21: git_midx_writer_dump
+  22: BaseThreadInitThunk
+  23: RtlUserThreadStart
+   0.922337900s  INFO prepare_target{force=false package_id=pyo3-macros-backend v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for pyo3-macros-backend v0.23.5/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pyo3-macros-backend-0.23.5\\build.rs", Edition2021) }
+   0.922353600s  INFO prepare_target{force=false package_id=pyo3-macros-backend v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\pyo3-macros-backend-d6d318d2e7f78d8f\run-build-script-build-script-build`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_filter_source_repo
+  15: git_filter_source_repo
+  16: git_libgit2_prerelease
+  17: <unknown>
+  18: <unknown>
+  19: <unknown>
+  20: <unknown>
+  21: git_midx_writer_dump
+  22: git_filter_source_repo
+  23: git_midx_writer_dump
+  24: BaseThreadInitThunk
+  25: RtlUserThreadStart
+   0.922523800s  INFO prepare_target{force=false package_id=pyo3-macros-backend v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for pyo3-macros-backend v0.23.5/Build/TargetInner { ..: custom_build_target("build-script-build", "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\pyo3-macros-backend-0.23.5\\build.rs", Edition2021) }
+   0.922551600s  INFO prepare_target{force=false package_id=pyo3-macros-backend v0.23.5 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\pyo3-macros-backend-a589953438df7b73\build-script-build-script-build`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_filter_source_repo
+  14: git_filter_source_repo
+  15: git_filter_source_repo
+  16: git_libgit2_prerelease
+  17: <unknown>
+  18: <unknown>
+  19: <unknown>
+  20: <unknown>
+  21: git_midx_writer_dump
+  22: git_filter_source_repo
+  23: git_midx_writer_dump
+  24: BaseThreadInitThunk
+  25: RtlUserThreadStart
+   0.923000000s  INFO prepare_target{force=false package_id=unindent v0.2.4 target="unindent"}: cargo::core::compiler::fingerprint: fingerprint error for unindent v0.2.4/Check { test: false }/TargetInner { ..: lib_target("unindent", ["lib"], "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\unindent-0.2.4\\src\\lib.rs", Edition2021) }
+   0.923019500s  INFO prepare_target{force=false package_id=unindent v0.2.4 target="unindent"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\unindent-039745841fe89e58\lib-unindent`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.923529100s  INFO prepare_target{force=false package_id=coh v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-python) target="coh"}: cargo::core::compiler::fingerprint: fingerprint error for coh v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-python)/Check { test: true }/TargetInner { ..: lib_target("coh", ["cdylib"], "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-python\\src\\lib.rs", Edition2021) }
+   0.923549500s  INFO prepare_target{force=false package_id=coh v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-python) target="coh"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-8c13b23d32837219\test-lib-coh`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.924305400s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { name_inferred: true, ..: lib_target("coh_core", ["lib"], "C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\src\\lib.rs", Edition2021) }
+   0.924328600s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="coh_core"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-c03f93ab148a90ce\test-lib-coh_core`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.924953100s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_build_slab"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_build_slab", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_build_slab.rs", Edition2021) }
+   0.924977200s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_build_slab"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-d379acb1dd8ee0ef\test-integration-test-test_build_slab`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.925740200s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_canon"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_canon", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_canon.rs", Edition2021) }
+   0.925781400s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_canon"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-3d20a2f2ad5853c5\test-integration-test-test_canon`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.926547000s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_math"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_math", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_math.rs", Edition2021) }
+   0.926582700s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_math"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-ee7d1064a66c6090\test-integration-test-test_math`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.927473500s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_overflow"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_overflow", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_overflow.rs", Edition2021) }
+   0.927530400s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_overflow"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-c7c7f6090ba8d226\test-integration-test-test_overflow`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.928318800s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_tamper"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_tamper", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_tamper.rs", Edition2021) }
+   0.928339400s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_tamper"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-391039304e48815f\test-integration-test-test_tamper`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.929122400s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_verify_chain"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_verify_chain", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_verify_chain.rs", Edition2021) }
+   0.929143100s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_verify_chain"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-aa891c0b76c4558e\test-integration-test-test_verify_chain`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.929858300s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_verify_micro"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_verify_micro", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_verify_micro.rs", Edition2021) }
+   0.929878500s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_verify_micro"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-a0db2730ee39f07d\test-integration-test-test_verify_micro`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.930738700s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_verify_slab"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: true }/TargetInner { kind: "test", name: "test_verify_slab", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\tests\\test_verify_slab.rs", Edition2021) }
+   0.930758700s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="test_verify_slab"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-38c6bef9ba08886c\test-integration-test-test_verify_slab`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.931637500s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="accuracy_test_suite"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "accuracy_test_suite", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\accuracy_test_suite.rs", Edition2021) }
+   0.931660300s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="accuracy_test_suite"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-320aa29e1bd73205\example-accuracy_test_suite`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.932258400s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="benchmark"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "benchmark", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\benchmark.rs", Edition2021) }
+   0.932279500s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="benchmark"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-c1023e4ac14a06c1\example-benchmark`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.932903900s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="benchmark_ai_demo"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "benchmark_ai_demo", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\benchmark_ai_demo.rs", Edition2021) }
+   0.932926500s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="benchmark_ai_demo"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-ac960645f22ff153\example-benchmark_ai_demo`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.933649700s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="benchmark_integrity"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "benchmark_integrity", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\benchmark_integrity.rs", Edition2021) }
+   0.933670800s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="benchmark_integrity"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-9327b3974fab615e\example-benchmark_integrity`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.934262200s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="gen_ai_fixtures"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "gen_ai_fixtures", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\gen_ai_fixtures.rs", Edition2021) }
+   0.934283600s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="gen_ai_fixtures"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-bdf028c4e4ef987c\example-gen_ai_fixtures`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.934860700s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="integrity_demo_gen"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "integrity_demo_gen", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\integrity_demo_gen.rs", Edition2021) }
+   0.934881300s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="integrity_demo_gen"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-8f20d31e5eca2b6e\example-integrity_demo_gen`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.935450100s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="real_agent_integration"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "real_agent_integration", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\real_agent_integration.rs", Edition2021) }
+   0.935470700s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="real_agent_integration"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-6a91271675676376\example-real_agent_integration`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.936244100s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="showcase"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "showcase", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\showcase.rs", Edition2021) }
+   0.936273500s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="showcase"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-7977838ff9a99090\example-showcase`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.936984000s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="stress_test"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "stress_test", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\stress_test.rs", Edition2021) }
+   0.937007300s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="stress_test"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-aaac3bf3949ab713\example-stress_test`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.937622800s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="verify_chain"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "verify_chain", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\verify_chain.rs", Edition2021) }
+   0.937643000s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="verify_chain"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-185162b87f080e69\example-verify_chain`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.938192300s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="verify_single"}: cargo::core::compiler::fingerprint: fingerprint error for coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)/Check { test: false }/TargetInner { kind: "example", name: "verify_single", tested: false, benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-core\\examples\\verify_single.rs", Edition2021) }
+   0.938212200s  INFO prepare_target{force=false package_id=coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core) target="verify_single"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-core-2c2029585cf537d6\example-verify_single`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.949239500s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="coh-validator"}: cargo::core::compiler::fingerprint: fingerprint error for coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli)/Check { test: false }/TargetInner { name: "coh-validator", doc: true, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-cli\\src\\main.rs", Edition2021) }
+   0.949268300s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="coh-validator"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-validator-4ef6f1c1be4c47e7\bin-coh-validator`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.956136800s  INFO prepare_target{force=false package_id=clap v4.6.0 target="clap"}: cargo::core::compiler::fingerprint: fingerprint error for clap v4.6.0/Check { test: false }/TargetInner { benched: false, ..: lib_target("clap", ["lib"], "C:\\Users\\truea\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\clap-4.6.0\\src\\lib.rs", Edition2024) }
+   0.956183800s  INFO prepare_target{force=false package_id=clap v4.6.0 target="clap"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\clap-ac9dd2459499f70d\lib-clap`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_libgit2_prerelease
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: git_midx_writer_dump
+  18: git_filter_source_repo
+  19: git_midx_writer_dump
+  20: BaseThreadInitThunk
+  21: RtlUserThreadStart
+   1.031233200s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="coh-validator"}: cargo::core::compiler::fingerprint: fingerprint error for coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli)/Check { test: true }/TargetInner { name: "coh-validator", doc: true, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-cli\\src\\main.rs", Edition2021) }
+   1.031269500s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="coh-validator"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-validator-8eef6cfc778126d0\test-bin-coh-validator`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   1.032003000s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="test_cli"}: cargo::core::compiler::fingerprint: fingerprint error for coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli)/Check { test: true }/TargetInner { kind: "test", name: "test_cli", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-cli\\tests\\test_cli.rs", Edition2021) }
+   1.032026500s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="test_cli"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-validator-044ad0a3cf962505\test-integration-test-test_cli`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   1.033025200s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="test_fixtures"}: cargo::core::compiler::fingerprint: fingerprint error for coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli)/Check { test: true }/TargetInner { kind: "test", name: "test_fixtures", benched: false, ..: with_path("C:\\Users\\truea\\.gemini\\antigravity\\brain\\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\\Coh wedge\\coh-node\\crates\\coh-cli\\tests\\test_fixtures.rs", Edition2021) }
+   1.033048200s  INFO prepare_target{force=false package_id=coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli) target="test_fixtures"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\.fingerprint\coh-validator-a2bda1d5a94b8c49\test-integration-test-test_fixtures`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+    Checking serde v1.0.228
+    Checking thiserror v2.0.18
+   Compiling pyo3-build-config v0.23.5
+    Checking libc v0.2.184
+    Checking once_cell v1.21.4
+    Checking unindent v0.2.4
+    Checking memoffset v0.9.1
+    Checking clap v4.6.0
+error: failed to run custom build command for `pyo3-build-config v0.23.5`
+note: To improve backtraces for build dependencies, set the CARGO_PROFILE_DEV_BUILD_OVERRIDE_DEBUG=true environment variable to enable debug information generation.
+
+Caused by:
+  process didn't exit successfully: `C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\target\debug\build\pyo3-build-config-52e29fa479a31af9\build-script-build` (exit code: 1)
+  --- stdout
+  cargo:rerun-if-env-changed=PYO3_CONFIG_FILE
+  cargo:rerun-if-env-changed=PYO3_NO_PYTHON
+  cargo:rerun-if-env-changed=PYO3_ENVIRONMENT_SIGNATURE
+  cargo:rerun-if-env-changed=PYO3_PYTHON
+  cargo:rerun-if-env-changed=VIRTUAL_ENV
+  cargo:rerun-if-env-changed=CONDA_PREFIX
+  cargo:rerun-if-env-changed=PATH
+
+  --- stderr
+  error: no Python 3.x interpreter found
+warning: build failed, waiting for other jobs to finish...
     Checking coh-core v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-core)
     Checking coh-validator v0.1.0 (C:\Users\truea\.gemini\antigravity\brain\75ab5e4c-a69b-451c-b975-f05bf7a3baf3\Coh wedge\coh-node\crates\coh-cli)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.03s
