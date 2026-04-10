@@ -42,11 +42,11 @@ pub fn verify_slab(wire: SlabReceiptWire) -> VerifySlabResult {
         };
     }
 
-    // 3. Range sanity
+    // 3. Range sanity (Slab Summary layer)
     if r.micro_count == 0 {
         return VerifySlabResult { 
             decision: Decision::Reject, 
-            code: Some(RejectCode::RejectSchema), 
+            code: Some(RejectCode::RejectSlabSummary), 
             message: "Slab is empty (micro_count = 0)".to_string(),
             range_start: r.range_start,
             range_end: r.range_end,
@@ -57,7 +57,7 @@ pub fn verify_slab(wire: SlabReceiptWire) -> VerifySlabResult {
     if r.range_end < r.range_start {
         return VerifySlabResult { 
             decision: Decision::Reject, 
-            code: Some(RejectCode::RejectSchema), 
+            code: Some(RejectCode::RejectSlabSummary), 
             message: format!("Invalid range: {}..{}", r.range_start, r.range_end),
             range_start: r.range_start,
             range_end: r.range_end,
@@ -67,11 +67,10 @@ pub fn verify_slab(wire: SlabReceiptWire) -> VerifySlabResult {
     }
     
     // Exactly count matches interval check:
-    // (range_end - range_start + 1) == micro_count
     if (r.range_end - r.range_start + 1) != r.micro_count {
         return VerifySlabResult { 
             decision: Decision::Reject, 
-            code: Some(RejectCode::RejectSchema), 
+            code: Some(RejectCode::RejectSlabSummary), 
             message: format!("Range {}..{} does not match micro_count {}", r.range_start, r.range_end, r.micro_count),
             range_start: r.range_start,
             range_end: r.range_end,
@@ -79,9 +78,8 @@ pub fn verify_slab(wire: SlabReceiptWire) -> VerifySlabResult {
             merkle_root: Some(r.merkle_root.to_hex()),
         };
     }
-
+    
     // 4. Macro inequality
-    // v_post_last + total_spend <= v_pre_first + total_defect
     let left_side = match r.summary.v_post_last.safe_add(r.summary.total_spend) {
         Ok(val) => val,
         Err(e) => return VerifySlabResult { 

@@ -28,7 +28,6 @@ Verifies a single transition receipt in isolation.
 **Example Accept**:
 `	ext
 ACCEPT
-message: Micro-receipt accepted
 step_index: 0
 object_id: obj_123
 chain_digest_next: d6f3b24b580b5d4b3f3ee683ecf02ef47e42837cc0d7c13daab4e082923a5149
@@ -40,7 +39,6 @@ Verifies a contiguous chain of receipts.
 **Example Accept**:
 `	ext
 ACCEPT
-message: Verified 2 steps successfully
 steps_verified: 2
 first_step_index: 0
 last_step_index: 1
@@ -67,7 +65,6 @@ Verifies a standalone slab-receipt using macro-accounting logic.
 **Example Accept**:
 `	ext
 ACCEPT
-message: Slab accepted
 range_start: 0
 range_end: 1
 micro_count: 2

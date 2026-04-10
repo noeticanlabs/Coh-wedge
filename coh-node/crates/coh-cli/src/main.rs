@@ -82,12 +82,9 @@ fn main() {
                 }
                 output_result(res, cli.format);
             } else {
-                // Determine exit code
                 let exit_code = if let Some(code) = &res.code {
                     match code {
-                        // EXIT 4 ONLY for invalid chain/linkage per Step 6/9
-                        RejectCode::RejectChainDigest | 
-                        RejectCode::RejectStateHashLink |
+                        RejectCode::RejectChainDigest | RejectCode::RejectStateHashLink => 4,
                         RejectCode::RejectSchema if res.message.contains("Index discontinuity") => 4,
                         _ => 1,
                     }
@@ -160,6 +157,7 @@ fn exit_with_error(err: String, code: i32, format: Format) -> ! {
         }
         Format::Text => {
             println!("REJECT");
+            println!("code: RejectNumericParse");
             println!("message: {}", err);
         }
     }
@@ -183,8 +181,10 @@ impl DisplayResult for VerifyMicroResult {
     fn is_accept(&self) -> bool { self.decision == Decision::Accept }
     fn to_text(&self) -> String {
         let mut s = format!("{}\n", decision_to_text(&self.decision));
-        if let Some(code) = &self.code { s.push_str(&format!("code: {:?}\n", code)); }
-        s.push_str(&format!("message: {}\n", self.message));
+        if self.decision == Decision::Reject {
+            if let Some(code) = &self.code { s.push_str(&format!("code: {:?}\n", code)); }
+            s.push_str(&format!("message: {}\n", self.message));
+        }
         if let Some(idx) = self.step_index { s.push_str(&format!("step_index: {}\n", idx)); }
         if let Some(oid) = &self.object_id { s.push_str(&format!("object_id: {}\n", oid)); }
         if let Some(digest) = &self.chain_digest_next { s.push_str(&format!("chain_digest_next: {}\n", digest)); }
@@ -196,8 +196,10 @@ impl DisplayResult for VerifyChainResult {
     fn is_accept(&self) -> bool { self.decision == Decision::Accept }
     fn to_text(&self) -> String {
         let mut s = format!("{}\n", decision_to_text(&self.decision));
-        if let Some(code) = &self.code { s.push_str(&format!("code: {:?}\n", code)); }
-        s.push_str(&format!("message: {}\n", self.message));
+        if self.decision == Decision::Reject {
+            if let Some(code) = &self.code { s.push_str(&format!("code: {:?}\n", code)); }
+            s.push_str(&format!("message: {}\n", self.message));
+        }
         s.push_str(&format!("steps_verified: {}\n", self.steps_verified));
         s.push_str(&format!("first_step_index: {}\n", self.first_step_index));
         s.push_str(&format!("last_step_index: {}\n", self.last_step_index));
@@ -211,8 +213,12 @@ impl DisplayResult for BuildSlabResult {
     fn is_accept(&self) -> bool { self.decision == Decision::SlabBuilt }
     fn to_text(&self) -> String {
         let mut s = format!("{}\n", decision_to_text(&self.decision));
-        if let Some(code) = &self.code { s.push_str(&format!("code: {:?}\n", code)); }
-        s.push_str(&format!("message: {}\n", self.message));
+        if self.decision == Decision::Reject {
+            if let Some(code) = &self.code { s.push_str(&format!("code: {:?}\n", code)); }
+            s.push_str(&format!("message: {}\n", self.message));
+        } else {
+            s.push_str(&format!("message: {}\n", self.message));
+        }
         if let Some(rs) = self.range_start { s.push_str(&format!("range_start: {}\n", rs)); }
         if let Some(re) = self.range_end { s.push_str(&format!("range_end: {}\n", re)); }
         if let Some(mc) = self.micro_count { s.push_str(&format!("micro_count: {}\n", mc)); }
@@ -226,8 +232,10 @@ impl DisplayResult for VerifySlabResult {
     fn is_accept(&self) -> bool { self.decision == Decision::Accept }
     fn to_text(&self) -> String {
         let mut s = format!("{}\n", decision_to_text(&self.decision));
-        if let Some(code) = &self.code { s.push_str(&format!("code: {:?}\n", code)); }
-        s.push_str(&format!("message: {}\n", self.message));
+        if self.decision == Decision::Reject {
+            if let Some(code) = &self.code { s.push_str(&format!("code: {:?}\n", code)); }
+            s.push_str(&format!("message: {}\n", self.message));
+        }
         s.push_str(&format!("range_start: {}\n", self.range_start));
         s.push_str(&format!("range_end: {}\n", self.range_end));
         if let Some(mc) = self.micro_count { s.push_str(&format!("micro_count: {}\n", mc)); }
@@ -235,3 +243,4 @@ impl DisplayResult for VerifySlabResult {
         s
     }
 }
+
