@@ -101,9 +101,9 @@ fn compare(py: Python<'_>, a: Bound<'_, PyAny>, b: Bound<'_, PyAny>) -> PyResult
 
 #[pyfunction]
 fn assert_equivalent(py: Python<'_>, a: Bound<'_, PyAny>, b: Bound<'_, PyAny>) -> PyResult<()> {
-    if !compare(py, a, b)? {
-        let h_a = hash(py, a.clone())?;
-        let h_b = hash(py, b.clone())?;
+    if !compare(py, a.clone(), b.clone())? {
+        let h_a = hash(py, a)?;
+        let h_b = hash(py, b)?;
         return Err(CohVerificationError::new_err(format!(
             "Equivalence check failed: hashes differ ({} vs {})",
             h_a, h_b
@@ -132,3 +132,4 @@ fn coh(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     Ok(())
 }
+
