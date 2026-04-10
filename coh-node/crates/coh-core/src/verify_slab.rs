@@ -1,7 +1,14 @@
 use crate::types::{SlabReceiptWire, SlabReceipt, VerifySlabResult, Decision, RejectCode};
 use crate::math::CheckedMath;
 use crate::canon::{EXPECTED_SLAB_SCHEMA_ID, EXPECTED_SLAB_VERSION};
+use crate::merkle;
 use std::convert::TryFrom;
+
+/// Standalone slab verification (v1 mode).
+/// 
+/// NOTE: This verifies macro-accounting integrity but does NOT verify the Merkle root.
+/// Full Merkle verification requires access to the original chain digests 
+/// (the leaves). Use `verify_slab_with_leaves()` for complete verification.
 
 pub fn verify_slab(wire: SlabReceiptWire) -> VerifySlabResult {
     // 1. Wire to runtime
@@ -126,5 +133,57 @@ pub fn verify_slab(wire: SlabReceiptWire) -> VerifySlabResult {
         range_end: r.range_end,
         micro_count: Some(r.micro_count),
         merkle_root: Some(r.merkle_root.to_hex()),
+    }
+}
+
+/// Full slab verification including Merkle root verification.
+/// 
+/// Takes the slab wire and the original chain digests (leaves) to compute
+/// and verify the Merkle root.
+pub fn verify_slab_with_leaves(wire: SlabReceiptWire, leaves: Vec<crate::types::Hash32>) -> VerifySlabResult {
+    // Extract what we need before moving wire
+    let wire_clone = wire.clone();
+    
+    // First run standard verification for schema, range, and macro policy
+    let mut result = verify_slab(wire);
+    
+    // If already rejected, return early
+    if result.decision != Decision::Accept {
+        return result;
+    }
+    
+    // Now verify Merkle root
+    let slab = match crate::types::SlabReceipt::try_from(wire_clone) {
+        Ok(s) => s,
+        Err(e) => return VerifySlabResult {
+            decision: Decision::Reject,
+            code: Some(e),
+            message: "Wire conversion failed for Merkle verification".to_string(),
+            range_start: 0,
+            range_end: 0,
+            micro_count: None,
+            merkle_root: None,
+        },
+    };
+    
+    // Verify Merkle root matches computed root from leaves
+    match merkle::verify_merkle_root(slab.merkle_root, &leaves) {
+        Ok(()) => {
+            result.message = "Slab verified successfully: range, macro-accounting, and Merkle root all valid.".to_string();
+            result
+        },
+        Err(()) => VerifySlabResult {
+            decision: Decision::Reject,
+            code: Some(RejectCode::RejectSlabMerkle),
+            message: format!(
+                "Merkle root mismatch: expected {}, computed {}",
+                slab.merkle_root.to_hex(),
+                crate::merkle::build_merkle_root(&leaves).to_hex()
+            ),
+            range_start: slab.range_start,
+            range_end: slab.range_end,
+            micro_count: Some(slab.micro_count),
+            merkle_root: Some(slab.merkle_root.to_hex()),
+        },
     }
 }
