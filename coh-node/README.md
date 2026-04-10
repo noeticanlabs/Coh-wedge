@@ -6,7 +6,7 @@
 
 > **"Coh Validator is a deterministic CLI tool that verifies state transitions, detects tampering in transition chains, and explains invalid actions with explicit reject codes."**
 
-The **Coh Validator** is the reference "Frozen Wedge" implementation for the Coh protocol. It serves as a high-rigor, deterministic constraint verifier engine that bridge's the formal semantics of the [Coh-Lean](https://github.com/noeticanlabs/coh-lean) safety kernel with real-world execution.
+The **Coh Validator** is the reference "Frozen Wedge" implementation for the Coh protocol. It serves as a high-rigor, deterministic constraint verifier engine.
 
 ---
 
@@ -14,98 +14,78 @@ The **Coh Validator** is the reference "Frozen Wedge" implementation for the Coh
 
 The primary job of the validator is to enforce the **Accounting Law of Transitions**. For every micro-receipt, the system ensures that:
 
-$$V_{post} + spend \le V_{pre} + defect$$
+V_{post} + spend \le V_{pre} + defect
 
-Where:
-- **$V_{pre}$**: Pre-transition potential (metrics).
-- **$V_{post}$**: Post-transition potential (metrics).
-- **$spend$**: Consumed potential.
-- **$defect$**: Injected potential (usually zero in standard transitions).
-
-Failure to satisfy this inequality results in an immediate **`RejectRiskBound`** decision.
+Failure to satisfy this inequality results in a **RejectPolicyViolation** decision.
 
 ---
 
-## ??? Command Reference
+## ??? Command Surface
 
-The validator exposes exactly four commands, designed for use in automated validation pipelines.
-
-### 1. `verify-micro <input.json>`
+### 1. erify-micro <input.json>
 Verifies a single transition receipt in isolation.
 - **Checks**: Schema, Version, Canon Profile, Policy Inequality, and Digest Integrity.
-- **Input**: A single JSON receipt file.
 
-### 2. `verify-chain <input.jsonl>`
+### 2. erify-chain <input.jsonl>
 Verifies a contiguous chain of receipts.
-- **Checks**: All micro-checks, plus state-linkage ($state\_hash\_next_{i} = state\_hash\_prev_{i+1}$) and digest-linkage ($chain\_digest\_next_{i} = chain\_digest\_prev_{i+1}$).
-- **Input**: A [JSONL](https://jsonlines.org/) file where each line is a receipt.
+- **Checks**: All micro-checks, plus index continuity, state-linkage, and digest-linkage.
 
-### 3. `build-slab <input.jsonl> --out <output.json>`
+### 3. uild-slab <input.jsonl> --out <output.json>
 Aggregates a verified chain into a single high-level **Slab Receipt**.
 - **Checks**: Fully verifies the input chain before aggregation.
-- **Output**: A standalone slab JSON summarizing the ranges and total aggregation.
 
-### 4. `verify-slab <input.json>`
+### 4. erify-slab <input.json>
 Verifies a standalone slab-receipt using macro-accounting logic.
-- **Checks**: Range sanity, micro-count validation, and macro-inequality.
+- **Checks**: Range sanity and macro-inequality ({post\_last} + total\_spend \le v_{pre\_first} + total\_defect$).
 
 ---
 
 ## ??? Technical Specification
 
 ### 4-Layer Data Model
-To eliminate floating-point ambiguity and non-determinism, the validator uses a strict 4-layer architecture:
-
 1. **Wire Layer**: All numerical fields are encoded as **Decimal Strings**.
-2. **Runtime Layer**: Converted to **$u128$** for exact-integer arithmetic.
+2. **Runtime Layer**: Converted to **$** for exact-integer arithmetic.
 3. **Prehash Layer**: Alphabetized canonical view for deterministic hashing.
-4. **Result Layer**: Typed decisions (`ACCEPT`/`REJECT`) with explicit `RejectCode`.
+4. **Result Layer**: Typed decisions (ACCEPT/REJECT/SLAB_BUILT).
 
-### Non-Circular Digest Logic
-The validator implements a strict non-circular digest rule. The `chain_digest_next` is computed as:
-```
-SHA256("COH_V1_CHAIN" || "|" || chain_digest_prev || "|" || canonical_json(prehash_view))
-```
-The prehash view structurally excludes the `chain_digest_next` field itself, ensuring the digest is a true anchor of the content it receipts.
-
----
-
-## ?? Exit Code Contract
-
-Automation tools can rely on the following exit codes:
-
+### Exit Code Contract
 | Code | Label | Description |
 | :--- | :--- | :--- |
-| **0** | `ACCEPT` | Verification successful. |
-| **1** | `REJECT` | Semantic rejection (Policy violation, Digest mismatch). |
-| **2** | `MALFORMED` | Input error (JSON parse error, Invalid HEX, Missing fields). |
-| **3** | `ERROR` | Internal execution error. |
-| **4** | `SOURCE` | Invalid source chain provided to `build-slab`. |
+| **0** | SUCCESS | Verification successful or Slab built. |
+| **1** | REJECT | Semantic rejection (Policy violation, Linkage failure). |
+| **2** | MALFORMED | Input error (JSON parse error, Missing fields). |
+| **3** | ERROR | Internal execution error. |
+| **4** | SOURCE | Invalid source chain provided to uild-slab. |
+
+### Reject Code Taxonomy
+- RejectSchema: Invalid schema ID or version.
+- RejectCanonProfile: Profile hash mismatch.
+- RejectChainDigest: Digest linkage or integrity failure.
+- RejectStateHashLink: State transition discontinuity.
+- RejectNumericParse: Invalid decimal string.
+- RejectOverflow: Arithmetic overflow.
+- RejectPolicyViolation: Accounting law breach.
+- RejectSlabSummary: Slab macro-accounting failure.
+- RejectSlabMerkle: Slab Merkle root mismatch.
 
 ---
 
 ## ?? Getting Started
 
 ### Installation
-```bash
+`ash
 cargo build --release -p coh-validator
-```
+`
 
 ### Running Examples
-The `examples/` directory contains standard test vectors:
-```bash
-# Valid micro-receipt
-coh-validator verify-micro examples/micro_valid.json
+`ash
+# Valid chain verification
+coh-validator verify-chain examples/chain_valid.jsonl
 
-# Invalid policy (Risk violation)
-coh-validator verify-micro examples/micro_invalid_policy.json
-```
+# Build a slab
+coh-validator build-slab examples/chain_valid.jsonl --out examples/slab_new.json
+`
 
 ---
-
-## ?? Development
-
-- **Tests**: `cargo test -p coh-core` runs the internal digest stability vectors.
-- **Format**: Use `--format json` to get machine-readable output from all commands.
 
 **Built with rigor by the Antigravity Team.**
