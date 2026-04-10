@@ -1,4 +1,4 @@
-# Coh Validator
+# Coh Validator`n`n**Deterministic AI Verification Kernel & Security Wedge**`n`n`ai-safety` `determinism` `rust` `verification-kernel` `integrity-audit`
 
 [![CI](https://github.com/noeticanlabs/Coh-wedge/actions/workflows/ci.yml/badge.svg)](https://github.com/noeticanlabs/Coh-wedge/actions/workflows/ci.yml)
 [![Rust: stable](https://img.shields.io/badge/rust-stable-brightgreen.svg)](https://www.rust-lang.org/)

@@ -1,10 +1,10 @@
-﻿use serde::Serialize;
-use coh_core::reject::RejectCode;
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
     Json,
 };
+use coh_core::reject::RejectCode;
+use serde::Serialize;
 
 #[derive(Debug, Serialize, Clone, Copy)]
 pub enum CohErrorCode {
@@ -17,18 +17,16 @@ pub enum CohErrorCode {
 impl From<RejectCode> for CohErrorCode {
     fn from(code: RejectCode) -> Self {
         match code {
-             RejectCode::RejectSchema 
-             | RejectCode::RejectCanonProfile 
-             | RejectCode::RejectNumericParse 
-             | RejectCode::RejectOverflow => CohErrorCode::E001,
-             
-             RejectCode::RejectChainDigest 
-             | RejectCode::RejectSlabMerkle => CohErrorCode::E002,
-             
-             RejectCode::RejectPolicyViolation 
-             | RejectCode::RejectSlabSummary => CohErrorCode::E003,
-             
-             RejectCode::RejectStateHashLink => CohErrorCode::E004,
+            RejectCode::RejectSchema
+            | RejectCode::RejectCanonProfile
+            | RejectCode::RejectNumericParse
+            | RejectCode::RejectOverflow => CohErrorCode::E001,
+
+            RejectCode::RejectChainDigest | RejectCode::RejectSlabMerkle => CohErrorCode::E002,
+
+            RejectCode::RejectPolicyViolation | RejectCode::RejectSlabSummary => CohErrorCode::E003,
+
+            RejectCode::RejectStateHashLink => CohErrorCode::E004,
         }
     }
 }

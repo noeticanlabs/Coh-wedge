@@ -1,7 +1,10 @@
-﻿mod error;
+mod error;
 mod routes;
 
-use axum::{routing::{get, post}, Router};
+use axum::{
+    routing::{get, post},
+    Router,
+};
 use std::net::SocketAddr;
 use tower_http::cors::CorsLayer;
 use tower_http::trace::TraceLayer;
@@ -20,7 +23,10 @@ async fn main() {
         .route("/health", get(routes::health_check))
         .route("/v1/verify-micro", post(routes::verify_micro_handler))
         .route("/v1/verify-chain", post(routes::verify_chain_handler))
-        .route("/v1/execute-verified", post(routes::execute_verified_handler))
+        .route(
+            "/v1/execute-verified",
+            post(routes::execute_verified_handler),
+        )
         .layer(CorsLayer::permissive())
         .layer(TraceLayer::new_for_http());
 
