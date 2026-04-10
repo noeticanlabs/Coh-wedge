@@ -1,7 +1,7 @@
+use coh_core::canon::*;
+use coh_core::hash::compute_chain_digest;
 use coh_core::types::*;
 use coh_core::verify_chain::verify_chain;
-use coh_core::hash::compute_chain_digest;
-use coh_core::canon::*;
 use std::convert::TryFrom;
 
 const VALID_PROFILE: &str = "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09";
@@ -58,5 +58,46 @@ fn test_chain_reject_broken_digest_link() {
     let res = verify_chain(vec![w0, w1]);
     assert_eq!(res.decision, Decision::Reject);
     assert_eq!(res.code, Some(RejectCode::RejectChainDigest));
+    assert_eq!(res.failing_step_index, Some(1));
+}
+
+#[test]
+fn test_chain_reject_empty() {
+    let res = verify_chain(vec![]);
+    assert_eq!(res.decision, Decision::Reject);
+    assert_eq!(res.code, Some(RejectCode::RejectSchema));
+}
+
+#[test]
+fn test_chain_reject_invalid_first_receipt() {
+    let mut w0 = create_valid_wire(0, "0".repeat(64), "0".repeat(64));
+    w0.schema_id = "invalid".to_string(); // Make first receipt invalid
+
+    let res = verify_chain(vec![w0]);
+    assert_eq!(res.decision, Decision::Reject);
+    assert_eq!(res.failing_step_index, Some(0));
+}
+
+#[test]
+fn test_chain_reject_broken_step_index() {
+    let w0 = create_valid_wire(0, "0".repeat(64), "0".repeat(64));
+    let mut w1 = create_valid_wire(5, w0.chain_digest_next.clone(), w0.state_hash_next.clone()); // Wrong index
+    seal_wire(&mut w1);
+
+    let res = verify_chain(vec![w0, w1]);
+    assert_eq!(res.decision, Decision::Reject);
+    assert_eq!(res.code, Some(RejectCode::RejectSchema)); // Index discontinuity uses RejectSchema
+    assert_eq!(res.failing_step_index, Some(5));
+}
+
+#[test]
+fn test_chain_reject_broken_state_link() {
+    let w0 = create_valid_wire(0, "0".repeat(64), "0".repeat(64));
+    let mut w1 = create_valid_wire(1, w0.chain_digest_next.clone(), "1".repeat(64)); // Wrong state
+    seal_wire(&mut w1);
+
+    let res = verify_chain(vec![w0, w1]);
+    assert_eq!(res.decision, Decision::Reject);
+    assert_eq!(res.code, Some(RejectCode::RejectStateHashLink));
     assert_eq!(res.failing_step_index, Some(1));
 }

@@ -1,7 +1,7 @@
-use coh_core::types::*;
 use coh_core::build_slab::build_slab;
-use coh_core::hash::compute_chain_digest;
 use coh_core::canon::*;
+use coh_core::hash::compute_chain_digest;
+use coh_core::types::*;
 use std::convert::TryFrom;
 
 const VALID_PROFILE: &str = "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09";
@@ -57,4 +57,22 @@ fn test_build_slab_reject_broken_chain() {
     let res = build_slab(vec![w0, w1]);
     assert_eq!(res.decision, Decision::Reject);
     assert_eq!(res.code, Some(RejectCode::RejectChainDigest));
+}
+
+#[test]
+fn test_build_slab_overflow_rejected() {
+    let mut w1 = create_valid_wire(0, "0".repeat(64), "0".repeat(64));
+    w1.metrics.spend = (u128::MAX / 2 + 10).to_string();
+    w1.metrics.v_post = "0".to_string();
+    w1.metrics.v_pre = w1.metrics.spend.clone();
+    seal_wire(&mut w1);
+
+    let mut w2 = w1.clone();
+    w2.step_index = 1;
+    w2.chain_digest_prev = w1.chain_digest_next.clone();
+    seal_wire(&mut w2);
+
+    let res = build_slab(vec![w1, w2]);
+    assert_eq!(res.decision, Decision::Reject);
+    assert_eq!(res.code, Some(RejectCode::RejectOverflow));
 }
