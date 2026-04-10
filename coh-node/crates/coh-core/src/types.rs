@@ -1,8 +1,10 @@
-use serde::{Deserialize, Serialize};
 pub use crate::reject::RejectCode;
+use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Default, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,
+)]
 pub struct Hash32(pub [u8; 32]);
 
 impl Hash32 {
@@ -23,12 +25,6 @@ impl Hash32 {
 
     pub fn to_hex(&self) -> String {
         hex::encode(self.0)
-    }
-}
-
-impl Default for Hash32 {
-    fn default() -> Self {
-        Hash32([0u8; 32])
     }
 }
 
@@ -232,7 +228,8 @@ pub struct VerifySlabResult {
 // --- Conversions ---
 
 fn parse_u128(s: &str) -> Result<u128, RejectCode> {
-    s.parse::<u128>().map_err(|_| RejectCode::RejectNumericParse)
+    s.parse::<u128>()
+        .map_err(|_| RejectCode::RejectNumericParse)
 }
 
 impl TryFrom<MetricsWire> for Metrics {

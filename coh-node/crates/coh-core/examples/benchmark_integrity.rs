@@ -32,32 +32,41 @@ fn main() {
 fn benchmark_honest_chain(size: usize) {
     println!("[A] Honest Audit (100% path)");
     let chain = generate_demo_chain(size, None);
-    
+
     let start = Instant::now();
     let result = verify_chain(chain);
     let elapsed = start.elapsed();
-    
+
     assert_eq!(result.decision, coh_core::Decision::Accept);
-    
+
     println!("  Time: {:.2} ms", elapsed.as_secs_f64() * 1000.0);
-    println!("  Throughput: {:.0} receipts/sec", size as f64 / elapsed.as_secs_f64());
+    println!(
+        "  Throughput: {:.0} receipts/sec",
+        size as f64 / elapsed.as_secs_f64()
+    );
     println!();
 }
 
 fn benchmark_hallucinated_chain(size: usize, breach_percent: f64, label: &str) {
     let breach_at = (size as f64 * breach_percent) as usize;
-    println!("[B] Hallucinated Audit ({} Breach @ step {})", label, breach_at);
-    
+    println!(
+        "[B] Hallucinated Audit ({} Breach @ step {})",
+        label, breach_at
+    );
+
     let chain = generate_demo_chain(size, Some(breach_at));
-    
+
     let start = Instant::now();
     let result = verify_chain(chain);
     let elapsed = start.elapsed();
-    
+
     assert_eq!(result.decision, coh_core::Decision::Reject);
-    
+
     println!("  Detection Time: {:.2} ms", elapsed.as_secs_f64() * 1000.0);
-    println!("  Effective Audit Speed: {:.0} steps-scanned/sec", breach_at as f64 / elapsed.as_secs_f64());
+    println!(
+        "  Effective Audit Speed: {:.0} steps-scanned/sec",
+        breach_at as f64 / elapsed.as_secs_f64()
+    );
     println!();
 }
 
@@ -70,7 +79,7 @@ fn generate_demo_chain(steps: usize, breach_at: Option<usize>) -> Vec<MicroRecei
 
     for i in 0..steps {
         let next_state = format!("{:064x}", (i + 2) as u64);
-        
+
         let v_pre = current_v;
         let spend = 10;
         let defect = 0;
@@ -108,7 +117,7 @@ fn generate_demo_chain(steps: usize, breach_at: Option<usize>) -> Vec<MicroRecei
         receipt.chain_digest_next = seal(&receipt);
         prev_digest = receipt.chain_digest_next.clone();
         prev_state = next_state;
-        current_v = v_post; 
+        current_v = v_post;
         chain.push(receipt);
     }
 

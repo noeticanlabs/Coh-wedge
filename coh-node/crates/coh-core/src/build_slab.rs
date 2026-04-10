@@ -1,10 +1,14 @@
-use crate::types::{MicroReceiptWire, MicroReceipt, SlabReceiptWire, SlabSummaryWire, BuildSlabResult, Decision, RejectCode};
+use crate::canon::{EXPECTED_SLAB_SCHEMA_ID, EXPECTED_SLAB_VERSION};
 use crate::math::CheckedMath;
 use crate::merkle::build_merkle_root;
+use crate::types::{
+    BuildSlabResult, Decision, MicroReceipt, MicroReceiptWire, RejectCode, SlabReceiptWire,
+    SlabSummaryWire,
+};
 use crate::verify_chain::verify_chain;
-use crate::canon::{EXPECTED_SLAB_SCHEMA_ID, EXPECTED_SLAB_VERSION};
 use std::convert::TryFrom;
 
+#[must_use]
 pub fn build_slab(receipts: Vec<MicroReceiptWire>) -> BuildSlabResult {
     if receipts.is_empty() {
         return BuildSlabResult {
@@ -41,52 +45,58 @@ pub fn build_slab(receipts: Vec<MicroReceiptWire>) -> BuildSlabResult {
     let mut total_defect: u128 = 0;
     let first_wire = receipts.first().unwrap();
     let last_wire = receipts.last().unwrap();
-    
+
     let mut leaves = Vec::with_capacity(receipts.len());
 
     for wire in &receipts {
         let r = match MicroReceipt::try_from(wire.clone()) {
             Ok(r) => r,
-            Err(e) => return BuildSlabResult { 
-                decision: Decision::Reject, 
-                code: Some(e.clone()), 
-                message: format!("Wire conversion failed in builder: {:?}", e),
-                range_start: None,
-                range_end: None,
-                micro_count: None,
-                merkle_root: None,
-                output: None,
-                slab: None,
-            },
+            Err(e) => {
+                return BuildSlabResult {
+                    decision: Decision::Reject,
+                    code: Some(e),
+                    message: format!("Wire conversion failed in builder: {:?}", e),
+                    range_start: None,
+                    range_end: None,
+                    micro_count: None,
+                    merkle_root: None,
+                    output: None,
+                    slab: None,
+                }
+            }
         };
-        
+
         total_spend = match total_spend.safe_add(r.metrics.spend) {
             Ok(val) => val,
-            Err(e) => return BuildSlabResult { 
-                decision: Decision::Reject, 
-                code: Some(e.clone()), 
-                message: format!("Total spend overflow: {:?}", e),
-                range_start: None,
-                range_end: None,
-                micro_count: None,
-                merkle_root: None,
-                output: None,
-                slab: None,
-            },
+            Err(e) => {
+                return BuildSlabResult {
+                    decision: Decision::Reject,
+                    code: Some(e),
+                    message: format!("Total spend overflow: {:?}", e),
+                    range_start: None,
+                    range_end: None,
+                    micro_count: None,
+                    merkle_root: None,
+                    output: None,
+                    slab: None,
+                }
+            }
         };
         total_defect = match total_defect.safe_add(r.metrics.defect) {
             Ok(val) => val,
-            Err(e) => return BuildSlabResult { 
-                decision: Decision::Reject, 
-                code: Some(e.clone()), 
-                message: format!("Total defect overflow: {:?}", e),
-                range_start: None,
-                range_end: None,
-                micro_count: None,
-                merkle_root: None,
-                output: None,
-                slab: None,
-            },
+            Err(e) => {
+                return BuildSlabResult {
+                    decision: Decision::Reject,
+                    code: Some(e),
+                    message: format!("Total defect overflow: {:?}", e),
+                    range_start: None,
+                    range_end: None,
+                    micro_count: None,
+                    merkle_root: None,
+                    output: None,
+                    slab: None,
+                }
+            }
         };
         leaves.push(r.chain_digest_next);
     }

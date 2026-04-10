@@ -23,7 +23,7 @@ fn main() {
 
     for i in 0..50 {
         let next_state = format!("{:064x}", (i + 2) as u64);
-        
+
         // Honest step logic
         let v_pre = 1000 - (i * 10);
         let spend = 10;
@@ -80,7 +80,12 @@ fn main() {
             receipt.clone()
         };
 
-        writeln!(hallucinated_file, "{}", serde_json::to_string(&h_receipt).unwrap()).unwrap();
+        writeln!(
+            hallucinated_file,
+            "{}",
+            serde_json::to_string(&h_receipt).unwrap()
+        )
+        .unwrap();
         prev_digest_c = h_receipt.chain_digest_next.clone();
         prev_state_c = next_state;
     }

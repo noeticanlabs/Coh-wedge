@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: coh-node
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            coh-node/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('coh-node/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Check formatting
+        run: cargo fmt --check
+
+      - name: Clippy — deny warnings
+        run: cargo clippy -- -D warnings
+
+      - name: Build (release)
+        run: cargo build --release
+
+      - name: Run tests
+        run: cargo test
+
+  benchmark:
+    name: Benchmark (perf regression guard)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: coh-node
+    needs: build-and-test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            coh-node/target
+          key: ${{ runner.os }}-cargo-bench-${{ hashFiles('coh-node/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-bench-
+
+      - name: Run benchmark (smoke test — verify it completes without error)
+        run: cargo run --example benchmark -p coh-core --release

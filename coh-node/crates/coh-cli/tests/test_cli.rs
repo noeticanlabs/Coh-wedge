@@ -1,6 +1,6 @@
-use std::process::Command;
 use std::fs;
 use std::path::PathBuf;
+use std::process::Command;
 
 fn bin_path() -> PathBuf {
     let mut path = std::env::current_exe().unwrap();
@@ -30,14 +30,21 @@ fn examples_dir() -> PathBuf {
 fn test_cli_verify_micro_success() {
     let mut path = examples_dir();
     path.push("micro_valid.json");
-    
+
     let output = Command::new(bin_path())
         .arg("verify-micro")
         .arg(path)
         .output()
         .expect("Failed to execute command");
 
-    assert_eq!(output.status.code(), Some(0), "CLI failed with status {:?}. Stdout: {}, Stderr: {}", output.status.code(), String::from_utf8_lossy(&output.stdout), String::from_utf8_lossy(&output.stderr));
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "CLI failed with status {:?}. Stdout: {}, Stderr: {}",
+        output.status.code(),
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
     let stdout = String::from_utf8(output.stdout).unwrap();
     assert!(stdout.starts_with("ACCEPT"));
 }
@@ -102,7 +109,14 @@ fn test_cli_build_slab_success() {
         .output()
         .expect("Failed to execute command");
 
-    assert_eq!(output.status.code(), Some(0), "CLI failed with status {:?}. Stdout: {}, Stderr: {}", output.status.code(), String::from_utf8_lossy(&output.stdout), String::from_utf8_lossy(&output.stderr));
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "CLI failed with status {:?}. Stdout: {}, Stderr: {}",
+        output.status.code(),
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
     assert!(out_path.exists());
     let _ = fs::remove_file(out_path);
 }

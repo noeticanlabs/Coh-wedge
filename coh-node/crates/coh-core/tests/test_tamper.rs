@@ -1,6 +1,6 @@
-use coh_core::types::*;
 use coh_core::canon::*;
 use coh_core::hash::compute_chain_digest;
+use coh_core::types::*;
 use coh_core::verify_micro::verify_micro;
 use std::convert::TryFrom;
 
@@ -53,7 +53,10 @@ fn test_tamper_prev_link_changes_digest() {
     wire.chain_digest_prev = "1".repeat(64);
     let d2 = compute_digest(&wire);
 
-    assert_ne!(d1, d2, "Tampering with chain_digest_prev must change the digest!");
+    assert_ne!(
+        d1, d2,
+        "Tampering with chain_digest_prev must change the digest!"
+    );
 }
 
 #[test]
@@ -64,7 +67,10 @@ fn test_tamper_state_link_changes_digest() {
     wire.state_hash_next = "1".repeat(64);
     let d2 = compute_digest(&wire);
 
-    assert_ne!(d1, d2, "Tampering with state_hash_next must change the digest!");
+    assert_ne!(
+        d1, d2,
+        "Tampering with state_hash_next must change the digest!"
+    );
 }
 
 #[test]
@@ -75,12 +81,22 @@ fn test_verifier_traps_tampered_receipt() {
 
     // 1. Verify it accepts initially
     let res = verify_micro(wire.clone());
-    assert_eq!(res.decision, Decision::Accept, "Initial verify should accept but failed: {}", res.message);
+    assert_eq!(
+        res.decision,
+        Decision::Accept,
+        "Initial verify should accept but failed: {}",
+        res.message
+    );
 
     // 2. Tamper with a field in a way that stays POLICY-VALID but changes the digest
     wire.metrics.spend = "10".to_string(); // Change spend (valid policy: 80+10 <= 100)
-    
+
     let res = verify_micro(wire);
     assert_eq!(res.decision, Decision::Reject);
-    assert_eq!(res.code, Some(RejectCode::RejectChainDigest), "Verifier should have detected the digest mismatch! Got: {:?}", res.code);
+    assert_eq!(
+        res.code,
+        Some(RejectCode::RejectChainDigest),
+        "Verifier should have detected the digest mismatch! Got: {:?}",
+        res.code
+    );
 }

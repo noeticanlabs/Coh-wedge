@@ -1,7 +1,7 @@
+use coh_core::canon::*;
+use coh_core::hash::compute_chain_digest;
 use coh_core::types::*;
 use coh_core::verify_micro::verify_micro;
-use coh_core::hash::compute_chain_digest;
-use coh_core::canon::*;
 use std::convert::TryFrom;
 
 const VALID_PROFILE: &str = "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09";

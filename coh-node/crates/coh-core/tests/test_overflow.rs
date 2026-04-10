@@ -1,8 +1,8 @@
-use coh_core::types::*;
+use coh_core::build_slab::build_slab;
 use coh_core::canon::*;
 use coh_core::hash::compute_chain_digest;
+use coh_core::types::*;
 use coh_core::verify_micro::verify_micro;
-use coh_core::build_slab::build_slab;
 use std::convert::TryFrom;
 
 const VALID_PROFILE: &str = "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09";
@@ -40,7 +40,7 @@ fn test_micro_lhs_overflow() {
     let mut wire = create_valid_wire();
     wire.metrics.v_post = u128::MAX.to_string();
     wire.metrics.spend = "1".to_string();
-    
+
     let res = verify_micro(wire);
     assert_eq!(res.decision, Decision::Reject);
     assert_eq!(res.code, Some(RejectCode::RejectOverflow));
@@ -52,7 +52,7 @@ fn test_micro_rhs_overflow() {
     let mut wire = create_valid_wire();
     wire.metrics.v_pre = u128::MAX.to_string();
     wire.metrics.defect = "1".to_string();
-    
+
     let res = verify_micro(wire);
     assert_eq!(res.decision, Decision::Reject);
     assert_eq!(res.code, Some(RejectCode::RejectOverflow));
@@ -66,7 +66,7 @@ fn test_slab_accumulation_overflow() {
     wire1.metrics.v_post = "0".to_string();
     wire1.metrics.v_pre = wire1.metrics.spend.clone();
     seal_wire(&mut wire1);
-    
+
     let mut wire2 = wire1.clone();
     wire2.step_index = 1;
     wire2.chain_digest_prev = wire1.chain_digest_next.clone();
@@ -75,5 +75,9 @@ fn test_slab_accumulation_overflow() {
     let res = build_slab(vec![wire1, wire2]);
     assert_eq!(res.decision, Decision::Reject);
     assert_eq!(res.code, Some(RejectCode::RejectOverflow));
-    assert!(res.message.to_lowercase().contains("total spend overflow"), "Got message: {}", res.message);
+    assert!(
+        res.message.to_lowercase().contains("total spend overflow"),
+        "Got message: {}",
+        res.message
+    );
 }

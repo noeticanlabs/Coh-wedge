@@ -1,7 +1,8 @@
-use crate::types::{MicroReceiptWire, MicroReceipt, VerifyChainResult, Decision, RejectCode};
+use crate::types::{Decision, MicroReceipt, MicroReceiptWire, RejectCode, VerifyChainResult};
 use crate::verify_micro::verify_micro;
 use std::convert::TryFrom;
 
+#[must_use]
 pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
     if receipts.is_empty() {
         return VerifyChainResult {
@@ -84,7 +85,12 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
                     return VerifyChainResult {
                         decision: Decision::Reject,
                         code: Some(RejectCode::RejectStateHashLink),
-                        message: format!("State link broken at step {}: expected link to {}, but found {}.", step_idx, prev_state, r.state_hash_prev.to_hex()),
+                        message: format!(
+                            "State link broken at step {}: expected link to {}, but found {}.",
+                            step_idx,
+                            prev_state,
+                            r.state_hash_prev.to_hex()
+                        ),
                         steps_verified: i as u64,
                         first_step_index: first_index,
                         last_step_index: last_good_index,
@@ -104,7 +110,10 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
     VerifyChainResult {
         decision: Decision::Accept,
         code: None,
-        message: format!("Linear proof chain verified: {} contiguous steps accepted.", last_good_index - first_index + 1),
+        message: format!(
+            "Linear proof chain verified: {} contiguous steps accepted.",
+            last_good_index - first_index + 1
+        ),
         steps_verified: (last_good_index - first_index + 1),
         first_step_index: first_index,
         last_step_index: last_good_index,

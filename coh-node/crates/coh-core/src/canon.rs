@@ -1,11 +1,12 @@
-use crate::types::{MicroReceipt, MicroReceiptPrehash, MetricsPrehash};
 use crate::reject::RejectCode;
+use crate::types::{MetricsPrehash, MicroReceipt, MicroReceiptPrehash};
 
 pub const EXPECTED_MICRO_SCHEMA_ID: &str = "coh.receipt.micro.v1";
 pub const EXPECTED_MICRO_VERSION: &str = "1.0.0";
 pub const EXPECTED_SLAB_SCHEMA_ID: &str = "coh.receipt.slab.v1";
 pub const EXPECTED_SLAB_VERSION: &str = "1.0.0";
-pub const EXPECTED_CANON_PROFILE_HASH: &str = "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09";
+pub const EXPECTED_CANON_PROFILE_HASH: &str =
+    "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09";
 
 pub fn to_prehash_view(r: &MicroReceipt) -> MicroReceiptPrehash {
     MicroReceiptPrehash {

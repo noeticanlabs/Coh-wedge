@@ -94,7 +94,7 @@ fn main() {
     for t in tests {
         let result = verify_chain(t.chain);
         let success = result.decision == t.expected_decision && result.code == t.expected_reject;
-        
+
         if success {
             passed += 1;
         }
@@ -106,16 +106,21 @@ fn main() {
             result.decision,
             if success { "PASS " } else { "FAIL!" }
         );
-        
+
         if !success {
-            println!("  [ERROR] Expected {:?} / {:?}, got {:?} / {:?}", 
-                t.expected_decision, t.expected_reject, 
-                result.decision, result.code);
+            println!(
+                "  [ERROR] Expected {:?} / {:?}, got {:?} / {:?}",
+                t.expected_decision, t.expected_reject, result.decision, result.code
+            );
         }
     }
 
-    println!("\nFinal Accuracy Score: {:.2}% ({}/{})", 
-        (passed as f64 / total as f64) * 100.0, passed, total);
+    println!(
+        "\nFinal Accuracy Score: {:.2}% ({}/{})",
+        (passed as f64 / total as f64) * 100.0,
+        passed,
+        total
+    );
 }
 
 fn generate_chain(steps: usize, _breach_at: Option<usize>) -> Vec<MicroReceiptWire> {
@@ -128,7 +133,7 @@ fn generate_chain(steps: usize, _breach_at: Option<usize>) -> Vec<MicroReceiptWi
         let next_state = format!("{:064x}", (i + 2) as u64);
         let v_pre = current_v;
         let v_post = v_pre - 10;
-        
+
         let mut receipt = MicroReceiptWire {
             schema_id: "coh.receipt.micro.v1".to_string(),
             version: "1.0.0".to_string(),

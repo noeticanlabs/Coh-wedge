@@ -31,7 +31,7 @@ fn main() {
 
     benchmark_mixed_chain_workload(200);
     benchmark_rejection_cost(1000);
-    
+
     print_memory_estimate(10_000);
 }
 
@@ -151,25 +151,34 @@ fn benchmark_mixed_chain_workload(chains: usize) {
 
 fn benchmark_rejection_cost(steps: usize) {
     println!("[6] Rejection cost analysis ({} receipts)", steps);
-    
+
     // Test ACCEPT path (full chain)
     let valid_chain = generate_ai_chain(steps);
     let t0 = Instant::now();
     let _ = verify_chain(valid_chain);
     let accept_time = t0.elapsed();
-    
+
     // Test REJECT path (fail at 10%)
     let mut invalid_chain = generate_ai_chain(steps);
     invalid_chain[steps / 10].step_index = 99999;
     invalid_chain[steps / 10].chain_digest_next = seal(&invalid_chain[steps / 10]);
-    
+
     let t1 = Instant::now();
     let _ = verify_chain(invalid_chain);
     let reject_time = t1.elapsed();
-    
-    println!("  Accept (full): {:.2} ms", accept_time.as_secs_f64() * 1000.0);
-    println!("  Reject (early exit @ 10%): {:.2} ms", reject_time.as_secs_f64() * 1000.0);
-    println!("  Rejection efficiency: {:.1}x faster", accept_time.as_secs_f64() / reject_time.as_secs_f64());
+
+    println!(
+        "  Accept (full): {:.2} ms",
+        accept_time.as_secs_f64() * 1000.0
+    );
+    println!(
+        "  Reject (early exit @ 10%): {:.2} ms",
+        reject_time.as_secs_f64() * 1000.0
+    );
+    println!(
+        "  Rejection efficiency: {:.1}x faster",
+        accept_time.as_secs_f64() / reject_time.as_secs_f64()
+    );
     println!();
 }
 
@@ -177,28 +186,30 @@ fn print_memory_estimate(steps: usize) {
     println!("[7] Memory profile estimate");
     let chain = generate_ai_chain(1);
     let receipt = &chain[0];
-    
+
     // Rough size estimate
-    let string_costs = 
-        receipt.schema_id.len() + 
-        receipt.version.len() + 
-        receipt.object_id.len() + 
-        receipt.canon_profile_hash.len() + 
-        receipt.policy_hash.len() + 
-        receipt.state_hash_prev.len() + 
-        receipt.state_hash_next.len() + 
-        receipt.chain_digest_prev.len() + 
-        receipt.chain_digest_next.len() +
-        receipt.metrics.v_pre.len() +
-        receipt.metrics.v_post.len() +
-        receipt.metrics.spend.len() +
-        receipt.metrics.defect.len();
-        
+    let string_costs = receipt.schema_id.len()
+        + receipt.version.len()
+        + receipt.object_id.len()
+        + receipt.canon_profile_hash.len()
+        + receipt.policy_hash.len()
+        + receipt.state_hash_prev.len()
+        + receipt.state_hash_next.len()
+        + receipt.chain_digest_prev.len()
+        + receipt.chain_digest_next.len()
+        + receipt.metrics.v_pre.len()
+        + receipt.metrics.v_post.len()
+        + receipt.metrics.spend.len()
+        + receipt.metrics.defect.len();
+
     let struct_overhead = 256; // approximate
     let per_receipt = string_costs + struct_overhead;
-    
+
     println!("  Estimated per-receipt (Wire): ~{} bytes", per_receipt);
-    println!("  Estimated 10k receipts: ~{:.2} MB", (per_receipt * steps) as f64 / 1_048_576.0);
+    println!(
+        "  Estimated 10k receipts: ~{:.2} MB",
+        (per_receipt * steps) as f64 / 1_048_576.0
+    );
     println!("  Peak allocation strategy: Linear/Reusable");
     println!();
 }

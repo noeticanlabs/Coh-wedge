@@ -1,10 +1,14 @@
 # Coh Validator
 
+[![CI](https://github.com/noeticanlabs/Coh-wedge/actions/workflows/ci.yml/badge.svg)](https://github.com/noeticanlabs/Coh-wedge/actions/workflows/ci.yml)
+[![Rust: stable](https://img.shields.io/badge/rust-stable-brightgreen.svg)](https://www.rust-lang.org/)
+[![License: Proprietary](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
+
+> **"Stops corrupted AI workflows in 16ms with zero false positives."**
+
 **Rust Protocol: Coh V1 | Identity: Frozen Wedge**
 
-> "Coh Validator is a deterministic CLI tool that verifies state transitions, detects tampering in transition chains, and explains invalid actions with explicit reject codes."
-
-The Coh Validator is the reference "Frozen Wedge" implementation for the Coh protocol. It serves as a high-rigor, deterministic constraint verifier engine that bridges the formal semantics of the Coh-Lean safety kernel with real-world execution.
+The Coh Validator is a deterministic CLI tool that verifies state transitions, detects tampering in transition chains, and explains invalid actions with explicit reject codes. It is the reference "Frozen Wedge" implementation for the Coh protocol — a high-rigor constraint verifier engine bridging the formal semantics of [coh-lean](https://github.com/noeticanlabs/coh-lean) with real-world AI agent execution.
 
 ---
 
@@ -102,32 +106,75 @@ See [`LICENSE`](LICENSE) for governing terms.
 
 ---
 
+## Quick Start (Copy-Paste Ready)
+
+```bash
+# Clone and build
+git clone https://github.com/noeticanlabs/Coh-wedge.git
+cd Coh-wedge/coh-node
+cargo build --release -p coh-validator
+
+# Run the 60-second cinematic demo (hallucination breach + circuit break)
+cargo run --example showcase -p coh-core --release
+
+# Verify a chain of agent steps
+coh-validator verify-chain examples/chain_valid.jsonl
+```
+
+---
+
+## Formal Verification
+
+The accounting law is **formally proved** in Lean 4:
+
+> [`github.com/noeticanlabs/coh-lean`](https://github.com/noeticanlabs/coh-lean)
+
+The `IsLawful` predicate in `Coh/Core/Chain.lean` is the mathematical specification that this Rust implementation faithfully enforces. See [`FORMAL_FOUNDATION.md`](FORMAL_FOUNDATION.md) for the full traceability map.
+
+---
+
+
 ## Getting Started
 
 ### Installation
 
 ```bash
+cd coh-node
 cargo build --release -p coh-validator
+```
+
+### Running the Demo
+
+```bash
+# See the hallucination breach + circuit breaker in action (60 seconds)
+cargo run --example showcase -p coh-core --release
 ```
 
 ### Running Examples
 
-The `examples/` directory contains standard test vectors:
+The `coh-node/examples/` directory contains standard test vectors:
 
 ```bash
 # Valid micro-receipt
 coh-validator verify-micro examples/micro_valid.json
 
-# Invalid policy (Risk violation)
+# Invalid policy (policy violation)
 coh-validator verify-micro examples/micro_invalid_policy.json
 ```
+
+### Integration Templates
+
+See [`coh-node/examples/integrations/`](coh-node/examples/integrations/) for copy-paste templates:
+- **Generic agent loop** — works with any LLM provider
+- **OpenAI function calling** — wraps function-call responses with safety gating
 
 ---
 
 ## Development
 
-- Tests: `cargo test -p coh-core` runs the internal digest stability vectors
-- Format: Use `--format json` to get machine-readable output from all commands
+- Tests: `cargo test -p coh-core` — digest stability + fixture oracle
+- Lint: `cargo clippy -- -D warnings`
+- Format: `cargo fmt --check`
 
 ---
 

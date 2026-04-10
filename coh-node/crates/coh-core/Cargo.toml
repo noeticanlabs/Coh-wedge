@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "coh-core"
 version.workspace = true
 edition.workspace = true
@@ -11,6 +11,7 @@ sha2.workspace = true
 hex.workspace = true
 base64.workspace = true
 thiserror.workspace = true
+colored.workspace = true
 
 [[example]]
 name = "verify_single"
@@ -35,3 +36,7 @@ path = "examples/gen_ai_fixtures.rs"
 [[example]]
 name = "benchmark_ai_demo"
 path = "examples/benchmark_ai_demo.rs"
+
+[[example]]
+name = "showcase"
+path = "examples/showcase.rs"
