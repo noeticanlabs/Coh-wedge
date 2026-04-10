@@ -23,3 +23,7 @@ path = "examples/verify_chain.rs"
 [[example]]
 name = "benchmark"
 path = "examples/benchmark.rs"
+
+[[example]]
+name = "stress_test"
+path = "examples/stress_test.rs"
