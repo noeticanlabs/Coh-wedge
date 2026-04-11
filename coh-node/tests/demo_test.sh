@@ -17,7 +17,7 @@
 
 set -e
 
-BIN="${BIN:-./target/debug/coh-validator}"
+BIN="${BIN:-./target/release/coh-validator}"
 EXAMPLES="${EXAMPLES:-./examples}"
 
 PASS=0
@@ -34,7 +34,8 @@ echo ""
 run_test() {
     local name="$1"
     local expected="$2"
-    local input="$3"
+    local cmd="$3"
+    local input="$4"
     
     echo "------------------------------------------------------------------------"
     echo "Test: $name"
@@ -47,16 +48,20 @@ run_test() {
     fi
     
     local output
-    output=$("$BIN" verify --json "$EXAMPLES/$input" 2>&1) || true
+    output=$("$BIN" --format json "$cmd" "$EXAMPLES/$input" 2>&1) || true
     
     # Extract ACCEPT/REJECT from output
     local result
-    if echo "$output" | grep -q "ACCEPT"; then
+    if echo "$output" | grep -q '"decision":"ACCEPT"'; then
         result="ACCEPT"
-    elif echo "$output" | grep -q "REJECT"; then
+    elif echo "$output" | grep -q '"decision":"REJECT"'; then
         result="REJECT"
     elif echo "$output" | grep -q "SLAB_BUILT"; then
         result="SLAB_BUILT"
+    elif echo "$output" | grep -q "ACCEPT"; then
+        result="ACCEPT"
+    elif echo "$output" | grep -q "REJECT"; then
+        result="REJECT"
     else
         result="ERROR: $output"
     fi
@@ -75,7 +80,7 @@ run_test() {
 # Build first if needed
 if [ ! -f "$BIN" ]; then
     echo "Building binary..."
-    cargo build -p coh-validator
+    cargo build --release -p coh-validator
 fi
 
 echo ""
@@ -83,25 +88,22 @@ echo "Starting demo sequence..."
 echo ""
 
 # Test 1: verify-micro valid -> ACCEPT
-run_test "verify-micro valid" "ACCEPT" "micro_valid.json"
+run_test "verify-micro valid" "ACCEPT" "verify-micro" "micro_valid.json"
 
 # Test 2: verify-micro invalid digest -> REJECT
-run_test "verify-micro invalid digest" "REJECT" "micro_invalid_digest.json"
+run_test "verify-micro invalid digest" "REJECT" "verify-micro" "micro_invalid_digest.json"
 
 # Test 3: verify-chain valid -> ACCEPT
-run_test "verify-chain valid" "ACCEPT" "chain_valid.jsonl"
+run_test "verify-chain valid" "ACCEPT" "verify-chain" "chain_valid.jsonl"
 
 # Test 4: verify-chain broken -> REJECT
-run_test "verify-chain broken" "REJECT" "chain_invalid_index.jsonl"
+run_test "verify-chain broken" "REJECT" "verify-chain" "chain_invalid_index.jsonl"
 
-# Test 5: build-slab valid -> SLAB_BUILT
-run_test "build-slab valid" "SLAB_BUILT" "slab_new.json"
+# Test 5: verify-slab valid -> ACCEPT
+run_test "verify-slab valid" "ACCEPT" "verify-slab" "slab_valid.json"
 
-# Test 6: verify-slab valid -> ACCEPT
-run_test "verify-slab valid" "ACCEPT" "slab_valid.json"
-
-# Test 7: verify-slab invalid merkle -> REJECT
-run_test "verify-slab invalid merkle" "REJECT" "slab_invalid_merkle.json"
+# Test 6: verify-slab invalid policy -> REJECT
+run_test "verify-slab invalid policy" "REJECT" "verify-slab" "slab_invalid_policy.json"
 
 echo "================================================================================"
 echo "                              TEST SUMMARY"

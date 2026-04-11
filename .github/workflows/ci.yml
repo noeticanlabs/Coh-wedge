@@ -91,27 +91,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Rust stable toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache Cargo registry
+      - name: Restore cargo cache
         uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
             coh-node/target
-          key: ${{ runner.os }}-cargo-demo-${{ hashFiles('coh-node/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-${{ hashFiles('coh-node/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
 
       - name: Build binary
-        run: cargo build --release
+        run: cargo build --release -p coh-validator
 
       - name: Run demo test (shell script)
         run: bash tests/demo_test.sh
         env:
           BIN: target/release/coh-validator
+          EXAMPLES: examples
 
   dashboard-test:
     name: Dashboard UI Test
