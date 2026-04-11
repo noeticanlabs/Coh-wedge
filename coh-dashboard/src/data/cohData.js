@@ -1,30 +1,72 @@
-const DEFAULT_COH_VERSION = '0.1.0';
+﻿const DEFAULT_COH_VERSION = '0.1.0';
 
 export const DEFAULT_SIDECAR_BASE_URL =
     import.meta.env.VITE_COH_SIDECAR_URL ?? 'http://127.0.0.1:3030';
 
 const SCENARIOS = {
-    valid: {
-        key: 'valid',
-        label: 'Valid Chain',
-        description: 'Happy-path receipt chain with a consistent slab summary.',
-        chainPath: '/demo/ai_workflow_chain_valid.jsonl',
-        slabPath: '/demo/ai_workflow_slab_valid.json',
-    },
-    invalid_state_link: {
-        key: 'invalid_state_link',
-        label: 'Broken State Link',
-        description: 'Receipt linkage fails on state continuity at a deterministic break point.',
-        chainPath: '/demo/ai_workflow_chain_invalid_state_link.jsonl',
-        slabPath: '/demo/ai_workflow_slab_valid.json',
-    },
-    invalid_slab_summary: {
-        key: 'invalid_slab_summary',
-        label: 'Invalid Slab Summary',
-        description: 'The chain verifies, but the slab macro-summary does not reconcile.',
-        chainPath: '/demo/ai_workflow_chain_valid.jsonl',
-        slabPath: '/demo/ai_workflow_slab_invalid_summary.json',
-    },
+  valid: {
+    key: 'valid',
+    label: 'Valid Chain',
+    description: 'Happy-path receipt chain with a consistent slab summary.',
+    chainPath: '/demo/ai_workflow_chain_valid.jsonl',
+    slabPath: '/demo/ai_workflow_slab_valid.json',
+  },
+  invalid_state_link: {
+    key: 'invalid_state_link',
+    label: 'Broken State Link (T1)',
+    description: 'Receipt linkage fails on state continuity at a deterministic break point.',
+    chainPath: '/demo/ai_workflow_chain_invalid_state_link.jsonl',
+    slabPath: '/demo/ai_workflow_slab_valid.json',
+  },
+  reject_chain_digest: {
+    key: 'reject_chain_digest',
+    label: 'Chain Digest Mismatch (T2)',
+    description: 'Cryptographic digest linkage failure between receipts.',
+    chainPath: '/demo/reject_chain_digest.jsonl',
+    slabPath: '/demo/ai_workflow_slab_valid.json',
+  },
+  reject_state_link_adv: {
+    key: 'reject_state_link_adv',
+    label: 'State Discontinuity (T4)',
+    description: 'Adversarial state transition mismatch detected.',
+    chainPath: '/demo/reject_state_link.jsonl',
+    slabPath: '/demo/ai_workflow_slab_valid.json',
+  },
+  reject_policy_violation: {
+    key: 'reject_policy_violation',
+    label: 'Policy Violation (T5)',
+    description: 'Accounting law v_post + spend <= v_pre + defect was violated.',
+    chainPath: '/demo/reject_policy_violation.jsonl',
+    slabPath: '/demo/ai_workflow_slab_valid.json',
+  },
+  reject_schema: {
+    key: 'reject_schema',
+    label: 'Schema Version Reject (T0)',
+    description: 'Unsupported or malformed schema ID / Version detected.',
+    chainPath: '/demo/reject_schema.jsonl',
+    slabPath: '/demo/ai_workflow_slab_valid.json',
+  },
+  reject_numeric_parse: {
+    key: 'reject_numeric_parse',
+    label: 'Malformed Numeric (T3)',
+    description: 'Non-decimal numeric strings rejected by the kernel.',
+    chainPath: '/demo/reject_numeric_parse.jsonl',
+    slabPath: '/demo/ai_workflow_slab_valid.json',
+  },
+  reject_overflow: {
+    key: 'reject_overflow',
+    label: 'Arithmetic Overflow (T6)',
+    description: 'Extreme value range causing u128 safe-math rejection.',
+    chainPath: '/demo/reject_overflow.jsonl',
+    slabPath: '/demo/ai_workflow_slab_valid.json',
+  },
+  invalid_slab_summary: {
+    key: 'invalid_slab_summary',
+    label: 'Invalid Slab Summary (M1)',
+    description: 'The chain verifies, but the slab macro-summary does not reconcile.',
+    chainPath: '/demo/ai_workflow_chain_valid.jsonl',
+    slabPath: '/demo/ai_workflow_slab_invalid_summary.json',
+  },
 };
 
 export const SCENARIO_OPTIONS = Object.values(SCENARIOS).map(({ key, label, description }) => ({
