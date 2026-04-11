@@ -132,4 +132,3 @@ fn coh(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     Ok(())
 }
-
