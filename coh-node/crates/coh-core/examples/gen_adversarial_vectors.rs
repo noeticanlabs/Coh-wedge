@@ -1,4 +1,4 @@
-﻿//! Generate adversarial test vectors for the Coh Validator.
+//! Generate adversarial test vectors for the Coh Validator.
 //! Covering: broken digests, state discontinuities, policy violations, numeric malformations.
 
 use coh_core::canon::*;
@@ -130,7 +130,7 @@ where
         // Apply tampering *conditionally* on whether we need a valid digest first
         // If we want a valid-looking receipt that triggers a LATER link failure, we seal it.
         // If we want a receipt that is internally malformed, we can skip sealing or seal then tamper.
-        
+
         let digest = compute_digest(&wire);
         wire.chain_digest_next = digest.clone();
 
@@ -138,7 +138,7 @@ where
         tamper(i, &mut wire);
 
         // Update loop state (using the version BEFORE tampering for continuity demos)
-        prev_digest = digest; 
+        prev_digest = digest;
         prev_state = next_state;
 
         serde_json::to_writer(&file, &wire)?;
@@ -152,7 +152,8 @@ fn compute_digest(wire: &MicroReceiptWire) -> String {
     use std::convert::TryFrom;
     // We only unwrap here because we are generating vectors from a known-good starting point.
     // If this fails, the generator logic is broken.
-    let r = coh_core::types::MicroReceipt::try_from(wire.clone()).expect("Failed to create MicroReceipt in compute_digest");
+    let r = coh_core::types::MicroReceipt::try_from(wire.clone())
+        .expect("Failed to create MicroReceipt in compute_digest");
     let prehash = to_prehash_view(&r);
     let bytes = to_canonical_json_bytes(&prehash).unwrap();
     compute_chain_digest(r.chain_digest_prev, &bytes).to_hex()
