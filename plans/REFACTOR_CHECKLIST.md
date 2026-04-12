@@ -16,15 +16,15 @@ The repo claims to be a "full Coh implementation" but is actually a "determinist
 ### Actions
 
 #### `coh-node/README.md` (lines 1-20)
-- [ ] Change tagline from "deterministic state transition validator" to "Coh wedge kernel - deterministic receipt validator subset"
-- [ ] Add disclaimer: "This is a subset aligned to Coh v1 contract, not the full canon implementation"
+- [x] Change tagline from "deterministic state transition validator" to "Coh wedge kernel - deterministic receipt validator subset"
+- [x] Add disclaimer: "This is a subset aligned to Coh v1 contract, not the full canon implementation"
 
 #### `coh-node/crates/coh-core/README.md` (lines 1-20)
-- [ ] Update overview to clarify this is a "wedge kernel" not "full implementation"
-- [ ] Add section "Contract Alignment Status" listing what's implemented vs. planned
+- [x] Update overview to clarify this is a "wedge kernel" not "full implementation"
+- [x] Add section "Contract Alignment Status" listing what's implemented vs. planned
 
 #### `coh-node/docs/00-purpose-and-scope.md`
-- [ ] Add clear distinction between "implemented now" vs. "planned canon extensions"
+- [x] Add clear distinction between "implemented now" vs. "planned canon extensions"
 
 ---
 
@@ -36,13 +36,13 @@ The repo claims to be a "full Coh implementation" but is actually a "determinist
 ### File: `coh-node/crates/coh-core/src/canon.rs`
 
 #### Changes (lines 31-33)
-- [ ] Replace `serde_json::to_vec` with proper JCS canonicalization
-- [ ] Implement RFC 8785 rules:
+- [x] Replace `serde_json::to_vec` with proper JCS canonicalization
+- [x] Implement RFC 8785 rules:
   - No unnecessary whitespace
   - Sort keys lexicographically
   - Use escaped unicode (not raw)
   - Encode numbers as integers where possible
-- [ ] Add `to_canonical_json_bytes_jcs()` function
+- [x] Add `to_canonical_json_bytes_jcs()` function
 
 #### Note
 This is a load-bearing issue for cross-language consensus. The change should maintain backward compatibility with existing fixtures by providing a migration path.
@@ -54,8 +54,8 @@ This is a load-bearing issue for cross-language consensus. The change should mai
 ### File: `coh-node/crates/coh-core/src/types.rs` (lines 52-64)
 
 #### MicroReceiptWire - Add fields
-- [ ] Add `step_type: Option<String>` field (for future step categorization)
-- [ ] Add `signatures: Option<Vec<SignatureWire>>` field (for multi-party signatures)
+- [x] Add `step_type: Option<String>` field (for future step categorization)
+- [x] Add `signatures: Option<Vec<SignatureWire>>` field (for multi-party signatures)
 
 #### Add new types
 ```rust
@@ -68,13 +68,13 @@ pub struct SignatureWire {
 ```
 
 #### Runtime layer updates
-- [ ] Add corresponding fields to `MicroReceipt` runtime struct
-- [ ] Update `try_from` conversion logic
+- [x] Add corresponding fields to `MicroReceipt` runtime struct
+- [x] Update `try_from` conversion logic
 
 ### File: `coh-node/crates/coh-core/src/reject.rs`
 
 #### RejectCode enum - Add variant (line 14)
-- [ ] Add `RejectIntervalInvalid` to enum (for interval validation failures)
+- [x] Add `RejectIntervalInvalid` to enum (for interval validation failures)
 
 ---
 
@@ -86,15 +86,15 @@ pub struct SignatureWire {
 The NOTE already exists but is easy to miss.
 
 #### Actions
-- [ ] Rename function to `verify_slab_envelope()` (more descriptive)
-- [ ] Add prominent doc comment:
+- [x] Rename function to `verify_slab_envelope()` (more descriptive)
+- [x] Add prominent doc comment:
   ```rust
   /// NOTE: This verifies macro-accounting integrity but does NOT verify the Merkle root.
   /// Full Merkle verification requires `verify_slab_with_leaves()`.
   /// - `verify_slab_envelope()` = summary/envelope verification only
   /// - `verify_slab_with_leaves()` = full merkle verification
   ```
-- [ ] Export both functions with clear distinction in lib.rs
+- [x] Export both functions with clear distinction in lib.rs
 
 ---
 
@@ -106,11 +106,11 @@ The `coh-lean/` directory exists but the audit notes it feels "implied but not d
 ### Actions
 
 #### Option A: Include actual Lean contents (if they exist)
-- [ ] Verify coh-lean contents are actually populated
-- [ ] If populated: Add to release artifacts/zips
+- [x] Verify coh-lean contents are actually populated
+- [x] If populated: Add to release artifacts/zips
 
 #### Option B: Clarify delivery status
-- [ ] Update `coh-node/README.md` to clarify Lean status:
+- [x] Update `coh-node/README.md` to clarify Lean status:
   ```
   ### Formal Proof Layer
   The coh-lean directory contains the Lean4 mechanization of the Coh contract.
@@ -118,7 +118,7 @@ The `coh-lean/` directory exists but the audit notes it feels "implied but not d
   ```
 
 #### File: `coh-lean/README.md`
-- [ ] Ensure clear status indication of the Lean proof
+- [x] Ensure clear status indication of the Lean proof
 
 ---
 
@@ -130,20 +130,20 @@ Tests are fixture-shape tests, not behavioral UI tests.
 ### File: `coh-dashboard/src/App.test.jsx`
 
 #### Current tests (fixture-based)
-- [ ] `can load files`
-- [ ] `can parse JSONL`
-- [ ] `fixture fields exist`
+- [x] `can load files`
+- [x] `can parse JSONL`
+- [x] `fixture fields exist`
 
 #### Add behavioral tests
-- [ ] Add test: `scenario switching` - verify switching between valid/invalid chains updates UI
-- [ ] Add test: `broken-chain state rendering` - verify error display for broken chains
-- [ ] Add test: `slab-fail rendering` - verify slab verification failure display
-- [ ] Add test: `sidecar fallback` - verify behavior when sidecar is unavailable
-- [ ] Add test: `proof payload visibility` - verify proof data is visible in UI
-- [ ] Add test: `selected-step synchronization` - verify selected step updates metrics display
+- [x] Add test: `scenario switching` - verify switching between valid/invalid chains updates UI
+- [x] Add test: `broken-chain state rendering` - verify error display for broken chains
+- [x] Add test: `slab-fail rendering` - verify slab verification failure display
+- [x] Add test: `sidecar fallback` - verify behavior when sidecar is unavailable
+- [x] Add test: `proof payload visibility` - verify proof data is visible in UI
+- [x] Add test: `selected-step synchronization` - verify selected step updates metrics display
 
 ### File: `coh-dashboard/vitest.config.js`
-- [ ] Ensure testing library (react-testing-library) is available
+- [x] Ensure testing library (react-testing-library) is available
 
 ---
 

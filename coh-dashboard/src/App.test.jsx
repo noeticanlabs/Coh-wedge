@@ -74,20 +74,21 @@ describe('App Behavioral Tests', () => {
 
   it('renders correctly and shows scenario info', async () => {
     loadDashboardData.mockResolvedValueOnce(mockDashboardData);
-    
+
     render(<App />);
-    
+
     // Wait for loading to finish
     await waitFor(() => expect(screen.queryByText(/Loading AI demo data/i)).not.toBeInTheDocument());
 
     expect(screen.getByText(/Integrity Operations Dashboard/i)).toBeInTheDocument();
     expect(screen.getByText(/Attention Required/i)).toBeInTheDocument();
-    expect(screen.getByText(/Policy Violation/i)).toBeInTheDocument();
+    // "Policy Violation" appears in multiple places (dropdown and inspector); check at least one exists
+    expect(screen.queryAllByText(/Policy Violation/i).length).toBeGreaterThan(0);
   });
 
   it('handles scenario selection change', async () => {
     loadDashboardData.mockResolvedValue(mockDashboardData);
-    
+
     render(<App />);
     await waitFor(() => expect(screen.queryByText(/Loading AI demo data/i)).not.toBeInTheDocument());
 
@@ -101,7 +102,7 @@ describe('App Behavioral Tests', () => {
 
   it('updates inspector when a timeline step is clicked', async () => {
     loadDashboardData.mockResolvedValueOnce(mockDashboardData);
-    
+
     render(<App />);
     await waitFor(() => expect(screen.queryByText(/Loading AI demo data/i)).not.toBeInTheDocument());
 
@@ -117,7 +118,7 @@ describe('App Behavioral Tests', () => {
 
   it('toggles live verification mode', async () => {
     loadDashboardData.mockResolvedValue(mockDashboardData);
-    
+
     render(<App />);
     await waitFor(() => expect(screen.queryByText(/Loading AI demo data/i)).not.toBeInTheDocument());
 
@@ -127,7 +128,7 @@ describe('App Behavioral Tests', () => {
     expect(loadDashboardData).toHaveBeenCalledWith(expect.objectContaining({
       preferLiveVerification: true
     }));
-    
+
     expect(screen.getByText(/Live verify enabled/i)).toBeInTheDocument();
   });
 });

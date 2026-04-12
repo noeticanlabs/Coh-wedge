@@ -51,7 +51,7 @@ jobs:
         run: cargo test
 
   formal-verification:
-    name: Lean Formal Verification
+    name: Lean T-Stack Verification
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -62,17 +62,17 @@ jobs:
           curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
 
-      - name: Build Lean proofs
+      - name: Build T-Stack Ledger
         run: |
-          cd coh-lean
+          cd coh-t-stack
           lake build
         env:
           ELAN_HOME: /home/runner/.elan
 
       - name: Audit for sorry/admit
         run: |
-          if grep -rn "sorry" coh-lean/Coh || grep -rn "admit" coh-lean/Coh; then
-            echo "::error::Formal proofs contain placeholders (sorry/admit). Safety Wedge integrity not guaranteed."
+          if grep -rn "sorry" coh-t-stack/Coh || grep -rn "admit" coh-t-stack/Coh; then
+            echo "::error::T-Stack Ledger contains placeholders (sorry/admit). Safety Wedge integrity not guaranteed."
             exit 1
           fi
 

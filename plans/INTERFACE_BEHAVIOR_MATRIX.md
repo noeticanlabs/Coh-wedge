@@ -19,7 +19,7 @@
 | Error: file not found | — | 2 | — | — | 400 | — | raises exception | — |
 | Error: file write fail | — | 3 | — | — | 500 | — | raises exception | — |
 | Error: internal panic | — | 3 | — | — | 500 | — | raises exception | — |
-| `build-slab`: source chain invalid | REJECT | 4 | `"REJECT"` | `"RejectChainDigest"` / `"RejectStateHashLink"` / source index discontinuity path | N/A | N/A | N/A | N/A |
+| Reject: interval invalid | REJECT | 1 | "REJECT" | "RejectIntervalInvalid" | 200 | "E003" | "Reject" | "RejectIntervalInvalid" |`n| `build-slab`: source chain invalid | REJECT | 4 | `"REJECT"` | `"RejectChainDigest"` / `"RejectStateHashLink"` / source index discontinuity path | N/A | N/A | N/A | N/A |
 
 ---
 

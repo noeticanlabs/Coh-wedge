@@ -40,7 +40,7 @@ Fine-grained rejection reasons in JSON payloads:
 | `RejectOverflow` | Math | Arithmetic overflow | v_post + spend exceeds u128::MAX |
 | `RejectPolicyViolation` | Policy | Accounting inequality violated | `v_post + spend > v_pre + defect` (or defect > spend) |
 | `RejectSlabSummary` | Slab | Summary totals mismatch | Summed metrics don't match claimed `summary` |
-| `RejectSlabMerkle` | Slab | Merkle root mismatch | Computed Merkle root doesn't match claimed `merkle_root` |
+| `RejectSlabMerkle` | Slab | Merkle root mismatch |`n| `RejectIntervalInvalid` | Linkage | Transition interval gap detected | Computed Merkle root doesn't match claimed `merkle_root` |
 
 ---
 
