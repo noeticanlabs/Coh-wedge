@@ -2,7 +2,7 @@ use coh_core::build_slab;
 use coh_core::canon::{to_canonical_json_bytes, to_prehash_view};
 use coh_core::hash::compute_chain_digest;
 use coh_core::types::{Decision, MicroReceiptWire, SlabReceiptWire};
-use coh_core::{verify_chain, verify_micro, verify_slab};
+use coh_core::{verify_chain, verify_micro, verify_slab_envelope};
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
 use pythonize::{depythonize, pythonize};
@@ -156,7 +156,7 @@ fn build_slab_api(py: Python<'_>, input: Bound<'_, PyAny>) -> PyResult<PyObject>
 #[pyfunction]
 fn verify_slab_api(py: Python<'_>, input: Bound<'_, PyAny>) -> PyResult<PyObject> {
     let wire = parse_slab_input(py, input)?;
-    let result = verify_slab(wire);
+    let result = verify_slab_envelope(wire);
     pythonize(py, &result)
         .map(|b| b.unbind())
         .map_err(|e| CohError::new_err(format!("Result conversion failed: {}", e)))

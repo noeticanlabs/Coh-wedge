@@ -2,23 +2,33 @@ pub use crate::reject::RejectCode;
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Default, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,
+)]
 pub struct Hash32(pub [u8; 32]);
 
 impl Hash32 {
     pub fn from_hex(hex: &str) -> Result<Hash32, RejectCode> {
-        if hex.len() != 64 { return Err(RejectCode::RejectNumericParse); }
+        if hex.len() != 64 {
+            return Err(RejectCode::RejectNumericParse);
+        }
         let bytes = hex::decode(hex).map_err(|_| RejectCode::RejectNumericParse)?;
         let mut arr = [0u8; 32];
         arr.copy_from_slice(&bytes);
         Ok(Hash32(arr))
     }
-    pub fn to_hex(&self) -> String { hex::encode(self.0) }
+    pub fn to_hex(&self) -> String {
+        hex::encode(self.0)
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum Decision { Accept, Reject, SlabBuilt }
+pub enum Decision {
+    Accept,
+    Reject,
+    SlabBuilt,
+}
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -216,7 +226,8 @@ pub struct VerifySlabResult {
 }
 
 fn parse_u128(s: &str) -> Result<u128, RejectCode> {
-    s.parse::<u128>().map_err(|_| RejectCode::RejectNumericParse)
+    s.parse::<u128>()
+        .map_err(|_| RejectCode::RejectNumericParse)
 }
 
 impl TryFrom<MetricsWire> for Metrics {

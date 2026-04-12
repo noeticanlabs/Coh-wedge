@@ -283,4 +283,3 @@ fn percentile(values: &[u64], p: f64) -> u64 {
     let idx = ((p / 100.0) * (sorted.len() as f64 - 1.0)) as usize;
     sorted[idx.min(sorted.len() - 1)]
 }
-

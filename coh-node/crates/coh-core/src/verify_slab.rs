@@ -29,7 +29,10 @@ pub fn verify_slab_envelope(wire: SlabReceiptWire) -> VerifySlabResult {
         return VerifySlabResult {
             decision: Decision::Reject,
             code: Some(RejectCode::RejectSchema),
-            message: format!("Invalid schema_id: {} (Expected: {})", r.schema_id, EXPECTED_SLAB_SCHEMA_ID),
+            message: format!(
+                "Invalid schema_id: {} (Expected: {})",
+                r.schema_id, EXPECTED_SLAB_SCHEMA_ID
+            ),
             range_start: r.range_start,
             range_end: r.range_end,
             micro_count: Some(r.micro_count),
@@ -40,7 +43,10 @@ pub fn verify_slab_envelope(wire: SlabReceiptWire) -> VerifySlabResult {
         return VerifySlabResult {
             decision: Decision::Reject,
             code: Some(RejectCode::RejectSchema),
-            message: format!("Unsupported version: {} (Expected: {})", r.version, EXPECTED_SLAB_VERSION),
+            message: format!(
+                "Unsupported version: {} (Expected: {})",
+                r.version, EXPECTED_SLAB_VERSION
+            ),
             range_start: r.range_start,
             range_end: r.range_end,
             micro_count: Some(r.micro_count),
@@ -86,11 +92,31 @@ pub fn verify_slab_envelope(wire: SlabReceiptWire) -> VerifySlabResult {
 
     let left_side = match r.summary.v_post_last.safe_add(r.summary.total_spend) {
         Ok(val) => val,
-        Err(e) => return VerifySlabResult { decision: Decision::Reject, code: Some(e), message: "Overflow".to_string(), range_start: r.range_start, range_end: r.range_end, micro_count: Some(r.micro_count), merkle_root: Some(r.merkle_root.to_hex()) }
+        Err(e) => {
+            return VerifySlabResult {
+                decision: Decision::Reject,
+                code: Some(e),
+                message: "Overflow".to_string(),
+                range_start: r.range_start,
+                range_end: r.range_end,
+                micro_count: Some(r.micro_count),
+                merkle_root: Some(r.merkle_root.to_hex()),
+            }
+        }
     };
     let right_side = match r.summary.v_pre_first.safe_add(r.summary.total_defect) {
         Ok(val) => val,
-        Err(e) => return VerifySlabResult { decision: Decision::Reject, code: Some(e), message: "Overflow".to_string(), range_start: r.range_start, range_end: r.range_end, micro_count: Some(r.micro_count), merkle_root: Some(r.merkle_root.to_hex()) }
+        Err(e) => {
+            return VerifySlabResult {
+                decision: Decision::Reject,
+                code: Some(e),
+                message: "Overflow".to_string(),
+                range_start: r.range_start,
+                range_end: r.range_end,
+                micro_count: Some(r.micro_count),
+                merkle_root: Some(r.merkle_root.to_hex()),
+            }
+        }
     };
 
     if left_side > right_side {
@@ -117,10 +143,15 @@ pub fn verify_slab_envelope(wire: SlabReceiptWire) -> VerifySlabResult {
 }
 
 #[must_use]
-pub fn verify_slab_with_leaves(wire: SlabReceiptWire, leaves: Vec<crate::types::Hash32>) -> VerifySlabResult {
+pub fn verify_slab_with_leaves(
+    wire: SlabReceiptWire,
+    leaves: Vec<crate::types::Hash32>,
+) -> VerifySlabResult {
     let wire_clone = wire.clone();
     let mut result = verify_slab_envelope(wire);
-    if result.decision != Decision::Accept { return result; }
+    if result.decision != Decision::Accept {
+        return result;
+    }
 
     let slab = crate::types::SlabReceipt::try_from(wire_clone).unwrap();
     match merkle::verify_merkle_root(slab.merkle_root, &leaves) {

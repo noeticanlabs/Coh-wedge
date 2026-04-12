@@ -3,7 +3,7 @@ use coh_core::build_slab::build_slab;
 use coh_core::types::*;
 use coh_core::verify_chain::verify_chain;
 use coh_core::verify_micro::verify_micro;
-use coh_core::verify_slab::verify_slab;
+use coh_core::verify_slab_envelope;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use std::process;
@@ -115,7 +115,7 @@ fn main() {
                     cli.format,
                 ),
             };
-            let res = verify_slab(wire);
+            let res = verify_slab_envelope(wire);
             output_result(res, cli.format);
         }
     }

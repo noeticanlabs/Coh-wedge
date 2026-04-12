@@ -132,4 +132,3 @@ fn seal(receipt: &MicroReceiptWire) -> String {
     let bytes = to_canonical_json_bytes(&prehash).unwrap();
     compute_chain_digest(runtime.chain_digest_prev, &bytes).to_hex()
 }
-

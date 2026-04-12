@@ -160,4 +160,3 @@ fn compute_digest(wire: &MicroReceiptWire) -> String {
     let bytes = to_canonical_json_bytes(&prehash).unwrap();
     compute_chain_digest(r.chain_digest_prev, &bytes).to_hex()
 }
-

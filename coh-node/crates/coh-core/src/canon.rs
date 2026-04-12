@@ -31,10 +31,10 @@ pub fn to_prehash_view(r: &MicroReceipt) -> MicroReceiptPrehash {
 }
 
 pub fn to_canonical_json_bytes<T: serde::Serialize>(val: &T) -> Result<Vec<u8>, RejectCode> {
-    // JCS Compliance Note: 
-    // Since our Prehash structs ensure alphabetical field order and we use 
-    // serde_json::to_vec (which omits whitespace), this is JCS-compatible 
-    // for our current schema (which uses Strings for all potentially 
+    // JCS Compliance Note:
+    // Since our Prehash structs ensure alphabetical field order and we use
+    // serde_json::to_vec (which omits whitespace), this is JCS-compatible
+    // for our current schema (which uses Strings for all potentially
     // ambiguous numeric/special types).
     serde_json::to_vec(val).map_err(|_| RejectCode::RejectNumericParse)
 }
