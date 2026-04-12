@@ -1,5 +1,5 @@
 use coh_core::types::*;
-use coh_core::verify_slab::verify_slab;
+use coh_core::verify_slab_envelope;
 
 const VALID_PROFILE: &str = "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09";
 
@@ -28,36 +28,36 @@ fn create_valid_slab() -> SlabReceiptWire {
 }
 
 #[test]
-fn test_verify_slab_accept() {
+fn test_verify_slab_envelope_accept() {
     let wire = create_valid_slab();
-    let res = verify_slab(wire);
+    let res = verify_slab_envelope(wire);
     assert_eq!(res.decision, Decision::Accept);
 }
 
 #[test]
-fn test_verify_slab_reject_policy() {
+fn test_verify_slab_envelope_reject_policy() {
     let mut wire = create_valid_slab();
     wire.summary.v_post_last = "150".to_string(); // 150 + 20 > 100
-    let res = verify_slab(wire);
+    let res = verify_slab_envelope(wire);
     assert_eq!(res.decision, Decision::Reject);
     assert_eq!(res.code, Some(RejectCode::RejectPolicyViolation));
 }
 
 #[test]
-fn test_verify_slab_reject_count() {
+fn test_verify_slab_envelope_reject_count() {
     let mut wire = create_valid_slab();
     wire.micro_count = 0;
-    let res = verify_slab(wire);
+    let res = verify_slab_envelope(wire);
     assert_eq!(res.decision, Decision::Reject);
     assert_eq!(res.code, Some(RejectCode::RejectSlabSummary));
 }
 
 #[test]
-fn test_verify_slab_reject_range() {
+fn test_verify_slab_envelope_reject_range() {
     let mut wire = create_valid_slab();
     wire.range_start = 10;
     wire.range_end = 5;
-    let res = verify_slab(wire);
+    let res = verify_slab_envelope(wire);
     assert_eq!(res.decision, Decision::Reject);
     assert_eq!(res.code, Some(RejectCode::RejectSlabSummary));
 }

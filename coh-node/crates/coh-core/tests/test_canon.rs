@@ -36,7 +36,7 @@ fn test_canonical_json_order() {
     let bytes = to_canonical_json_bytes(&prehash).unwrap();
     let json_str = String::from_utf8(bytes).unwrap();
 
-    let expected = "{\"canon_profile_hash\":\"0000000000000000000000000000000000000000000000000000000000000001\",\"chain_digest_prev\":\"0000000000000000000000000000000000000000000000000000000000000005\",\"metrics\":{\"defect\":\"0\",\"spend\":\"15\",\"v_post\":\"80\",\"v_pre\":\"100\"},\"object_id\":\"demo.obj\",\"policy_hash\":\"0000000000000000000000000000000000000000000000000000000000000002\",\"schema_id\":\"coh.receipt.micro.v1\",\"state_hash_next\":\"0000000000000000000000000000000000000000000000000000000000000004\",\"state_hash_prev\":\"0000000000000000000000000000000000000000000000000000000000000003\",\"step_index\":0,\"version\":\"1.0.0\"}";
+    let expected = r#"{"canon_profile_hash":"0000000000000000000000000000000000000000000000000000000000000001","chain_digest_prev":"0000000000000000000000000000000000000000000000000000000000000005","metrics":{"defect":"0","spend":"15","v_post":"80","v_pre":"100"},"object_id":"demo.obj","policy_hash":"0000000000000000000000000000000000000000000000000000000000000002","schema_id":"coh.receipt.micro.v1","signatures":null,"state_hash_next":"0000000000000000000000000000000000000000000000000000000000000004","state_hash_prev":"0000000000000000000000000000000000000000000000000000000000000003","step_index":0,"step_type":null,"version":"1.0.0"}"#;
 
     assert_eq!(json_str, expected, "Canonical JSON drift detected!");
 }
@@ -51,6 +51,8 @@ fn test_digest_stability_vector() {
             .to_string(),
         policy_hash: "0000000000000000000000000000000000000000000000000000000000000002".to_string(),
         step_index: 0,
+        step_type: None,
+        signatures: None,
         state_hash_prev: "0000000000000000000000000000000000000000000000000000000000000003"
             .to_string(),
         state_hash_next: "0000000000000000000000000000000000000000000000000000000000000004"
@@ -74,7 +76,7 @@ fn test_digest_stability_vector() {
     let hex = digest.to_hex();
 
     // Actual value computed by the finalized v1 logic
-    let expected = "7df81cd9137a74acdbdb21a386819fd9a1ecfc1e58959412517655b8fd843f2d";
+    let expected = "fcb388f57c37af0cafc3553dab375751aeb6ff0debe6ac6da77ae44e1d45aa57";
     assert_eq!(hex, expected, "Digest semantics drift detected!");
 }
 
@@ -87,6 +89,8 @@ fn test_digest_self_exclusion() {
         canon_profile_hash: "0".repeat(64),
         policy_hash: "0".repeat(64),
         step_index: 0,
+        step_type: None,
+        signatures: None,
         state_hash_prev: "0".repeat(64),
         state_hash_next: "0".repeat(64),
         chain_digest_prev: "0".repeat(64),

@@ -61,6 +61,8 @@ fn main() {
             canon_profile_hash: VALID_PROFILE.to_string(),
             policy_hash: "0".repeat(64),
             step_index: (step - 1) as u64,
+            step_type: None,
+            signatures: None,
             state_hash_prev: current_state.clone(),
             state_hash_next: next_state.clone(),
             chain_digest_prev: prev_digest.clone(),
@@ -133,3 +135,4 @@ fn seal(receipt: &MicroReceiptWire) -> String {
     let bytes = to_canonical_json_bytes(&prehash).unwrap();
     compute_chain_digest(runtime.chain_digest_prev, &bytes).to_hex()
 }
+

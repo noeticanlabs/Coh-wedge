@@ -195,6 +195,8 @@ fn create_receipt(
         canon_profile_hash: VALID_PROFILE.to_string(),
         policy_hash: "0".repeat(64),
         step_index,
+        step_type: None,
+        signatures: None,
         state_hash_prev: state_hash_prev.to_string(),
         state_hash_next: state_hash_next.to_string(),
         chain_digest_prev: "0".repeat(64),

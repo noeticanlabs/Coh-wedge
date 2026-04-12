@@ -236,6 +236,8 @@ fn generate_ai_chain(steps: usize) -> Vec<MicroReceiptWire> {
             canon_profile_hash: VALID_PROFILE.to_string(),
             policy_hash: "0".repeat(64),
             step_index: i as u64,
+            step_type: None,
+            signatures: None,
             state_hash_prev: prev_state.clone(),
             state_hash_next: next_state.clone(),
             chain_digest_prev: prev_digest.clone(),
@@ -281,3 +283,4 @@ fn percentile(values: &[u64], p: f64) -> u64 {
     let idx = ((p / 100.0) * (sorted.len() as f64 - 1.0)) as usize;
     sorted[idx.min(sorted.len() - 1)]
 }
+

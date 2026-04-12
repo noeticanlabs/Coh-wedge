@@ -45,3 +45,4 @@ V1 does **not** include: network transport, agent SDKs, multi-tenant routing, or
 - **Zero false positives**: the accounting law is mathematical; there are no probabilistic classifiers.
 - **Offline-first**: no network calls, no external dependencies at runtime.
 - **Formally grounded**: the invariant is proved in Lean 4 (see `07-lean-to-rust-traceability.md`).
+
