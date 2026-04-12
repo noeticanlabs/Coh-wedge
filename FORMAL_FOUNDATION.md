@@ -1,4 +1,4 @@
-# Coh Wedge — Formal Foundation
+# Coh Wedge � Formal Foundation
 
 This document specifies the mathematical and logical foundations of the Coh Validator system.
 
@@ -40,9 +40,9 @@ Where:
 - Serialized as JSON bytes for digest computation
 
 ### Layer 4: Result
-- `Decision::Accept` — verification passed
-- `Decision::Reject` — verification failed with explicit `RejectCode`
-- `Decision::SlabBuilt` — slab construction succeeded
+- `Decision::Accept` � verification passed
+- `Decision::Reject` � verification failed with explicit `RejectCode`
+- `Decision::SlabBuilt` � slab construction succeeded
 
 ---
 
@@ -83,6 +83,7 @@ merkle_inner = SHA256("COH_V1_MERKLE" || "|" || left_bytes || "|" || right_bytes
 | `RejectPolicyViolation` | Accounting law inequality violated |
 | `RejectSlabSummary` | Slab macro-accounting failure |
 | `RejectSlabMerkle` | Slab Merkle root mismatch |
+| `RejectIntervalInvalid` | Transition interval gap detected |
 
 ---
 
@@ -109,7 +110,7 @@ merkle_inner = SHA256("COH_V1_MERKLE" || "|" || left_bytes || "|" || right_bytes
 3. Build Merkle tree from chain_digest_next of each receipt
 4. Construct SlabReceiptWire with computed merkle_root
 
-### verify_slab (standalone)
+### verify_slab_envelope (standalone)
 1. Parse wire to runtime
 2. Verify schema and version
 3. Verify range and count consistency
@@ -117,7 +118,7 @@ merkle_inner = SHA256("COH_V1_MERKLE" || "|" || left_bytes || "|" || right_bytes
 5. Return Accept/Reject with details
 
 ### verify_slab_with_leaves (full verification)
-1. Run verify_slab for schema/range/policy checks
+1. Run verify_slab_envelope for schema/range/policy checks
 2. Extract chain digests from receipts (leaves)
 3. Compute Merkle root from leaves
 4. Compare computed root against slab's merkle_root
@@ -130,49 +131,31 @@ merkle_inner = SHA256("COH_V1_MERKLE" || "|" || left_bytes || "|" || right_bytes
 - No floating-point arithmetic
 - No randomness / RNG
 - No external system calls (time, network, filesystem)
-- Canonical JSON ordering ensures identical digest for identical semantic input
-- Checked arithmetic prevents overflow-based attacks
+- Canonical JSON ordering (JCS) ensures identical digest for semantic input
+- Checked arithmetic prevents overflow-attacks
 
 ---
 
-## Performance Characteristics
+## Lean to Rust Traceability
 
-| Operation | Complexity | Notes |
-|-----------|------------|-------|
-| verify_micro | O(1) | Single JSON parse + SHA256 |
-| verify_chain | O(n) | Linear in chain length |
-| build_slab | O(n) | Includes chain verification |
-| verify_slab | O(1) | Standalone slab check |
-| verify_slab_with_leaves | O(n) | Full verification with Merkle |
+The core accounting invariant is **formally proved** in Lean 4 (minimal verified stack).
+
+Lean source: [formal/Coh/VerifiedCore.lean](formal/Coh/VerifiedCore.lean)
 
 ---
 
-## Copyright
+### The IsLawful Predicate
 
-This document is proprietary to **NoeticanLabs (Micheal Ellington)**. All rights reserved.
-
-See [`LICENSE`](LICENSE) for governing terms.
-
-
-
-# Lean to Rust Traceability
-
-The core accounting invariant is **formally proved** in Lean 4. This document maps each formal theorem to its Rust enforcement point.
-
-Lean repository: [github.com/noeticanlabs/coh-lean](https://github.com/noeticanlabs/coh-lean)
-
----
-
-## The IsLawful Predicate
-
-In `Coh/Core/Chain.lean`, the `IsLawful` predicate formalizes the single-step accounting law:
+In `VerifiedCore.lean`, the `IsLawful` predicate formalizes the single-step accounting law:
 
 ```lean
-def IsLawful (r : MicroReceipt) : Prop :=
-  r.metrics.v_post + r.metrics.spend ≤ r.metrics.v_pre + r.metrics.defect
+def IsLawful {V : Type*}
+    [NormedAddCommGroup V] [NormedSpace R V] [InnerProductSpace R V] [CarrierSpace V]
+    (r : Receipt) (obj obj' : CohObject V) : Prop :=
+  obj'.potential obj'.state + r.spend = obj.potential obj.state + r.defect + r.authority
 ```
 
-**Rust enforcement**: Steps 5 of `verify_micro` in `crates/coh-core/src/verify_micro.rs`:
+**Rust enforcement**: `crates/coh-core/src/verify_micro.rs`:
 
 ```rust
 // Constraint: v_post + spend <= v_pre + defect
@@ -183,16 +166,19 @@ if lhs > rhs { return Reject(RejectPolicyViolation) }
 
 ---
 
-## The lawful_composition Theorem
+### The lawful_composition Theorem
 
 In Lean, the composition theorem proves that if every micro-step in a chain is lawful, the aggregate slab is also lawful:
 
 ```lean
-theorem lawful_composition (chain : List MicroReceipt) (h : ∀ r ∈ chain, IsLawful r) :
-    v_post_last + total_spend ≤ v_pre_first + total_defect
+theorem lawful_composition {V : Type*}
+    (r1 r2 : Receipt) (obj1 obj2 obj3 : CohObject V)
+    (h1 : IsLawful r1 obj1 obj2)
+    (h2 : IsLawful r2 obj2 obj3) :
+    IsLawful (combineReceipts r1 r2) obj1 obj3
 ```
 
-**Rust enforcement**: `verify_slab` in `crates/coh-core/src/verify_slab.rs` enforces the aggregate:
+**Rust enforcement**: `verify_slab_envelope` in `crates/coh-core/src/verify_slab.rs`:
 
 ```rust
 // Macro inequality: v_post_last + total_spend <= v_pre_first + total_defect
@@ -203,40 +189,12 @@ if lhs > rhs { return Reject(RejectSlabSummary) }
 
 ---
 
-## Arithmetic Safety
-
-The Lean proof assumes exact integer arithmetic. In Rust, this is guaranteed by:
-
-- All metrics stored as `u128`
-- All arithmetic via `CheckedMath` trait (`safe_add`, `safe_sub`, `safe_mul`)
-- No floating-point in any path
-
-Any overflow that the Lean proof did not account for is surfaced as `RejectOverflow` rather than silently wrapping.
-
----
-
-## Digest Non-Circularity
-
-The Lean model specifies that the digest of a receipt must not include the digest field itself (preventing circular self-reference). In Rust, the prehash view (`MicroReceiptPrehash`) structurally omits `chain_digest_next`:
-
-```rust
-pub struct MicroReceiptPrehash {
-    pub canon_profile_hash: String,
-    pub chain_digest_prev: String,   // previous digest IS included
-    // chain_digest_next is NOT a field here
-    pub metrics: MetricsPrehash,
-    // ...
-}
-```
-
----
-
 ## Traceability Summary
 
 | Lean Construct | Rust Location | Enforcement Point |
 |---|---|---|
-| `IsLawful` predicate | `verify_micro.rs` step 5 | Policy inequality check |
+| `IsLawful` predicate | `verify_micro.rs` | Policy inequality check |
 | `lawful_composition` | `verify_slab.rs` | Slab macro-inequality |
-| Exact integer arithmetic | `math.rs` `CheckedMath` | All arithmetic operations |
-| Non-circular digest | `types.rs` `MicroReceiptPrehash` | Structural field exclusion |
-| Alphabetized canon | `canon.rs` `to_prehash_view` | JSON byte ordering |
+| Exact integer arithmetic | `math.rs` | All arithmetic operations |
+| Non-circular digest | `types.rs` | Structural field exclusion |
+| Alphabetized canon (JCS) | `canon.rs` | JSON byte ordering |

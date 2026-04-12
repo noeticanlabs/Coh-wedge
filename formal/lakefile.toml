@@ -1,0 +1,12 @@
+name = "CohVerified"
+version = "0.1.0"
+defaultTargets = ["CohVerified"]
+
+[[lean_lib]]
+name = "CohVerified"
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+# Using a recent stable version tag
+rev = "v4.16.0"

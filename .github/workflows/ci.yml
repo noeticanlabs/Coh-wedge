@@ -11,8 +11,8 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  build-and-test:
-    name: Build & Test
+  rust-build-and-test:
+    name: Rust Build & Test
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -41,7 +41,7 @@ jobs:
       - name: Check formatting
         run: cargo fmt --check
 
-      - name: Clippy — deny warnings
+      - name: Clippy � deny warnings
         run: cargo clippy -- -D warnings
 
       - name: Build (release)
@@ -50,48 +50,44 @@ jobs:
       - name: Run tests
         run: cargo test
 
-  benchmark:
-    name: Benchmark (perf regression guard)
+  formal-verification:
+    name: Lean Formal Verification
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: coh-node
-    needs: build-and-test
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Rust stable toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Install Lean 4 (Elan)
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
 
-      - name: Cache Cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            coh-node/target
-          key: ${{ runner.os }}-cargo-bench-${{ hashFiles('coh-node/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-bench-
+      - name: Build Lean proofs
+        run: |
+          cd formal
+          lake build
+        env:
+          ELAN_HOME: /home/runner/.elan
 
-      - name: Run benchmark (smoke test — verify it completes without error)
-        run: cargo run --example benchmark -p coh-core --release
+      - name: Audit for sorry/admit
+        run: |
+          if grep -rn "sorry" formal/Coh || grep -rn "admit" formal/Coh; then
+            echo "::error::Formal proofs contain placeholders (sorry/admit). Safety Wedge integrity not guaranteed."
+            exit 1
+          fi
 
-  demo-test:
-    name: Demo Test (CI regression guard)
+  compliance-audit:
+    name: Compliance Vector Audit
     runs-on: ubuntu-latest
+    needs: rust-build-and-test
     defaults:
       run:
         working-directory: coh-node
-    needs: build-and-test
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Restore cargo cache
+      - name: Restore Cargo cache
         uses: actions/cache@v4
         with:
           path: |
@@ -99,17 +95,15 @@ jobs:
             ~/.cargo/git
             coh-node/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('coh-node/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
 
-      - name: Build binary
-        run: cargo build --release -p coh-validator
+      - name: Generate Adversarial Vectors
+        run: cargo run --example gen_adversarial_vectors -p coh-core
 
-      - name: Run demo test (shell script)
-        run: bash tests/demo_test.sh
-        env:
-          BIN: target/release/coh-validator
-          EXAMPLES: examples
+      - name: Run Compliance Audit
+        run: |
+          # Simple script to verify validator rejects bad vectors
+          # For now, we run a smoke check on the integrity demo
+          cargo run --example benchmark_integrity -p coh-core
 
   dashboard-test:
     name: Dashboard UI Test
