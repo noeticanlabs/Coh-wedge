@@ -1,0 +1,14 @@
+{"log":
+ [{"message":
+   ".> LEAN_PATH=.\\.\\.lake/packages\\Cli\\.lake\\build\\lib;.\\.\\.lake/packages\\batteries\\.lake\\build\\lib;.\\.\\.lake/packages\\Qq\\.lake\\build\\lib;.\\.\\.lake/packages\\aesop\\.lake\\build\\lib;.\\.\\.lake/packages\\proofwidgets\\.lake\\build\\lib;.\\.\\.lake/packages\\importGraph\\.lake\\build\\lib;.\\.\\.lake/packages\\LeanSearchClient\\.lake\\build\\lib;.\\.\\.lake/packages\\plausible\\.lake\\build\\lib;.\\.\\.lake/packages\\mathlib\\.lake\\build\\lib;.\\.\\.lake\\build\\lib PATH c:\\Users\\truea\\.elan\\toolchains\\leanprover--lean4---v4.16.0\\bin\\lean.exe .\\.\\.\\.\\Coh\\Spectral\\T4_Visibility.lean -R .\\.\\.\\. -o .\\.\\.lake\\build\\lib\\Coh\\Spectral\\T4_Visibility.olean -i .\\.\\.lake\\build\\lib\\Coh\\Spectral\\T4_Visibility.ilean -c .\\.\\.lake\\build\\ir\\Coh\\Spectral\\T4_Visibility.c --json",
+   "level": "trace"},
+  {"message":
+   ".\\.\\.\\.\\Coh\\Spectral\\T4_Visibility.lean:50:8: declaration uses 'sorry'",
+   "level": "warning"},
+  {"message":
+   ".\\.\\.\\.\\Coh\\Spectral\\T4_Visibility.lean:57:0: automatically included section variable(s) unused in theorem 'Coh.Spectral.visibility_bound':\n  [MetricSpace G]\nconsider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:\n  omit [MetricSpace G] in theorem ...\nnote: this linter can be disabled with `set_option linter.unusedSectionVars false`",
+   "level": "warning"},
+  {"message":
+   ".\\.\\.\\.\\Coh\\Spectral\\T4_Visibility.lean:68:8: declaration uses 'sorry'",
+   "level": "warning"}],
+ "depHash": "10811381908009021134"}

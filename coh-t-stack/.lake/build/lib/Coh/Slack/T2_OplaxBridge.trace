@@ -1,0 +1,11 @@
+{"log":
+ [{"message":
+   ".> LEAN_PATH=.\\.\\.lake/packages\\Cli\\.lake\\build\\lib;.\\.\\.lake/packages\\batteries\\.lake\\build\\lib;.\\.\\.lake/packages\\Qq\\.lake\\build\\lib;.\\.\\.lake/packages\\aesop\\.lake\\build\\lib;.\\.\\.lake/packages\\proofwidgets\\.lake\\build\\lib;.\\.\\.lake/packages\\importGraph\\.lake\\build\\lib;.\\.\\.lake/packages\\LeanSearchClient\\.lake\\build\\lib;.\\.\\.lake/packages\\plausible\\.lake\\build\\lib;.\\.\\.lake/packages\\mathlib\\.lake\\build\\lib;.\\.\\.lake\\build\\lib PATH c:\\Users\\truea\\.elan\\toolchains\\leanprover--lean4---v4.16.0\\bin\\lean.exe .\\.\\.\\.\\Coh\\Slack\\T2_OplaxBridge.lean -R .\\.\\.\\. -o .\\.\\.lake\\build\\lib\\Coh\\Slack\\T2_OplaxBridge.olean -i .\\.\\.lake\\build\\lib\\Coh\\Slack\\T2_OplaxBridge.ilean -c .\\.\\.lake\\build\\ir\\Coh\\Slack\\T2_OplaxBridge.c --json",
+   "level": "trace"},
+  {"message":
+   ".\\.\\.\\.\\Coh\\Slack\\T2_OplaxBridge.lean:7:4: declaration uses 'sorry'",
+   "level": "warning"},
+  {"message":
+   ".\\.\\.\\.\\Coh\\Slack\\T2_OplaxBridge.lean:11:4: declaration uses 'sorry'",
+   "level": "warning"}],
+ "depHash": "17445170063496761584"}

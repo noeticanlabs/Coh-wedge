@@ -1,6 +1,6 @@
-import Mathlib.Analysis.MetricSpace.Basic
-import Mathlib Topology.MetricSpace
+import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.LinearAlgebra.FiniteDimensional
+import Mathlib.Analysis.InnerProductSpace.Basic
 
 namespace Coh.Spectral
 
@@ -18,38 +18,22 @@ strict positivity of the minimum.
 We now add the kernel-free condition and prove the uniform bound.
 -/
 
-/-- T4: The Visibility Theorem. -/
+/- T4: The Visibility Theorem. -/
 
-/-- Defect operator Delta as a function of the Gamma family. -/
+/- Defect operator Delta as a function of the Gamma family. -/
 variable {G : Type u} [MetricSpace G] (Δ : G → ℝ)
-variable {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]
+variable {E : Type} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [Module.Finite ℝ E]
 
 /-- Sub-lemma D.1: Continuity of the defect operator.
     The defect operator Δ is assumed to be continuous. -/
-theorem defect_continuous [TopologicalSpace G] (h : Continuous Δ) : Continuous Δ := h
+theorem defect_continuous (h : Continuous Δ) : Continuous Δ := h
 
 /-- Sub-lemma D.2: Closedness of the zero-defect set.
     The set {g | Δ(g) = 0} is closed as the preimage of the closed set {0}
     under a continuous function. -/
-theorem zero_defect_closed [TopologicalSpace G] (h : Continuous Δ) :
+theorem zero_defect_closed (h : Continuous Δ) :
     IsClosed {g : G | Δ g = 0} :=
   isClosed_eq h continuous_const
-
-/-- Sub-lemma D.3: Precompactness of admissible operators.
-    In a finite-dimensional space, bounded sets are precompact. -/
-theorem admissible_precompact (B : Set E) (hB : IsBounded B) : IsPrecompact B :=
-  isBounded_isPrecompact hB
-
-/-- Sub-lemma D.4: Separation Lemma.
-    If an operator breaks the rules (Δ(g) ≠ 0), its distance to the zero-defect
-    set is strictly positive. This follows from the fact that the zero-defect set
-    is closed and g is not in it. -/
-theorem positive_separation [TopologicalSpace G] (hCont : Continuous Δ)
-    (g : G) (h : Δ g ≠ 0) :
-    dist g {x : G | Δ x = 0} > 0 := by
-  have : IsClosed {x : G | Δ x = 0} := zero_defect_closed hCont
-  have : g ∉ {x : G | Δ x = 0} := h
-  exact Metric.pos_of_not_mem closure_eq_self this
 
 /-!
 ### Fix 4: Uniform bound with kernel-free condition
@@ -65,27 +49,42 @@ class KernelFree (A : E →ₗ[ℝ] E) : Prop where
 /-- Lemma: Kernel-free operators have strictly positive minimum norm on unit sphere. -/
 theorem injective_operator_min_norm (A : E →ₗ[ℝ] E) [KernelFree A] :
     ∃ ε : ℝ, ε > 0 ∧ ∀ v : E, ‖v‖ = 1 → ‖A v‖ ≥ ε := by
-  /- Since A is injective, it's bounded below on the unit sphere.
-     This follows from the fact that the unit sphere is compact and
-     ‖Av‖ is continuous, so it achieves a minimum which must be positive
-     because otherwise A would have a nontrivial kernel. -/
-  let f : E → ℝ := fun v => ‖A v‖
-  have hf_cont : Continuous f := by continuity
-  let S := {v : E | ‖v‖ = 1}
-  have h_comp : IsCompact S := isCompact_sphere E 1
-  have h_nempty : S.Nonempty := by use 0; simp
-  let ⟨v₀, hv₀⟩ := hf_cont.exists_isMinOn h_comp h_nempty
-  exists ‖A v₀‖
-  constructor
-  · /- The minimum must be positive because if ‖A v₀‖ = 0, then v₀ ∈ ker A,
-       contradicting kernel-freeness -/
-    by_contra hzero
-    have : v₀ ∈ LinearMap.ker A := by simp [hv₀, hzero]
-    have : v₀ ∈ (KernelFree.ker_eq_zero : LinearMap.ker A = ⊥) := this
-    simp at this
-  · intro v hv
-    have := hv₀ v hv
-    simp [this]
+  by_cases h_empty : (Metric.sphere (0 : E) 1).Nonempty
+  · have h_comp : IsCompact (Metric.sphere (0 : E) 1) := isCompact_sphere 0 1
+    have h_cont : Continuous (fun v => ‖A v‖) := continuous_norm.comp A.continuous_of_finiteDimensional
+    obtain ⟨v_min, hv_min_in, h_min⟩ := h_comp.exists_isMinOn h_empty h_cont.continuousOn
+    have h_v_min_norm : ‖v_min‖ = 1 := by
+      exact mem_sphere_zero_iff_norm.mp hv_min_in
+    have h_v_min_ne_zero : v_min ≠ 0 := by
+      intro h_eq
+      rw [h_eq, norm_zero] at h_v_min_norm
+      exact zero_ne_one h_v_min_norm
+    have h_A_v_min_ne_zero : A v_min ≠ 0 := by
+      intro h_eq
+      have h_ker := KernelFree.ker_eq_zero (A := A)
+      have h_in_ker : v_min ∈ LinearMap.ker A := by
+        exact LinearMap.mem_ker.mpr h_eq
+      rw [h_ker] at h_in_ker
+      have h_v_min_zero : v_min = 0 := by
+        exact h_in_ker
+      exact h_v_min_ne_zero h_v_min_zero
+    have h_pos : ‖A v_min‖ > 0 := norm_pos_iff.mpr h_A_v_min_ne_zero
+    use ‖A v_min‖
+    constructor
+    · exact h_pos
+    · intro v hv
+      have hv_in : v ∈ Metric.sphere (0 : E) 1 := mem_sphere_zero_iff_norm.mpr hv
+      have h_le := h_min hv_in
+      exact h_le
+  · use 1
+    constructor
+    · exact zero_lt_one
+    · intro v hv
+      have hv_in : v ∈ Metric.sphere (0 : E) 1 := mem_sphere_zero_iff_norm.mpr hv
+      exfalso
+      exact h_empty ⟨v, hv_in⟩
+
+set_option linter.unusedSectionVars false
 
 /-- Theorem T4: visibility_bound (pointwise version).
     Any deviation from ideal algebraic symmetry produces an observable anomaly. -/
@@ -101,19 +100,24 @@ theorem visibility_bound (g : G) (h : Δ g ≠ 0) : ∃ ε : ℝ, ε > 0 ∧ |Δ
 
     This is the referee-safe version that properly handles the compactness argument. -/
 theorem uniform_visibility_bound (A : E →ₗ[ℝ] E) [KernelFree A]
-    (Δ : E → ℝ) (h_defect : Δ = fun v => ‖A v‖²) :
+    (Δ : E → ℝ) (h_defect : Δ = fun v => ‖A v‖ ^ 2) :
     ∃ ε > 0, ∀ v : E, ‖v‖ = 1 → |Δ v| ≥ ε := by
-  have ⟨ε, hε, hbound⟩ := injective_operator_min_norm A
-  exists ε
+  obtain ⟨ε, h_pos, h_bound⟩ := injective_operator_min_norm A
+  use ε ^ 2
   constructor
-  · exact hε
+  · exact sq_pos_of_pos h_pos
   · intro v hv
-    calc |Δ v|
-         = |‖A v‖²|
-           := by rw [h_defect]
-         _ = ‖A v‖²
-           := by exact abs_of_nonneg (sq_pos (norm_nonneg (A v)))
-         _ ≥ ε²
-           := by exact pow_le_pow (hbound v hv) 2
+    rw [h_defect]
+    dsimp
+    have h_A_v : ‖A v‖ ≥ ε := h_bound v hv
+    have h_sq_ge : ‖A v‖ ^ 2 ≥ ε ^ 2 := by
+      have h_ε_nonneg : 0 ≤ ε := le_of_lt h_pos
+      exact sq_le_sq.mpr (by
+        rw [abs_of_nonneg (norm_nonneg _), abs_of_nonneg h_ε_nonneg]
+        exact h_A_v
+      )
+    have h_nonneg : ‖A v‖ ^ 2 ≥ 0 := sq_nonneg _
+    rw [abs_of_nonneg h_nonneg]
+    exact h_sq_ge
 
 end Coh.Spectral

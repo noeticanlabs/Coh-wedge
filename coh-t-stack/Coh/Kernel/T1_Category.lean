@@ -1,5 +1,6 @@
 import Coh.Kernel.Receipt
 import Coh.Kernel.Verifier
+import Mathlib.Tactic.Linarith
 
 namespace Coh.Kernel
 
@@ -34,7 +35,7 @@ structure LawfulTransition (X : Type u) where
 def CatObj (X : Type u) : Type u := X
 
 /-- Identity transition is lawful. -/
-def transition_id (x : CatObj X) : Receipt :=
+def transition_id (_ : CatObj X) : Receipt :=
   { pre := 0, post := 0, spend := 0, defect := 0, authority := 0 }
 
 lemma transition_id_lawful (x : CatObj X) : Lawful (transition_id x) := by
@@ -48,10 +49,8 @@ def transition_comp (r2 r1 : Receipt) : Receipt :=
 
 theorem transition_comp_lawful (r2 r1 : Receipt) (h2 : Lawful r2) (h1 : Lawful r1)
     (h_compat : r1.post = r2.pre) : Lawful (transition_comp r2 r1) := by
-  unfold Lawful transition_comp
-  rw [h_compat]
-  have h1' : r1.post + r1.spend <= r1.pre + r1.defect + r1.authority := h1
-  have h2' : r2.post + r2.spend <= r2.pre + r2.defect + r2.authority := h2
+  unfold Lawful transition_comp at *
+  dsimp at *
   linarith
 
 /-- T1: Strict Coh System definition
@@ -100,43 +99,14 @@ structure SmallCategory (X : Type u) where
 
 /-- T1: the admissible fragment of a strict Coh system carries a small-category structure.
     This is the Categorical Ledger proof of T1. -/
-theorem T1_StrictCoh_to_Category {X : Type u} (C : StrictCoh X) :
-    SmallCategory C.obj :=
-  /- We construct the category where:
-       Objects = C.obj
-       Morphisms = admissible morphisms (those where RV f = true)
-       Identity = id x (which is admissible by rv_id)
-       Composition = comp g f (which is admissible by rv_comp when both inputs are)
-    -/
-  let Hom' (x y : C.obj) := Σ (f : C.Hom x y), (C.RV f = true)
-
-  /- Identity morphism -/
-  let id' (x : C.obj) : Hom' x x :=
-    ⟨C.id x, C.rv_id x⟩
-
-  /- Composition of admissible morphisms -/
-  let comp' {x y z : C.obj} (g : Hom' y z) (f : Hom' x y) : Hom' x z :=
-    ⟨C.comp g.fst f.fst, C.rv_comp g.fst f.fst g.snd f.snd⟩
-
-  /- Category axioms are inherited from C -/
-  { Hom := Hom',
-    id := id',
-    comp := comp',
-    id_comp := by
-      intro x y f
-      simp [id', comp']
-      /- Need to use C's id_comp -/
-      have := C.id_comp f.fst
-      simp [this],
-    comp_id := by
-      intro x y f
-      simp [id', comp']
-      have := C.comp_id f.fst
-      simp [this],
-    assoc := by
-      intro w x y z f g h
-      simp [comp']
-      have := C.assoc h.fst g.fst f.fst
-      simp [this] }
+def T1_StrictCoh_to_Category {X : Type u} (C : StrictCoh X) :
+    SmallCategory C.obj := {
+  Hom := fun x y => { f : C.Hom x y // C.RV f = true }
+  id := fun x => ⟨C.id x, C.rv_id x⟩
+  comp := fun g f => ⟨C.comp g.val f.val, C.rv_comp g.val f.val g.property f.property⟩
+  id_comp := fun f => Subtype.ext (C.id_comp f.val)
+  comp_id := fun f => Subtype.ext (C.comp_id f.val)
+  assoc := fun f g h => Subtype.ext (C.assoc f.val g.val h.val)
+}
 
 end Coh.Kernel

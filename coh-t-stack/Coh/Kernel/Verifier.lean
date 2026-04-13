@@ -13,22 +13,20 @@ inductive Decision
   deriving DecidableEq
 
 /-- The Operational Verifier logic. -/
-def verify (r : Receipt) : Decision :=
+noncomputable def verify (r : Receipt) : Decision :=
   if r.post + r.spend <= r.pre + r.defect + r.authority then Decision.accept else Decision.reject
 
 /-- Theorem A.2.1: verify_accept_iff -/
-lemma verify_accept_iff (r : Receipt) : verify r = Decision.accept ? Lawful r := by
+lemma verify_accept_iff (r : Receipt) : verify r = Decision.accept ↔ Lawful r := by
   unfold verify Lawful
-  split
-  · simp
-  · simp [h]
+  split <;> simp_all
 
 /-- Theorem A.2.2: verify_sound -/
-lemma verify_sound (r : Receipt) : verify r = Decision.accept ? Lawful r :=
+lemma verify_sound (r : Receipt) : verify r = Decision.accept → Lawful r :=
   (verify_accept_iff r).mp
 
 /-- Theorem A.2.3: verify_complete -/
-lemma verify_complete (r : Receipt) : Lawful r ? verify r = Decision.accept :=
+lemma verify_complete (r : Receipt) : Lawful r → verify r = Decision.accept :=
   (verify_accept_iff r).mpr
 
 end Coh.Kernel

@@ -5,6 +5,6 @@ namespace Coh
 universe u
 
 /-- Real number type alias for explicit proof readability. -/
-abbrev R := R
+abbrev CohR := ℝ
 
 end Coh

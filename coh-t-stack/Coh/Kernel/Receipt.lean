@@ -6,14 +6,14 @@ universe u
 
 /-- Core Receipt structure representing a discrete state transition. -/
 structure Receipt where
-  pre : R
-  post : R
-  spend : R
-  defect : R
-  authority : R := 0
+  pre : ℝ
+  post : ℝ
+  spend : ℝ
+  defect : ℝ
+  authority : ℝ := 0
 
 /-- Morphism mapping between state spaces. -/
-def map (f : R ? R) (r : Receipt) : Receipt where
+def map (f : ℝ → ℝ) (r : Receipt) : Receipt where
   pre := f r.pre
   post := f r.post
   spend := r.spend
@@ -21,15 +21,15 @@ def map (f : R ? R) (r : Receipt) : Receipt where
   authority := r.authority
 
 /-- Lemma A.1.1: map_pre -/
-lemma map_pre (f : R ? R) (r : Receipt) : (map f r).pre = f r.pre := rfl
+lemma map_pre (f : ℝ → ℝ) (r : Receipt) : (map f r).pre = f r.pre := rfl
 
 /-- Lemma A.1.2: map_post -/
-lemma map_post (f : R ? R) (r : Receipt) : (map f r).post = f r.post := rfl
+lemma map_post (f : ℝ → ℝ) (r : Receipt) : (map f r).post = f r.post := rfl
 
 /-- Lemma A.1.3: map_spend -/
-lemma map_spend (f : R ? R) (r : Receipt) : (map f r).spend = r.spend := rfl
+lemma map_spend (f : ℝ → ℝ) (r : Receipt) : (map f r).spend = r.spend := rfl
 
 /-- Lemma A.1.4: map_defect -/
-lemma map_defect (f : R ? R) (r : Receipt) : (map f r).defect = r.defect := rfl
+lemma map_defect (f : ℝ → ℝ) (r : Receipt) : (map f r).defect = r.defect := rfl
 
 end Coh.Kernel
