@@ -6,7 +6,7 @@ namespace Coh.Core
 open Coh.Kernel
 
 abbrev Decision := Coh.Kernel.Decision
-abbrev verify := Coh.Kernel.verify
+noncomputable abbrev verify := Coh.Kernel.verify
 
 theorem verify_accept_iff_lawful (r : Receipt) :
     verify r = Decision.accept ↔ Lawful r :=

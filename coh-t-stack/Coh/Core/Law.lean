@@ -22,7 +22,7 @@ def LawfulUpTo (Δ : ℝ) (r : Receipt) : Prop :=
 theorem lawful_iff_lawfulUpTo_zero (r : Receipt) :
     Lawful r ↔ LawfulUpTo 0 r := by
   unfold Lawful LawfulUpTo Coh.Kernel.Lawful
-  simpa
+  simp
 
 theorem lawfulUpTo_of_lawful (r : Receipt) {Δ : ℝ}
     (hLawful : Lawful r) (hΔ : 0 ≤ Δ) : LawfulUpTo Δ r := by
