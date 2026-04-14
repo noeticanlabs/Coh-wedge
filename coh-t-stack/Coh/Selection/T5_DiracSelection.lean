@@ -93,12 +93,7 @@ theorem dirac_dimension_from_clifford_equiv
     Module.finrank ℂ A = 2^n := by
   rw [← algebraEquiv_preserves_finrank h_equiv, h_cliff_dim]
 
-theorem Q_equivalent_sum_squares
-    {n : ℕ} (η : Fin n → ℂ)
-    (hQ : (QuadraticMap.associated (R := ℂ) (N := ℂ) (Q n η)).SeparatingLeft) :
-    QuadraticMap.Equivalent (Q n η)
-      (QuadraticMap.weightedSumSquares ℂ (1 : Fin n → ℂ)) := by
-  simpa [Q_def] using QuadraticForm.equivalent_sum_squares (Q := Q n η) hQ
+
 
 /-- T5: Dirac inevitability under explicit Clifford/PBW hypotheses.
 

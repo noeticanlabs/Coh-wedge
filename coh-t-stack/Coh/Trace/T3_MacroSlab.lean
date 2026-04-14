@@ -17,6 +17,6 @@ def Functor_Adm {X : Type u} (C : Coh.Kernel.StrictCoh X) :
 -- This establishes the "Macro Slab" categorical embedding from T3.
 def embeddingK {X : Type u} (C : Coh.Kernel.SmallCategory X) :
     Coh.Kernel.SmallCategory X :=
-  T2_Category_to_StrictCoh C
+  Coh.Slack.T2_Category_to_StrictCoh C
 
 end Coh.Trace

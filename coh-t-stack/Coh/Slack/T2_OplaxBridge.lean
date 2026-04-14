@@ -16,7 +16,7 @@ def Category_to_StrictCoh {X : Type u} (C : Coh.Kernel.SmallCategory X) :
     id := C.id,
     comp := C.comp,
     RV := fun _ => true,
-    rv_sound := fun f _ => by simp only [R, Coh.Kernel.Lawful, zero_add, and_self],
+    rv_sound := fun f _ => by simp [R, Coh.Kernel.Lawful],
     rv_id := fun _ => rfl,
     rv_comp := fun _ _ _ _ => rfl,
     id_comp := C.id_comp,
