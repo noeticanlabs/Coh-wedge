@@ -67,8 +67,38 @@ and Cl(ℂ^4) ≅ M_4(ℂ), so dim = 16.
 
 set_option linter.unusedVariables false
 
--- Step 1: Abstract quadratic form placeholder for the strengthened statement.
-opaque Q (n : ℕ) (η : Fin n → ℂ) : QuadraticForm ℂ (Fin n → ℂ)
+/-- Explicit quadratic form used in T5, modeled as a weighted sum of squares on `Fin n → ℂ`. -/
+def Q (n : ℕ) (η : Fin n → ℂ) : QuadraticForm ℂ (Fin n → ℂ) :=
+  QuadraticMap.weightedSumSquares ℂ η
+
+@[simp] theorem Q_def (n : ℕ) (η : Fin n → ℂ) :
+    Q n η = QuadraticMap.weightedSumSquares ℂ η := rfl
+
+@[simp] theorem Q_apply (n : ℕ) (η : Fin n → ℂ) (v : Fin n → ℂ) :
+    Q n η v = ∑ i : Fin n, η i * (v i * v i) := by
+  simp [Q, QuadraticMap.weightedSumSquares_apply]
+
+theorem algebraEquiv_preserves_finrank
+    {A B : Type} [Ring A] [Ring B] [Algebra ℂ A] [Algebra ℂ B]
+    [Module.Finite ℂ A] [Module.Finite ℂ B] (e : A ≃ₐ[ℂ] B) :
+    Module.finrank ℂ A = Module.finrank ℂ B :=
+  LinearEquiv.finrank_eq e.toLinearEquiv
+
+theorem dirac_dimension_from_clifford_equiv
+    {n : ℕ} (η : Fin n → ℂ)
+    (A : Type) [Ring A] [Algebra ℂ A] [Module.Finite ℂ A]
+    [Module.Finite ℂ (CliffordAlgebra (Q n η))]
+    (h_cliff_dim : Module.finrank ℂ (CliffordAlgebra (Q n η)) = 2^n)
+    (h_equiv : CliffordAlgebra (Q n η) ≃ₐ[ℂ] A) :
+    Module.finrank ℂ A = 2^n := by
+  rw [← algebraEquiv_preserves_finrank h_equiv, h_cliff_dim]
+
+theorem Q_equivalent_sum_squares
+    {n : ℕ} (η : Fin n → ℂ)
+    (hQ : (QuadraticMap.associated (R := ℂ) (N := ℂ) (Q n η)).SeparatingLeft) :
+    QuadraticMap.Equivalent (Q n η)
+      (QuadraticMap.weightedSumSquares ℂ (1 : Fin n → ℂ)) := by
+  simpa [Q_def] using QuadraticForm.equivalent_sum_squares (Q := Q n η) hQ
 
 /-- T5: Dirac inevitability under explicit Clifford/PBW hypotheses.
 
@@ -90,8 +120,6 @@ theorem T5_Dirac_inevitability
   use n
   constructor
   · rfl
-  · have h_iso : Module.finrank ℂ (CliffordAlgebra (Q n η)) = Module.finrank ℂ A :=
-      LinearEquiv.finrank_eq h_equiv.toLinearEquiv
-    rw [← h_iso, h_cliff_dim]
+  · exact dirac_dimension_from_clifford_equiv η A h_cliff_dim h_equiv
 
 end Coh.Selection
