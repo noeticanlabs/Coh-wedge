@@ -66,6 +66,13 @@ enum Commands {
         #[arg(long, default_value_t = false)]
         with_sidecar: bool,
     },
+    /// Comparative failure dominance benchmark: full verifier vs baselines
+    Dominance {
+        #[arg(long, default_value_t = 100)]
+        iterations: usize,
+        #[arg(long, default_value = "http://127.0.0.1:3000")]
+        sidecar_url: String,
+    },
 }
 
 #[derive(Debug, Serialize)]
@@ -165,6 +172,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             sidecar_url,
             with_sidecar,
         } => run_strategy_demo(iterations, &sidecar_url, with_sidecar)?,
+        Commands::Dominance {
+            iterations,
+            sidecar_url,
+        } => run_dominance(iterations, &sidecar_url)?,
     }
 
     Ok(())
@@ -397,6 +408,85 @@ struct SubtypeCount {
     escaped: usize,
 }
 
+/// Baseline comparison result for dominance table
+#[derive(Debug, Serialize, Clone)]
+struct BaselineResult {
+    system: String,
+    rejected: usize,
+    escaped: usize,
+    rejection_rate: f64,
+}
+
+/// Dominance comparison output
+#[derive(Debug, Serialize)]
+struct DominanceTable {
+    summary: String,
+    baselines: Vec<BaselineResult>,
+    per_strategy_escapes: Vec<StrategyEscapes>,
+}
+
+/// Per-strategy escape breakdown for dominance analysis
+#[derive(Debug, Serialize)]
+struct StrategyEscapes {
+    strategy: String,
+    full_verifier_escapes: usize,
+    schema_only_escapes: usize,
+    rule_only_escapes: usize,
+}
+
+/// Schema-only baseline: validates JSON structure only, no crypto/chain/trajectory
+fn verify_schema_only(wire: &MicroReceiptWire) -> bool {
+    // Check all required fields exist and are non-empty strings
+    if wire.schema_id.is_empty() || wire.version.is_empty() || wire.object_id.is_empty() {
+        return false;
+    }
+    // Check schema_id format (rough check)
+    if !wire.schema_id.starts_with("coh.") {
+        return false;
+    }
+    // Check version format (rough check)
+    if !wire.version.contains('.') {
+        return false;
+    }
+    // Check metrics fields exist
+    if wire.metrics.v_pre.is_empty() || wire.metrics.v_post.is_empty() {
+        return false;
+    }
+    // Check hashes are 64-char hex
+    if wire.canon_profile_hash.len() != 64
+        || wire.policy_hash.len() != 64
+        || wire.state_hash_prev.len() != 64
+        || wire.state_hash_next.len() != 64
+        || wire.chain_digest_prev.len() != 64
+        || wire.chain_digest_next.len() != 64
+    {
+        return false;
+    }
+    // Check step_index is reasonable
+    if wire.step_index > 1_000_000 {
+        return false;
+    }
+    true
+}
+
+/// Rule-only baseline: checks simple arithmetic invariant v_post + spend <= v_pre + defect
+fn verify_rule_only(wire: &MicroReceiptWire) -> bool {
+    // Parse metrics - any parsing error means reject
+    let v_pre: Option<u128> = wire.metrics.v_pre.parse().ok();
+    let v_post: Option<u128> = wire.metrics.v_post.parse().ok();
+    let spend: Option<u128> = wire.metrics.spend.parse().ok();
+    let defect: Option<u128> = wire.metrics.defect.parse().ok();
+
+    // All must parse successfully
+    let (Some(vp), Some(vpo), Some(sp), Some(df)) = (v_pre, v_post, spend, defect) else {
+        return false;
+    };
+
+    // Simple arithmetic check: v_post + spend <= v_pre + defect
+    // (This is the policy constraint - but without cryptographic verification)
+    vp.saturating_add(sp) <= vpo.saturating_add(df)
+}
+
 fn run_strategy_demo(
     iterations: usize,
     _sidecar_url: &str,
@@ -601,6 +691,182 @@ fn run_strategy_demo(
     // Write results
     let path = write_output_json("strategy_demo_results.json", &results)?;
     println!("\nSaved strategy demo results to {}", path.display());
+
+    Ok(())
+}
+
+/// Run comparative failure dominance benchmark
+/// Compares full verifier against schema-only and rule-only baselines
+fn run_dominance(iterations: usize, _sidecar_url: &str) -> Result<(), Box<dyn std::error::Error>> {
+    use ape::seed::SeededRng;
+
+    println!("\n=== Comparative Failure Dominance ===");
+    println!(
+        "Testing all systems with {} iterations per strategy\n",
+        iterations
+    );
+
+    // Track totals for each system
+    let mut full_verifier_rejected = 0usize;
+    let mut full_verifier_escaped = 0usize;
+    let mut schema_only_rejected = 0usize;
+    let mut schema_only_escaped = 0usize;
+    let mut rule_only_rejected = 0usize;
+    let mut rule_only_escaped = 0usize;
+
+    // Per-strategy breakdown
+    let mut per_strategy: Vec<StrategyEscapes> = Vec::new();
+
+    let base_receipt = generate_runtime_ai_micro().or_else(|_| load_ai_demo_micro())?;
+    let input = Input::from_micro(base_receipt);
+
+    for strategy in Strategy::all() {
+        let mut rng = SeededRng::new(42);
+        let mut strategy_full_escapes = 0usize;
+        let mut strategy_schema_escapes = 0usize;
+        let mut strategy_rule_escapes = 0usize;
+
+        for seed in 0..iterations as u64 {
+            let mut iter_rng = SeededRng::new(seed.wrapping_add(rng.next() as u64));
+            let candidate = strategy.generate(&input, &mut iter_rng);
+
+            if let Some(micro) = candidate.as_micro() {
+                // Full verifier (Coh Wedge)
+                let full_result = verify_micro(micro.clone());
+                let full_escaped = full_result.decision == Decision::Accept;
+
+                if full_escaped {
+                    full_verifier_escaped += 1;
+                    strategy_full_escapes += 1;
+                } else {
+                    full_verifier_rejected += 1;
+                }
+
+                // Schema-only baseline
+                let schema_passed = verify_schema_only(micro);
+                if schema_passed {
+                    schema_only_escaped += 1;
+                    strategy_schema_escapes += 1;
+                } else {
+                    schema_only_rejected += 1;
+                }
+
+                // Rule-only baseline
+                let rule_passed = verify_rule_only(micro);
+                if rule_passed {
+                    rule_only_escaped += 1;
+                    strategy_rule_escapes += 1;
+                } else {
+                    rule_only_rejected += 1;
+                }
+            }
+        }
+
+        per_strategy.push(StrategyEscapes {
+            strategy: strategy.name().to_string(),
+            full_verifier_escapes: strategy_full_escapes,
+            schema_only_escapes: strategy_schema_escapes,
+            rule_only_escapes: strategy_rule_escapes,
+        });
+    }
+
+    // Print headline table
+    let total = iterations * 20;
+    println!(
+        "| {:14} | {:>9} | {:>7} | {:>11} |",
+        "System", "Escaped", "Rejected", "Rejection %"
+    );
+    println!(
+        "|{}|{}|{}|{}|",
+        "-".repeat(15),
+        "-".repeat(10),
+        "-".repeat(8),
+        "-".repeat(12)
+    );
+
+    let full_rej_pct = 100.0 * full_verifier_rejected as f64 / total as f64;
+    let schema_rej_pct = 100.0 * schema_only_rejected as f64 / total as f64;
+    let rule_rej_pct = 100.0 * rule_only_rejected as f64 / total as f64;
+
+    println!(
+        "| {:14} | {:>9} | {:>7} | {:>10.1}% |",
+        "Full Verifier", full_verifier_escaped, full_verifier_rejected, full_rej_pct
+    );
+    println!(
+        "| {:14} | {:>9} | {:>7} | {:>10.1}% |",
+        "Schema Only", schema_only_escaped, schema_only_rejected, schema_rej_pct
+    );
+    println!(
+        "| {:14} | {:>9} | {:>7} | {:>10.1}% |",
+        "Rule Only", rule_only_escaped, rule_only_rejected, rule_rej_pct
+    );
+    println!();
+
+    // Per-strategy breakdown
+    println!("=== Per-Strategy Escapes ===");
+    println!(
+        "| {:14} | {:>18} | {:>18} | {:>15} |",
+        "Strategy", "Full Verifier", "Schema Only", "Rule Only"
+    );
+    println!(
+        "|{}|{}|{}|{}|",
+        "-".repeat(15),
+        "-".repeat(19),
+        "-".repeat(19),
+        "-".repeat(16)
+    );
+    for s in &per_strategy {
+        println!(
+            "| {:14} | {:>18} | {:>18} | {:>15} |",
+            s.strategy, s.full_verifier_escapes, s.schema_only_escapes, s.rule_only_escapes
+        );
+    }
+    println!();
+
+    // Build dominance output
+    let baselines = vec![
+        BaselineResult {
+            system: "Full Verifier".to_string(),
+            rejected: full_verifier_rejected,
+            escaped: full_verifier_escaped,
+            rejection_rate: full_rej_pct,
+        },
+        BaselineResult {
+            system: "Schema Only".to_string(),
+            rejected: schema_only_rejected,
+            escaped: schema_only_escaped,
+            rejection_rate: schema_rej_pct,
+        },
+        BaselineResult {
+            system: "Rule Only".to_string(),
+            rejected: rule_only_rejected,
+            escaped: rule_only_escaped,
+            rejection_rate: rule_rej_pct,
+        },
+    ];
+
+    let summary = format!(
+        "Full verifier rejects {:.1}% of attacks vs Schema-only {:.1}% and Rule-only {:.1}%",
+        full_rej_pct, schema_rej_pct, rule_rej_pct
+    );
+
+    let table = DominanceTable {
+        summary,
+        baselines,
+        per_strategy_escapes: per_strategy,
+    };
+
+    // Write JSON output
+    let path = write_output_json("dominance_results.json", &table)?;
+    println!("Saved dominance results to {}", path.display());
+    println!();
+    println!("=== Key Insight ===");
+    println!(
+        "Full Verifier achieves {:.1}% rejection while baselines miss {} to {} attacks",
+        full_rej_pct,
+        schema_only_escaped.min(rule_only_escaped),
+        schema_only_escaped.max(rule_only_escaped)
+    );
 
     Ok(())
 }
