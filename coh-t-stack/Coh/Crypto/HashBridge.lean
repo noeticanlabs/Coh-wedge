@@ -1,4 +1,4 @@
-import Coh.Crypto.SHA256Spec
+﻿import Coh.Crypto.SHA256Spec
 import Coh.Crypto.JCS
 
 namespace Coh.Crypto
@@ -42,19 +42,20 @@ theorem chain_preimage_eq (r : MicroReceipt) :
 theorem hashBytes_refines_sha256_spec_at_chain_boundary (input : ByteSeq) :
     hashBytes input = sha256_spec input := rfl
 
-/-- Placeholder for the refinement theorem; needs investigation. -/
-axiom digestUpdate_refines_sha256_spec
+theorem digestUpdate_refines_sha256_spec
     (r : MicroReceipt)
     (hPayload : PayloadMatchesCanonicalJson r) :
-    digestUpdate r.chainDigestPrev r.canonicalPayload = sha256_spec (canonicalDigestInputBytes r)
+    digestUpdate r.chainDigestPrev r.canonicalPayload = sha256_spec (canonicalDigestInputBytes r) := by
+  simp [digestUpdate, sha256_spec, digestPreimage, canonicalDigestInputBytes, rustChainDigestInputBytes, hPayload]
 
-/-- Placeholder for the full spec equivalence; needs investigation. -/
-axiom compute_chain_digest_eq_spec
+theorem compute_chain_digest_eq_spec
     (r : MicroReceipt)
     (hPayload : PayloadMatchesCanonicalJson r) :
     digestUpdate r.chainDigestPrev r.canonicalPayload =
       sha256_spec
         (rustChainDigestInputBytes r.chainDigestPrev
-          (receiptProjectionCanonicalJson (receiptProjectionOf r)))
+          (receiptProjectionCanonicalJson (receiptProjectionOf r))) := by
+  rw [digestUpdate_refines_sha256_spec r hPayload]
+  rw [chain_preimage_eq r]
 
 end Coh.Crypto
