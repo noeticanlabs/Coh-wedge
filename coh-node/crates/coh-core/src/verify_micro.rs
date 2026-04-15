@@ -59,10 +59,27 @@ pub fn verify_micro(wire: MicroReceiptWire) -> VerifyMicroResult {
     if r.object_id.trim().is_empty() {
         return VerifyMicroResult {
             decision: Decision::Reject,
-            code: Some(RejectCode::RejectSchema),
+            code: Some(RejectCode::RejectMissingObjectId),
             message: "Missing object_id".to_string(),
             step_index: Some(r.step_index),
             object_id: Some("".to_string()),
+            chain_digest_next: None,
+        };
+    }
+
+    // 3.5 Signature Presence
+    let missing_sig = match &r.signatures {
+        None => true,
+        Some(sigs) => sigs.is_empty(),
+    };
+
+    if missing_sig {
+        return VerifyMicroResult {
+            decision: Decision::Reject,
+            code: Some(RejectCode::RejectMissingSignature),
+            message: "Missing required signature(s)".to_string(),
+            step_index: Some(r.step_index),
+            object_id: Some(r.object_id),
             chain_digest_next: None,
         };
     }

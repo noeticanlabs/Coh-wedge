@@ -17,16 +17,33 @@ pub enum CohErrorCode {
 impl From<RejectCode> for CohErrorCode {
     fn from(code: RejectCode) -> Self {
         match code {
+            // Local integrity failures -> E001
             RejectCode::RejectSchema
             | RejectCode::RejectCanonProfile
             | RejectCode::RejectNumericParse
             | RejectCode::RejectOverflow
-            | RejectCode::RejectIntervalInvalid => CohErrorCode::E001,
+            | RejectCode::RejectIntervalInvalid
+            | RejectCode::RejectMissingSignature
+            | RejectCode::RejectMissingObjectId
+            // Trajectory failures -> E004 (chain/continuity)
+            | RejectCode::NoProgressLoop
+            | RejectCode::StateCycleDetected
+            | RejectCode::RetryBudgetExceeded
+            | RejectCode::TemporalDriftDetected
+            | RejectCode::TrajectoryCostExceeded
+            // Resource/governance -> E001 (malformed input)
+            | RejectCode::StepBudgetExceeded
+            | RejectCode::TimeBudgetExceeded
+            | RejectCode::MemoryBudgetExceeded
+            | RejectCode::DepthLimitExceeded => CohErrorCode::E001,
 
+            // Chain/continuity -> E002
             RejectCode::RejectChainDigest | RejectCode::RejectSlabMerkle => CohErrorCode::E002,
 
+            // Policy -> E003
             RejectCode::RejectPolicyViolation | RejectCode::RejectSlabSummary => CohErrorCode::E003,
 
+            // State link -> E004
             RejectCode::RejectStateHashLink => CohErrorCode::E004,
         }
     }

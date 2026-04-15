@@ -33,6 +33,36 @@ pub enum Strategy {
     /// Adversarial Alignment: appears aligned, passes checks, hides violation
     /// Example: ideal-looking receipt with subtle inconsistency
     AdversarialAlignment,
+    /// Non-Termination: creates repeated states or zero-progress cycles
+    /// Example: oscillating state transitions that never terminate
+    NonTermination,
+    /// Livelock: triggers retry storms without resolution
+    /// Example: reject → retry → reject cycles
+    Livelock,
+    /// State Explosion: causes combinatorial growth in verification paths
+    /// Example: deeply nested or massively branched structures
+    StateExplosion,
+    /// Resource Exhaustion: pushes near memory/time/depth limits
+    /// Example: maximum chain lengths, near-limit values
+    ResourceExhaustion,
+    /// Parser Pathology: structurally nasty but superficially plausible inputs
+    /// Example: duplicate keys, giant strings, malformed optionals
+    ParserPathology,
+    /// ShadowChain: individual receipts valid, but chain_digest_prev inconsistent
+    /// Example: correct digests individually but wrong lineage connections
+    ShadowChain,
+    /// GradientDescent: cumulative small pushes toward forbidden regions
+    /// Example: each step valid, but accumulation reaches invalid state
+    GradientDescent,
+    /// OracleManipulation: exploits immutable field assumptions at creation
+    /// Example: sets reserved values that appear valid but are semantically wrong
+    OracleManipulation,
+    /// TypeConfusion: syntactically valid JSON, invalid semantic interpretation
+    /// Example: valid numbers that semantically represent impossible values
+    TypeConfusion,
+    /// ReflexiveAttack: self-referential or circular metadata
+    /// Example: receipts that reference themselves or create verification loops
+    ReflexiveAttack,
 }
 
 impl Strategy {
@@ -48,6 +78,16 @@ impl Strategy {
             Strategy::TemporalDrift => "temporal_drift",
             Strategy::AmbiguityExploitation => "ambiguity",
             Strategy::AdversarialAlignment => "adv_alignment",
+            Strategy::NonTermination => "non_term",
+            Strategy::Livelock => "livelock",
+            Strategy::StateExplosion => "state_bomb",
+            Strategy::ResourceExhaustion => "resource_x",
+            Strategy::ParserPathology => "parser_bug",
+            Strategy::ShadowChain => "shadow_chain",
+            Strategy::GradientDescent => "gradient_descent",
+            Strategy::OracleManipulation => "oracle_manip",
+            Strategy::TypeConfusion => "type_confusion",
+            Strategy::ReflexiveAttack => "reflexive",
         }
     }
 
@@ -64,6 +104,16 @@ impl Strategy {
             Strategy::TemporalDrift => "each step valid, global behavior drifts",
             Strategy::AmbiguityExploitation => "exploits undefined or optional fields",
             Strategy::AdversarialAlignment => "appears aligned, hides deeper violation",
+            Strategy::NonTermination => "repeated states or zero-progress cycles",
+            Strategy::Livelock => "retry storms without resolution",
+            Strategy::StateExplosion => "combinatorial growth in verification paths",
+            Strategy::ResourceExhaustion => "pushes near memory/time/depth limits",
+            Strategy::ParserPathology => "structurally nasty but plausible inputs",
+            Strategy::ShadowChain => "valid receipts with wrong chain lineage",
+            Strategy::GradientDescent => "tiny pushes accumulating to forbidden regions",
+            Strategy::OracleManipulation => "exploits immutable field assumptions",
+            Strategy::TypeConfusion => "syntactically valid, semantically wrong",
+            Strategy::ReflexiveAttack => "self-referential or circular metadata",
         }
     }
 
@@ -71,6 +121,7 @@ impl Strategy {
     /// Note: For now, returns raw Candidate. The metadata is added at the call site.
     pub fn generate(&self, input: &Input, rng: &mut crate::seed::SeededRng) -> Candidate {
         use crate::strategies::ai_failure_modes;
+        use crate::strategies::runtime;
         use crate::strategies::{contradiction, mutation, overflow, recombination, violation};
         match self {
             Strategy::Mutation => mutation::run(input, rng),
@@ -83,11 +134,23 @@ impl Strategy {
             Strategy::TemporalDrift => ai_failure_modes::temporal_drift(input, rng),
             Strategy::AmbiguityExploitation => ai_failure_modes::ambiguity_exploitation(input, rng),
             Strategy::AdversarialAlignment => ai_failure_modes::adversarial_alignment(input, rng),
+            Strategy::NonTermination => runtime::non_termination(input, rng),
+            Strategy::Livelock => runtime::livelock(input, rng),
+            Strategy::StateExplosion => runtime::state_explosion(input, rng),
+            Strategy::ResourceExhaustion => runtime::resource_exhaustion(input, rng),
+            Strategy::ParserPathology => runtime::parser_pathology(input, rng),
+            Strategy::ShadowChain => crate::strategies::advanced::shadow_chain(input, rng),
+            Strategy::GradientDescent => crate::strategies::advanced::gradient_descent(input, rng),
+            Strategy::OracleManipulation => {
+                crate::strategies::advanced::oracle_manipulation(input, rng)
+            }
+            Strategy::TypeConfusion => crate::strategies::advanced::type_confusion(input, rng),
+            Strategy::ReflexiveAttack => crate::strategies::advanced::reflexive_attack(input, rng),
         }
     }
 
     /// Get all strategy variants
-    pub fn all() -> [Strategy; 10] {
+    pub fn all() -> [Strategy; 20] {
         [
             Strategy::Mutation,
             Strategy::Recombination,
@@ -99,6 +162,16 @@ impl Strategy {
             Strategy::TemporalDrift,
             Strategy::AmbiguityExploitation,
             Strategy::AdversarialAlignment,
+            Strategy::NonTermination,
+            Strategy::Livelock,
+            Strategy::StateExplosion,
+            Strategy::ResourceExhaustion,
+            Strategy::ParserPathology,
+            Strategy::ShadowChain,
+            Strategy::GradientDescent,
+            Strategy::OracleManipulation,
+            Strategy::TypeConfusion,
+            Strategy::ReflexiveAttack,
         ]
     }
 }
@@ -155,6 +228,26 @@ impl Input {
             base_slab: None,
             prompt: String::new(),
         }
+    }
+
+    /// Get base micro receipt if available
+    pub fn micro(&self) -> Option<&MicroReceiptWire> {
+        self.base_micro.as_ref()
+    }
+
+    /// Get base chain if available
+    pub fn chain(&self) -> Option<&Vec<MicroReceiptWire>> {
+        self.base_chain.as_ref()
+    }
+
+    /// Get base slab if available
+    pub fn slab(&self) -> Option<&SlabReceiptWire> {
+        self.base_slab.as_ref()
+    }
+
+    /// Check if input is empty (no base data)
+    pub fn is_empty(&self) -> bool {
+        self.base_micro.is_none() && self.base_chain.is_none() && self.base_slab.is_none()
     }
 }
 

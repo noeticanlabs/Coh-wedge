@@ -2,7 +2,7 @@
 //!
 //! Dispatches strategy implementations to generate proposals.
 
-use crate::proposal::{Candidate, Input, Proposal, Strategy};
+use crate::proposal::{Input, Proposal, Strategy};
 use crate::seed::SeededRng;
 use crate::strategies;
 
@@ -29,6 +29,16 @@ pub fn generate(strategy: Strategy, input: &Input, seed: u64) -> Proposal {
         Strategy::AdversarialAlignment => {
             strategies::ai_failure_modes::adversarial_alignment(input, &mut rng)
         }
+        Strategy::NonTermination => strategies::runtime::non_termination(input, &mut rng),
+        Strategy::Livelock => strategies::runtime::livelock(input, &mut rng),
+        Strategy::StateExplosion => strategies::runtime::state_explosion(input, &mut rng),
+        Strategy::ResourceExhaustion => strategies::runtime::resource_exhaustion(input, &mut rng),
+        Strategy::ParserPathology => strategies::runtime::parser_pathology(input, &mut rng),
+        Strategy::ShadowChain => strategies::advanced::shadow_chain(input, &mut rng),
+        Strategy::GradientDescent => strategies::advanced::gradient_descent(input, &mut rng),
+        Strategy::OracleManipulation => strategies::advanced::oracle_manipulation(input, &mut rng),
+        Strategy::TypeConfusion => strategies::advanced::type_confusion(input, &mut rng),
+        Strategy::ReflexiveAttack => strategies::advanced::reflexive_attack(input, &mut rng),
     };
 
     Proposal::new(strategy, seed, candidate)

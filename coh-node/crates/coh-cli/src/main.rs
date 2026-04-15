@@ -215,6 +215,9 @@ fn decision_to_text(d: &Decision) -> String {
         Decision::Accept => "ACCEPT".to_string(),
         Decision::Reject => "REJECT".to_string(),
         Decision::SlabBuilt => "SLAB_BUILT".to_string(),
+        Decision::TerminalSuccess => "TERMINAL_SUCCESS".to_string(),
+        Decision::TerminalFailure => "TERMINAL_FAILURE".to_string(),
+        Decision::AbortBudget => "ABORT_BUDGET".to_string(),
     }
 }
 

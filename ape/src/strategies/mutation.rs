@@ -102,7 +102,7 @@ fn mutate_slab(slab: &coh_core::types::SlabReceiptWire, rng: &mut SeededRng) -> 
     Candidate::Slab(s)
 }
 
-fn generate_valid_micro(rng: &mut SeededRng) -> Candidate {
+pub(crate) fn generate_valid_micro(rng: &mut SeededRng) -> Candidate {
     let step = rng.next() as u64;
     let v_pre = 100u128 + (rng.next() as u128 % 1000);
     let spend = rng.next() as u128 % 50;

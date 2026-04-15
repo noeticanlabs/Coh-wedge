@@ -28,6 +28,9 @@ pub enum Decision {
     Accept,
     Reject,
     SlabBuilt,
+    TerminalSuccess,
+    TerminalFailure,
+    AbortBudget,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

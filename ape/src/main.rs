@@ -4,7 +4,6 @@ use ape::realdata::{
     generate_runtime_ai_chain, generate_runtime_ai_micro, load_ai_demo_chain, load_ai_demo_micro,
     write_output_json,
 };
-use ape::seed::SeededRng;
 use clap::{Parser, Subcommand};
 use coh_core::types::{Decision, MicroReceiptWire};
 use coh_core::{build_slab, verify_chain, verify_micro};
@@ -400,10 +399,9 @@ struct SubtypeCount {
 
 fn run_strategy_demo(
     iterations: usize,
-    sidecar_url: &str,
+    _sidecar_url: &str,
     _with_sidecar: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    use ape::proposal::CandidateMetadata;
     use ape::seed::SeededRng;
 
     println!("\n=== APE Strategy Demo ===");
@@ -498,6 +496,21 @@ fn run_strategy_demo(
                         // Shouldn't happen for micro receipts, treat as escaped
                         escaped += 1;
                         entry.escaped += 1;
+                    }
+                    Decision::TerminalSuccess => {
+                        // Terminal states count as rejected (trajectory ended)
+                        rejected += 1;
+                        entry.rejected += 1;
+                    }
+                    Decision::TerminalFailure => {
+                        // Terminal failure counts as rejected
+                        rejected += 1;
+                        entry.rejected += 1;
+                    }
+                    Decision::AbortBudget => {
+                        // Budget exceeded counts as rejected
+                        rejected += 1;
+                        entry.rejected += 1;
                     }
                 }
             }

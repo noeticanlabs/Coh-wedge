@@ -4,8 +4,7 @@
 
 use crate::engine::generate;
 use crate::proposal::{Candidate, Input, Proposal, Strategy};
-use crate::seed::SeededRng;
-use coh_core::types::{Decision, MicroReceiptWire, RejectCode, SlabReceiptWire};
+use coh_core::types::{Decision, RejectCode};
 use coh_core::{verify_chain, verify_micro, verify_slab_envelope};
 
 /// Pipeline result including verification
