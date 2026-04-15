@@ -23,15 +23,22 @@
 pub mod adapter;
 pub mod engine;
 pub mod fixtures;
+pub mod http;
 pub mod pipeline;
 pub mod proposal;
+pub mod realdata;
 pub mod seed;
 pub mod strategies;
 
 pub use adapter::{LlmAdapter, LlmResponse, MockLlmAdapter};
 pub use engine::generate;
 pub use fixtures::{load_chain, load_micro, load_slab, FixtureError};
+pub use http::{execute_verified, ExecuteVerifiedRequest, SidecarResponse};
 pub use pipeline::{run_pipeline, PipelineResult};
 pub use proposal::Strategy;
 pub use proposal::{Candidate, Proposal};
+pub use realdata::{
+    ensure_output_dir, generate_runtime_ai_chain, generate_runtime_ai_micro, load_ai_demo_chain,
+    load_ai_demo_micro, load_dashboard_valid_chain, write_output_json,
+};
 pub use seed::SeededRng;

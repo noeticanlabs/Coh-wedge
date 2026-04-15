@@ -1,0 +1,55 @@
+{
+  "results": [
+    {
+      "name": "micro_verify",
+      "iterations": 100,
+      "total_ms": 12.1974,
+      "throughput_per_sec": 8198.468526079329,
+      "avg_us": 121.97400000000002
+    },
+    {
+      "name": "micro_parse_verify",
+      "iterations": 100,
+      "total_ms": 13.4416,
+      "throughput_per_sec": 7439.590524937507,
+      "avg_us": 134.416
+    },
+    {
+      "name": "chain_verify",
+      "iterations": 100,
+      "total_ms": 16544.4303,
+      "throughput_per_sec": 6.044330217886077,
+      "avg_us": 165444.30299999999
+    },
+    {
+      "name": "slab_build",
+      "iterations": 100,
+      "total_ms": 21068.362100000002,
+      "throughput_per_sec": 4.7464534511679,
+      "avg_us": 210683.621
+    },
+    {
+      "name": "ape_generate_verify_mutation",
+      "iterations": 100,
+      "total_ms": 30.7012,
+      "throughput_per_sec": 3257.201672898779,
+      "avg_us": 307.012
+    }
+  ],
+  "sidecar_results": [
+    {
+      "name": "sidecar_execute_verified_accept",
+      "iterations": 100,
+      "total_ms": 179.8678,
+      "throughput_per_sec": 555.9638801386352,
+      "avg_us": 1798.6779999999999
+    },
+    {
+      "name": "sidecar_execute_verified_reject",
+      "iterations": 100,
+      "total_ms": 160.6078,
+      "throughput_per_sec": 622.6347661819663,
+      "avg_us": 1606.078
+    }
+  ]
+}
