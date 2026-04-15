@@ -41,7 +41,7 @@ jobs:
       - name: Check formatting
         run: cargo fmt --check
 
-      - name: Clippy — deny warnings
+      - name: Clippy ï¿½ deny warnings
         run: cargo clippy -- -D warnings
 
       - name: Build (release)
@@ -49,6 +49,21 @@ jobs:
 
       - name: Run tests
         run: cargo test
+
+      - name: Run bounded acceptance-path suite
+        run: cargo test -p coh-core --test test_valid_chain
+
+      - name: Generate bounded valid and semi-realistic fixtures
+        run: cargo run -p coh-core --example gen_ai_fixtures
+
+      - name: Assert generated fixture outputs exist
+        shell: bash
+        run: |
+          test -f vectors/valid/valid_chain_10.jsonl
+          test -f vectors/valid/valid_chain_100.jsonl
+          test -f vectors/valid/valid_chain_1000.jsonl
+          test -f vectors/semi_realistic/ai_workflow_valid.jsonl
+          test -f vectors/semi_realistic/ai_workflow_noisy.jsonl
 
   formal-verification:
     name: Lean T-Stack Verification
@@ -98,6 +113,18 @@ jobs:
 
       - name: Generate Adversarial Vectors
         run: cargo run --example gen_adversarial_vectors -p coh-core
+
+      - name: Generate Acceptance and Semi-Realistic Vectors
+        run: cargo run --example gen_ai_fixtures -p coh-core
+
+      - name: Audit Generated Vector Surface
+        shell: bash
+        run: |
+          test -f vectors/valid/valid_chain_10.jsonl
+          test -f vectors/valid/valid_chain_100.jsonl
+          test -f vectors/valid/valid_chain_1000.jsonl
+          test -f vectors/semi_realistic/ai_workflow_valid.jsonl
+          test -f vectors/semi_realistic/ai_workflow_noisy.jsonl
 
       - name: Run Compliance Audit
         run: |
