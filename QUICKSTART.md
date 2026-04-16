@@ -6,41 +6,33 @@ This guide walks through the complete verification pipeline from raw AI action t
 
 ## Quick Start (5 minutes)
 
-### 1. Verify a Single Receipt
+### 1. Verify a Chain
 
 ```bash
-# From project root
-cd coh-node
-cargo run --release --package coh-cli -- verify-micro examples/micro_valid.json
+cargo run --manifest-path coh-node/Cargo.toml -p coh-validator --release -- \
+  verify-chain coh-node/vectors/valid/valid_chain_10.jsonl
 ```
 
 **Expected Output**:
 ```
 ACCEPT
+steps_verified: 10
+first_step_index: 0
+last_step_index: 9
 ```
 
-### 2. Verify a Chain
+### 2. Build a Slab (Aggregate)
 
 ```bash
-cargo run --release --package coh-cli -- verify-chain examples/chain_valid.jsonl
+cargo run --manifest-path coh-node/Cargo.toml -p coh-validator --release -- \
+  build-slab coh-node/vectors/valid/valid_chain_10.jsonl --out coh-node/slab_output.json
 ```
 
-**Expected Output**:
-```
-ACCEPT
-Chain verified: 10 receipts
-```
-
-### 3. Build a Slab (Aggregate)
+### 3. Verify the Slab
 
 ```bash
-cargo run --release --package coh-cli -- build-slab examples/chain_valid.jsonl --out slab_output.json
-```
-
-### 4. Verify the Slab
-
-```bash
-cargo run --release --package coh-cli -- verify-slab slab_output.json
+cargo run --manifest-path coh-node/Cargo.toml -p coh-validator --release -- \
+  verify-slab coh-node/slab_output.json
 ```
 
 ---
@@ -142,28 +134,28 @@ cargo run --release --package coh-cli -- verify-slab slab_output.json
 
 ## Testing with Examples
 
-The project includes test vectors:
+The project includes test vectors in `coh-node/examples/` and `coh-node/vectors/`:
 
 ```bash
 # Valid examples
-ls examples/micro_valid.json
-ls examples/chain_valid.jsonl
-ls examples/slab_valid.json
+ls coh-node/examples/micro_valid.json
+ls coh-node/examples/chain_valid.jsonl
+ls coh-node/examples/slab_valid.json
+ls coh-node/vectors/valid/
 
 # Invalid examples (should all REJECT)
-ls examples/micro_invalid_*.json
-ls examples/chain_invalid_*.jsonl
-ls examples/slab_invalid_*.json
+ls coh-node/examples/micro_invalid_*.json
+ls coh-node/examples/chain_invalid_*.jsonl
+ls coh-node/examples/slab_invalid_*.json
 
 # AI demo examples
-ls examples/ai_demo/*.json
+ls coh-node/examples/ai_demo/*.json
 ```
 
 Run all test vectors:
 
 ```bash
-cd coh-node
-cargo test --test integration
+cargo test --manifest-path coh-node/Cargo.toml
 ```
 
 ---
@@ -192,5 +184,5 @@ else:
 ## Next Steps
 
 - [ ] Try the [Dashboard](coh-dashboard/README.md) for visual inspection
-- [ ] Read [SECURITY_MODEL.md](SECURITY_MODEL.md) for threat model details
-- [ ] Explore [Lean T-Stack](coh-t-stack/) for formal proofs
+- [ ] Explore [coh-node/](coh-node/) for more examples and vectors
+- [ ] Explore [coh-t-stack/](coh-t-stack/) for formal proofs

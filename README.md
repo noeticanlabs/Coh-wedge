@@ -76,8 +76,6 @@ New to the repo? Start with [`QUICKSTART.md`](QUICKSTART.md), then use the flows
 cargo build --manifest-path coh-node/Cargo.toml -p coh-validator --release
 ```
 
-### 2. Verify a bundled valid chain
-
 ```bash
 cargo run --manifest-path coh-node/Cargo.toml -p coh-validator --release -- \
   verify-chain coh-node/vectors/valid/valid_chain_10.jsonl
@@ -134,10 +132,7 @@ Coh verifier (micro -> chain -> slab)
 | End-to-end walkthrough | [`QUICKSTART.md`](QUICKSTART.md) |
 | Rust workspace overview | [`coh-node/README.md`](coh-node/README.md) |
 | Dashboard usage | [`coh-dashboard/README.md`](coh-dashboard/README.md) |
-| Security assumptions and threat model | [`SECURITY_MODEL.md`](SECURITY_MODEL.md) |
-| Formal layer overview | [`FORMAL_FOUNDATION.md`](FORMAL_FOUNDATION.md) |
-| System diagram | [`SPEC_DIAGRAM.md`](SPEC_DIAGRAM.md) |
-| Roadmap | [`ROADMAP.md`](ROADMAP.md) |
+| Lean 4 formal layer | [`coh-t-stack/`](coh-t-stack/) |
 
 ## Development Prerequisites
 

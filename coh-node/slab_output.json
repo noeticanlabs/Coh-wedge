@@ -1,0 +1,21 @@
+{
+  "schema_id": "coh.receipt.slab.v1",
+  "version": "1.0.0",
+  "object_id": "agent.valid.10",
+  "canon_profile_hash": "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09",
+  "policy_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "range_start": 0,
+  "range_end": 9,
+  "micro_count": 10,
+  "chain_digest_prev": "0000000000000000000000000000000000000000000000000000000000000000",
+  "chain_digest_next": "837de2659eee396b7c9ede343041c757fbe5c149270ba0863ddf5cde38ce6a42",
+  "state_hash_first": "0000000000000000000000000000000000000000000000000000000000000000",
+  "state_hash_last": "000000000000000000000000000000000000000000000000000000000010000a",
+  "merkle_root": "f730ec25d247d5146c8e8bf054d863827bcbed850c188c26b7a4b0b47e6956a5",
+  "summary": {
+    "total_spend": "10",
+    "total_defect": "11",
+    "v_pre_first": "100",
+    "v_post_last": "99"
+  }
+}
