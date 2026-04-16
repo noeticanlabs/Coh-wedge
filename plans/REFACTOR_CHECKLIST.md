@@ -101,23 +101,23 @@ The NOTE already exists but is easy to miss.
 ## Priority 5: Pull Lean proof layer into deliverable form
 
 ### Problem
-The `coh-lean/` directory exists but the audit notes it feels "implied but not delivered."
+The `coh-t-stack/` directory exists but the audit notes it feels "implied but not delivered."
 
 ### Actions
 
 #### Option A: Include actual Lean contents (if they exist)
-- [x] Verify coh-lean contents are actually populated
+- [x] Verify coh-t-stack contents are actually populated
 - [x] If populated: Add to release artifacts/zips
 
 #### Option B: Clarify delivery status
 - [x] Update `coh-node/README.md` to clarify Lean status:
   ```
   ### Formal Proof Layer
-  The coh-lean directory contains the Lean4 mechanization of the Coh contract.
+  The coh-t-stack directory contains the Lean4 mechanization of the Coh contract.
   Status: [Include in release / Future deliverable / Reference only]
   ```
 
-#### File: `coh-lean/README.md`
+#### File: `coh-t-stack/README.md`
 - [x] Ensure clear status indication of the Lean proof
 
 ---
@@ -159,7 +159,7 @@ Tests are fixture-shape tests, not behavioral UI tests.
 | `coh-node/crates/coh-core/src/reject.rs` | 3 | Add RejectIntervalInvalid |
 | `coh-node/crates/coh-core/src/verify_slab.rs` | 4 | Rename/clarify functions |
 | `coh-node/crates/coh-core/src/lib.rs` | 4 | Export updates |
-| `coh-lean/README.md` | 5 | Status clarification |
+| `coh-t-stack/README.md` | 5 | Status clarification |
 | `coh-dashboard/src/App.test.jsx` | 6 | Add behavioral tests |
 
 ---

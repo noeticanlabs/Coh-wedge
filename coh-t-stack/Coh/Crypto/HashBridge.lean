@@ -6,6 +6,13 @@ namespace Coh.Crypto
 open Coh.Core
 open Coh.Contract
 
+/-!
+## Important: Symbolic Hash Model
+
+All theorems in this module prove *structural* refinement only (input-byte
+layout correctness).  `sha256_spec` is a symbolic placeholder â€” see
+`SHA256Spec.lean` for the full disclaimer.
+-/
 /-- Exact preimage bytes consumed by the Rust chain-digest function.
     This model directly mirrors the existing `digestPreimage` layout from the core hash module. -/
 def rustChainDigestInputBytes (prevDigest : ChainDigest) (canonicalJsonBytes : ByteSeq) : ByteSeq :=
@@ -59,3 +66,4 @@ theorem compute_chain_digest_eq_spec
   rw [chain_preimage_eq r]
 
 end Coh.Crypto
+

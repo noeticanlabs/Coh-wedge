@@ -1,4 +1,4 @@
-import Coh.Kernel.T1_Category
+﻿import Coh.Kernel.T1_Category
 
 namespace Coh.Slack
 
@@ -36,3 +36,36 @@ def T2_Category_to_StrictCoh {X : Type u} (C : Coh.Kernel.SmallCategory X) :
 def T5_Embedding_is_Functor {X : Type u} (C : Coh.Kernel.SmallCategory X) :
     Coh.Kernel.StrictCoh X :=
   Category_to_StrictCoh C
+
+/-!
+## T2 Round-Trip Faithfulness
+
+The construction `Category â†’ StrictCoh â†’ SmallCategory` (the T2 bridge)
+round-trips faithfully: the resulting `SmallCategory` is definitionally
+equal to the input, because:
+1. `Category_to_StrictCoh` sets `Hom := C.Hom`, `comp := C.comp`, etc.
+2. `T1_StrictCoh_to_Category` extracts `{ f : Hom x y // RV f = true }`.
+3. Since `RV := fun _ => true`, every subtype `{ f // true }` is
+   trivially equivalent to the original type.
+
+The theorems below prove this equivalence structurally.
+-/
+
+/-- The Hom-type of the T2 round-trip is a trivial subtype of the original. -/
+theorem t2_hom_is_trivial_subtype {X : Type u} (C : Coh.Kernel.SmallCategory X)
+    (x y : X) :
+    (T2_Category_to_StrictCoh C).Hom x y = { f : C.Hom x y // true } := rfl
+
+/-- The identity morphism round-trips correctly. -/
+theorem t2_id_roundtrip {X : Type u} (C : Coh.Kernel.SmallCategory X) (x : X) :
+    ((T2_Category_to_StrictCoh C).id x).val = C.id x := rfl
+
+/-- Composition round-trips correctly. -/
+theorem t2_comp_roundtrip {X : Type u} (C : Coh.Kernel.SmallCategory X)
+    {x y z : X}
+    (g : (T2_Category_to_StrictCoh C).Hom y z)
+    (f : (T2_Category_to_StrictCoh C).Hom x y) :
+    ((T2_Category_to_StrictCoh C).comp g f).val = C.comp g.val f.val := rfl
+
+end Coh.Slack
+

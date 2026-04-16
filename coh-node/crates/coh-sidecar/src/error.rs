@@ -41,7 +41,14 @@ impl From<RejectCode> for CohErrorCode {
             RejectCode::RejectChainDigest | RejectCode::RejectSlabMerkle => CohErrorCode::E002,
 
             // Policy -> E003
-            RejectCode::RejectPolicyViolation | RejectCode::RejectSlabSummary => CohErrorCode::E003,
+            RejectCode::RejectPolicyViolation
+            | RejectCode::RejectSlabSummary
+            // Semantic integrity failures (TypeConfusion defense)
+            | RejectCode::VacuousZeroReceipt
+            | RejectCode::SpendExceedsBalance
+            | RejectCode::SemanticTypeViolation
+            // Cumulative drift failures (GradientDescent defense)
+            | RejectCode::CumulativeDriftDetected => CohErrorCode::E003,
 
             // State link -> E004
             RejectCode::RejectStateHashLink => CohErrorCode::E004,

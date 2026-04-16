@@ -1,1 +1,0 @@
-{"version":3,"references":{"{\"c\":{\"n\":\"Real\",\"m\":\"Mathlib.Data.Real.Basic\"}}":{"usages":[[7,15,7,16,"Coh.CohR",6,0,7,16,7,7,7,11]],"definition":null},"{\"c\":{\"n\":\"Coh.CohR\",\"m\":\"Coh.Prelude\"}}":{"usages":[],"definition":[7,7,7,11]}},"module":"Coh.Prelude"}

@@ -185,13 +185,14 @@ fn test_valid_profile_standard_accepts() {
 
 #[test]
 fn test_valid_profile_minimal_accepts() {
+    // Uses small nonzero values -- vacuous zero receipts are rejected by C1.
     let wire = create_wire_with_metrics(
         0,
         ZERO_HASH.to_string(),
         ZERO_HASH.to_string(),
         next_state_for(0),
-        "0",
-        "0",
+        "1",
+        "1",
         "0",
         "0",
         "noop",
@@ -340,8 +341,12 @@ fn test_mixed_distribution_valid_accepts() {
             2 => "reflect",
             _ => "synthesize",
         };
+        // Use economics that satisfy the telescoping bound:
+        // v_post_last + cumulative_spend <= v_pre_first + total_defect
+        // With large v_pre and modest spending, this always holds.
         let spend = if i % 5 == 0 { "2" } else { "1" };
-        let v_post = if i % 5 == 0 { "98" } else { "99" };
+        // v_post << v_pre ensures telescoping bound is satisfied even with cumulative spend.
+        let v_post = "50000";
         let next_state = format!("{:064x}", 0x5000_u64 + i * 17 + 1);
 
         let wire = create_wire_with_metrics(
@@ -349,7 +354,7 @@ fn test_mixed_distribution_valid_accepts() {
             prev_digest.clone(),
             prev_state.clone(),
             next_state.clone(),
-            "100",
+            "100000",
             v_post,
             spend,
             &defect,

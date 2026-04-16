@@ -1,1 +1,0 @@
-{"version":3,"references":{"{\"c\":{\"n\":\"String\",\"m\":\"Init.Prelude\"}}":{"usages":[[4,19,4,25,"Coh.Contract.SchemaId",4,0,4,25,4,7,4,15]],"definition":null},"{\"c\":{\"n\":\"Coh.Contract.SchemaId\",\"m\":\"Coh.Contract.Schema\"}}":{"usages":[],"definition":[4,7,4,15]}},"module":"Coh.Contract.Schema"}

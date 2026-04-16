@@ -143,6 +143,38 @@ pub fn verify_micro(wire: MicroReceiptWire) -> VerifyMicroResult {
         };
     }
 
+    // 5.5 Semantic integrity checks (TypeConfusion defense — Q2)
+    // C1: No vacuous zero receipts
+    if r.metrics.v_pre == 0
+        && r.metrics.v_post == 0
+        && r.metrics.spend == 0
+        && r.metrics.defect == 0
+    {
+        return VerifyMicroResult {
+            decision: Decision::Reject,
+            code: Some(RejectCode::VacuousZeroReceipt),
+            message: "Vacuous zero receipt: all metrics are zero (no economic activity)"
+                .to_string(),
+            step_index: Some(r.step_index),
+            object_id: Some(r.object_id),
+            chain_digest_next: None,
+        };
+    }
+
+    // C4: Cannot spend more than balance (spend <= v_pre)
+    if r.metrics.spend > r.metrics.v_pre {
+        return VerifyMicroResult {
+            decision: Decision::Reject,
+            code: Some(RejectCode::SpendExceedsBalance),
+            message: format!(
+                "Spend exceeds balance: spend ({}) > v_pre ({})",
+                r.metrics.spend, r.metrics.v_pre
+            ),
+            step_index: Some(r.step_index),
+            object_id: Some(r.object_id),
+            chain_digest_next: None,
+        };
+    }
     // 6. Cryptographic integrity (Canonicalization + Hashing)
     let prehash = to_prehash_view(&r);
     let canon_bytes = match to_canonical_json_bytes(&prehash) {

@@ -93,5 +93,13 @@ fn test_build_slab_overflow_rejected() {
 
     let res = build_slab(vec![w1, w2]);
     assert_eq!(res.decision, Decision::Reject);
-    assert_eq!(res.code, Some(RejectCode::RejectOverflow));
+    // Previously this was RejectOverflow at the slab level. Now the chain-level
+    // cumulative drift check correctly catches it first: v_post_last + cumulative_spend
+    // far exceeds v_pre_first + total_defect.
+    assert!(
+        res.code == Some(RejectCode::CumulativeDriftDetected)
+            || res.code == Some(RejectCode::RejectOverflow),
+        "Expected CumulativeDriftDetected or RejectOverflow, got {:?}",
+        res.code,
+    );
 }

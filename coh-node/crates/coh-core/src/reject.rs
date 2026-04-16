@@ -21,6 +21,12 @@ pub enum RejectCode {
     RetryBudgetExceeded,
     TemporalDriftDetected,
     TrajectoryCostExceeded,
+    // Semantic integrity failures (TypeConfusion defense — Q2)
+    VacuousZeroReceipt,
+    SpendExceedsBalance,
+    SemanticTypeViolation,
+    // Cumulative drift failures (GradientDescent defense — Q1)
+    CumulativeDriftDetected,
     // Resource/governance failures
     StepBudgetExceeded,
     TimeBudgetExceeded,

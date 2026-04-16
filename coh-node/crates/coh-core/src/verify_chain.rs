@@ -33,6 +33,11 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
     let mut prev_defect: Option<u128> = None;
     let mut no_progress_count: usize = 0;
 
+    // Cumulative value tracking (GradientDescent defense — Q1)
+    let mut cumulative_spend: u128 = 0;
+    let mut first_v_pre: Option<u128> = None;
+    let mut last_v_post: u128 = 0;
+
     // Check for state explosion (depth limit)
     if receipts.len() > MAX_CHAIN_LENGTH {
         return VerifyChainResult {
@@ -199,6 +204,31 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
         }
         prev_defect = Some(r.metrics.defect);
 
+        // 3c. Cumulative spend tracking (GradientDescent defense — Q1)
+        if first_v_pre.is_none() {
+            first_v_pre = Some(r.metrics.v_pre);
+        }
+        last_v_post = r.metrics.v_post;
+        cumulative_spend = match cumulative_spend.checked_add(r.metrics.spend) {
+            Some(v) => v,
+            None => {
+                return VerifyChainResult {
+                    decision: Decision::Reject,
+                    code: Some(RejectCode::CumulativeDriftDetected),
+                    message: format!(
+                        "Cumulative spend overflow at step {}: chain spending exceeds u128",
+                        step_idx
+                    ),
+                    steps_verified: i as u64,
+                    first_step_index: first_index,
+                    last_step_index: last_good_index,
+                    final_chain_digest: current_digest,
+                    failing_step_index: Some(step_idx),
+                    steps_verified_before_failure: Some(i as u64),
+                };
+            }
+        };
+
         last_good_index = step_idx;
         current_digest = Some(r.chain_digest_next.to_hex());
         current_state = Some(r.state_hash_next.to_hex());
@@ -220,6 +250,32 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
             failing_step_index: None,
             steps_verified_before_failure: None,
         };
+    }
+
+    // Cumulative telescoping bound check (GradientDescent defense — Q1)
+    // The Accounting Law telescopes: v_post_last + cumulative_spend <= v_pre_first + total_defect
+    if let Some(v_pre_0) = first_v_pre {
+        let lhs = last_v_post.checked_add(cumulative_spend);
+        let rhs = v_pre_0.checked_add(total_defect);
+        match (lhs, rhs) {
+            (Some(l), Some(r)) if l > r => {
+                return VerifyChainResult {
+                    decision: Decision::Reject,
+                    code: Some(RejectCode::CumulativeDriftDetected),
+                    message: format!(
+                        "Cumulative drift detected: v_post_last + cumulative_spend ({}) > v_pre_first + total_defect ({})",
+                        l, r
+                    ),
+                    steps_verified: (last_good_index - first_index + 1),
+                    first_step_index: first_index,
+                    last_step_index: last_good_index,
+                    final_chain_digest: current_digest,
+                    failing_step_index: None,
+                    steps_verified_before_failure: None,
+                };
+            }
+            _ => {} // Overflow case handled by existing TrajectoryCostExceeded
+        }
     }
 
     // Trajectory completed successfully
