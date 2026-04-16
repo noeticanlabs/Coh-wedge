@@ -13,6 +13,9 @@ base64.workspace = true
 thiserror.workspace = true
 colored.workspace = true
 
+[dev-dependencies]
+criterion = { workspace = true }
+
 [[example]]
 name = "verify_single"
 path = "examples/verify_single.rs"
@@ -29,14 +32,6 @@ path = "examples/benchmark.rs"
 name = "stress_test"
 path = "examples/stress_test.rs"
 
-[[example]]
-name = "gen_ai_fixtures"
-path = "examples/gen_ai_fixtures.rs"
-
-[[example]]
-name = "benchmark_ai_demo"
-path = "examples/benchmark_ai_demo.rs"
-
-[[example]]
-name = "showcase"
-path = "examples/showcase.rs"
+[[bench]]
+name = "execution_benchmarks"
+harness = false

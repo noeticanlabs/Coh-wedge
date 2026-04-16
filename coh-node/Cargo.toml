@@ -1,5 +1,10 @@
 [workspace]
-members = ["crates/coh-core", "crates/coh-cli", "crates/coh-python", "crates/coh-sidecar"]
+members = [
+    "crates/coh-core",
+    "crates/coh-cli",
+    "crates/coh-python",
+    "crates/coh-sidecar",
+]
 resolver = "2"
 
 [workspace.package]
@@ -24,3 +29,4 @@ tower-http = { version = "0.5", features = ["cors", "trace"] }
 uuid = { version = "1", features = ["v4", "serde"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+criterion = "0.5"

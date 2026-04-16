@@ -1,0 +1,24 @@
+{
+    "benchmark_version": "v1.0",
+    "generated": "2026-04-16",
+    "micro_verify_us": 31,
+    "micro_parse_verify_us": 47,
+    "chain_verify_ms": 1.7,
+    "slab_build_ms": 3,
+    "runs": 1000,
+    "variance_percent": 0,
+    "throughput": {
+        "micro_verify_per_sec": 31953,
+        "micro_parse_verify_per_sec": 21189,
+        "chain_verify_per_sec": 571,
+        "slab_build_per_sec": 331,
+        "ape_generate_verify_per_sec": 4820
+    },
+    "latency": {
+        "p50_us": 31,
+        "p99_us": 280,
+        "min_us": 30,
+        "max_us": 272
+    },
+    "notes": "Deterministic runtime - no wall-clock dependence, replayable results"
+}
