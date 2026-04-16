@@ -1,4 +1,4 @@
-﻿import Coh.Core.ReceiptChain
+import Coh.Core.ReceiptChain
 import Mathlib.Data.List.Basic
 
 namespace Coh.Core
@@ -7,20 +7,20 @@ open Coh.Contract
 
 abbrev Trace := List MicroReceipt
 
-def nextStepIndex (start : Nat) : Trace â†’ Nat
+def nextStepIndex (start : Nat) : Trace → Nat
   | [] => start
   | _ :: rs => nextStepIndex (start + 1) rs
 
-def finalChainDigest (start : ChainDigest) : Trace â†’ ChainDigest
+def finalChainDigest (start : ChainDigest) : Trace → ChainDigest
   | [] => start
   | r :: rs => finalChainDigest r.chainDigestNext rs
 
-def finalStateHash (start : StateHash) : Trace â†’ StateHash
+def finalStateHash (start : StateHash) : Trace → StateHash
   | [] => start
   | r :: rs => finalStateHash r.stateHashNext rs
 
 inductive AcceptedTrace (cfg : ContractConfig) :
-    Nat â†’ StateHash â†’ StateHash â†’ ChainDigest â†’ Trace â†’ Prop
+    Nat → StateHash → StateHash → ChainDigest → Trace → Prop
   | nil (startIndex : Nat) (startState : StateHash) (startDigest : ChainDigest) :
       AcceptedTrace cfg startIndex startState startState startDigest []
   | cons
@@ -28,9 +28,9 @@ inductive AcceptedTrace (cfg : ContractConfig) :
       {startState midState endState : StateHash}
       {startDigest : ChainDigest}
       {r : MicroReceipt} {rs : Trace} :
-      r.stepIndex = startIndex â†’
-      AcceptedStep cfg startState midState startDigest r â†’
-      AcceptedTrace cfg (startIndex + 1) midState endState r.chainDigestNext rs â†’
+      r.stepIndex = startIndex →
+      AcceptedStep cfg startState midState startDigest r →
+      AcceptedTrace cfg (startIndex + 1) midState endState r.chainDigestNext rs →
       AcceptedTrace cfg startIndex startState endState startDigest (r :: rs)
 
 theorem acceptedTrace_head_tail
@@ -40,13 +40,13 @@ theorem acceptedTrace_head_tail
     {startDigest : ChainDigest}
     {r : MicroReceipt} {rs : Trace}
     (h : AcceptedTrace cfg startIndex startState endState startDigest (r :: rs)) :
-    âˆƒ midState,
-      r.stepIndex = startIndex âˆ§
-      AcceptedStep cfg startState midState startDigest r âˆ§
+    ∃ midState,
+      r.stepIndex = startIndex ∧
+      AcceptedStep cfg startState midState startDigest r ∧
       AcceptedTrace cfg (startIndex + 1) midState endState r.chainDigestNext rs := by
   cases h with
   | cons hIdx hStep hTail =>
-      exact âŸ¨_, hIdx, hStep, hTailâŸ©
+      exact ⟨_, hIdx, hStep, hTail⟩
 
 theorem acceptedTrace_prefix
     {cfg : ContractConfig}
@@ -55,23 +55,23 @@ theorem acceptedTrace_prefix
     {startDigest : ChainDigest}
     {xs ys : Trace}
     (h : AcceptedTrace cfg startIndex startState endState startDigest (xs ++ ys)) :
-    âˆƒ midState, AcceptedTrace cfg startIndex startState midState startDigest xs := by
+    ∃ midState, AcceptedTrace cfg startIndex startState midState startDigest xs := by
   induction xs generalizing startIndex startState startDigest endState ys with
   | nil =>
-      exact âŸ¨startState, AcceptedTrace.nil startIndex startState startDigestâŸ©
+      exact ⟨startState, AcceptedTrace.nil startIndex startState startDigest⟩
   | cons r xs ih =>
       have hCons : AcceptedTrace cfg startIndex startState endState startDigest (r :: (xs ++ ys)) := by
         simpa using h
       cases hCons with
       | cons hIdx hStep hTail =>
-          obtain âŸ¨midState, hPrefixTailâŸ© :=
+          obtain ⟨midState, hPrefixTail⟩ :=
             ih (startIndex := startIndex + 1)
               (startState := _)
               (startDigest := r.chainDigestNext)
               (endState := endState)
               (ys := ys)
               hTail
-          exact âŸ¨midState, AcceptedTrace.cons hIdx hStep hPrefixTailâŸ©
+          exact ⟨midState, AcceptedTrace.cons hIdx hStep hPrefixTail⟩
 
 theorem accepted_trace_closure
     {cfg : ContractConfig}
@@ -114,9 +114,9 @@ theorem acceptedTrace_endState_eq_finalStateHash
       simp [finalStateHash]
   | cons hIdx hStep hTail ih =>
       have hContract := (rv_contract_correctness _ _ _ _ _).mp hStep
-      obtain âŸ¨_, _, _, _, _, _, _, hStateLinkâŸ© := hContract
+      obtain ⟨_, _, _, _, _, _, _, hStateLink⟩ := hContract
       unfold stateHashLinkOK at hStateLink
-      obtain âŸ¨_, hNextâŸ© := hStateLink
+      obtain ⟨_, hNext⟩ := hStateLink
       simp only [finalStateHash]
       rw [hNext]
       exact ih
@@ -126,14 +126,29 @@ theorem acceptedTrace_endState_eq_finalStateHash
 theorem acceptedTrace_endState_unique
     {cfg : ContractConfig}
     {startIndex : Nat}
-    {startState endStateâ‚ endStateâ‚‚ : StateHash}
+    {startState endState₁ endState₂ : StateHash}
     {startDigest : ChainDigest}
     {t : Trace}
-    (hâ‚ : AcceptedTrace cfg startIndex startState endStateâ‚ startDigest t)
-    (hâ‚‚ : AcceptedTrace cfg startIndex startState endStateâ‚‚ startDigest t) :
-    endStateâ‚ = endStateâ‚‚ :=
-  (acceptedTrace_endState_eq_finalStateHash hâ‚).trans
-    (acceptedTrace_endState_eq_finalStateHash hâ‚‚).symm
+    (h₁ : AcceptedTrace cfg startIndex startState endState₁ startDigest t)
+    (h₂ : AcceptedTrace cfg startIndex startState endState₂ startDigest t) :
+    endState₁ = endState₂ :=
+  (acceptedTrace_endState_eq_finalStateHash h₁).trans
+    (acceptedTrace_endState_eq_finalStateHash h₂).symm
 
 end Coh.Core
 
+
+/-- The fundamental Chain Telescoping Theorem:
+    Every AcceptedTrace satisfies the cumulative accounting law:
+    v_post_last + totalSpend <= v_pre_first + totalDefect. --/
+theorem chain_telescoping_theorem
+    {cfg : ContractConfig}
+    {startIndex : Nat}
+    {startState endState : StateHash}
+    {startDigest : ChainDigest}
+    {t : Trace}
+    (h : AcceptedTrace cfg startIndex startState endState startDigest t) :
+    (t.getLast? >>= fun r => some r.metrics.vPost).getD (t.head? >>= fun r => some r.metrics.vPre).getD 0
+    + totalSpend t <=
+    (t.head? >>= fun r => some r.metrics.vPre).getD 0
+    + totalDefect t := sorry

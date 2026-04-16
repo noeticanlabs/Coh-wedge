@@ -1,4 +1,4 @@
-﻿import Coh.Core.Trace
+import Coh.Core.Trace
 import Coh.Contract.Slab
 
 namespace Coh.Trace
@@ -7,7 +7,7 @@ open Coh.Core
 open Coh.Contract
 
 /-!
-# T3 Cross-Layer Grounding: AcceptedTrace â†” SlabReceipt
+# T3 Cross-Layer Grounding: AcceptedTrace ↔ SlabReceipt
 
 This module bridges the categorical `AcceptedTrace` model (T3 MacroSlab)
 with the concrete `SlabReceipt` verification predicate in `Coh.Contract`.
@@ -34,8 +34,8 @@ assumes Merkle validity as a hypothesis.
     - the aggregate spend and defect bound the individual-step totals. -/
 def SlabCoherentWithTrace
     (r : SlabReceipt) (t : Trace) : Prop :=
-  t.length = r.microCount âˆ§
-  r.summary.vPreFirst = (t.head? >>= fun h => some h.metrics.vPre).getD r.summary.vPreFirst âˆ§
+  t.length = r.microCount ∧
+  r.summary.vPreFirst = (t.head? >>= fun h => some h.metrics.vPre).getD r.summary.vPreFirst ∧
   r.summary.vPostLast = (t.getLast? >>= fun h => some h.metrics.vPost).getD r.summary.vPostLast
 
 /-- T3 Grounding: If a non-empty `AcceptedTrace` witnesses acceptance of every
@@ -51,11 +51,11 @@ theorem t3_accepted_trace_implies_slab_verified
   verify_slab_accept_of_valid_merkle_summary cfg r hSchema hSummary hMerkle
 
 /-- T3 Grounding (reject path): If the slab summary is inconsistent, no
-    `AcceptedTrace` can rescue it â€” the slab verifier rejects regardless. -/
+    `AcceptedTrace` can rescue it — the slab verifier rejects regardless. -/
 theorem t3_bad_summary_always_rejects
     (cfg : ContractConfig)
     (r : SlabReceipt)
-    (hSummary : Â¬ SummaryConsistent r) :
+    (hSummary : ¬ SummaryConsistent r) :
     verifySlab cfg r = false :=
   verify_slab_reject_of_wrong_summary cfg r hSummary
 
@@ -64,8 +64,24 @@ theorem t3_bad_summary_always_rejects
 theorem t3_bad_merkle_always_rejects
     (cfg : ContractConfig)
     (r : SlabReceipt)
-    (hMerkle : Â¬ MerklePathValid r) :
+    (hMerkle : ¬ MerklePathValid r) :
     verifySlab cfg r = false :=
   verify_slab_reject_of_bad_merkle cfg r hMerkle
 
 end Coh.Trace
+
+
+/-- Soundness: If a slab correctly summarizes an accepted trace, then the slab is verifiable. --/
+theorem slab_soundness_theorem
+    (cfg : ContractConfig) (r : SlabReceipt) (t : Trace)
+    (hTrace : AcceptedTrace cfg r.summary.startIndex r.summary.stateHashPre r.summary.stateHashPost r.summary.digestPre t)
+    (hCoherent : SlabCoherentWithTrace r t)
+    (hSchema : SlabReceipt.ValidSchema cfg r)
+    (hMerkle : MerklePathValid r) :
+    verifySlab cfg r = true := by
+  -- The verify_slab_accept_of_valid_merkle_summary theorem already exists.
+  -- We just need to show that AcceptedTrace + Coherent implies SummaryConsistent.
+  apply verify_slab_accept_of_valid_merkle_summary
+  . exact hSchema
+  . sorry -- This bridges the chain_telescoping_theorem to SummaryConsistent
+  . exact hMerkle

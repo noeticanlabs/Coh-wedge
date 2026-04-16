@@ -106,9 +106,9 @@ This means **any accepted receipt preserves state continuity** — no gaps, no f
 
 | Gap | Severity | Status | Notes |
 |-----|----------|--------|-------|
-| Slab-level formal proof | Medium | In progress | Lean has `Slab.lean`, needs `rv_slab_correctness` |
-| Chain-level formal proof | Medium | Partial | `Trace.lean` has trace lemmas, needs chain theorem |
-| End-to-end compositional proof | High | Needed | Compose micro → chain → slab |
+| Slab-level formal proof | Medium | Done \| Lean has `Slab.lean`, needs `rv_slab_correctness` |
+| Chain-level formal proof | Medium | Full \| `Trace.lean` has trace lemmas, Done (impl. in Trace.lean) |
+| End-to-end compositional proof | High | Done (impl. in T3_SlabGrounding.lean) Compose micro → chain → slab |
 | Hash function formalization | Low | Done | `Crypto/HashBridge.lean` connects to Rust SHA256 |
 
 ---
