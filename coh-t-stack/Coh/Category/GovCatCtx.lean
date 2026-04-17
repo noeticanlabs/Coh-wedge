@@ -139,6 +139,17 @@ variable {σ : Type} [OrderedAddCommMonoid σ]
 
 end OplaxHom
 
+/-- Tightness preorder for OplaxHom: f ≤ g when f.Δ ≤ g.Δ.
+    This enables comparing slack values between oplax morphisms. -/
+instance OplaxHom_preorder (S T : GovObjCtx σ) : Preorder (OplaxHom S T) where
+  le f g := f.Δ ≤ g.Δ
+  lt f g := f.Δ < g.Δ
+  le_refl f := le_rfl
+  le_trans f g h := le_trans
+  lt_trans f g h := lt_trans
+  lt_of_le_of_lt f g h := lt_of_le_of_lt
+  le_of_lt_of_le f g h := le_of_lt_of_le
+
 /-- Adapter: view a context-free governed object as a contextful one by
     ignoring the context parameter. -/
 def fromGovObj {σ : Type} [OrderedAddCommMonoid σ] (S : GovObj σ) : GovObjCtx σ :=
@@ -151,5 +162,15 @@ def fromGovObj {σ : Type} [OrderedAddCommMonoid σ] (S : GovObj σ) : GovObjCtx
   , Defect := S.Defect
   , RV := fun _ x r x' => S.RV x r x'
   , rv_sound := by intro c x r x' h; exact S.rv_sound h }
+
+/-- [TESTED]
+Example lemma: fromGovObj preserves rv_sound. The soundness law holds in the
+contextful category because we ignore the context. -/
+lemma fromGovObj_rv_sound {σ : Type} [OrderedAddCommMonoid σ]
+    (S : GovObj σ) (c : StepCtx) (x : S.X) (r : S.Receipt) (x' : S.X)
+    (h : (fromGovObj S).RV c x r x' = Decision.accept) :
+    (fromGovObj S).V x' + (fromGovObj S).Spend r ≤ (fromGovObj S).V x + (fromGovObj S).Defect r := by
+  simp [fromGovObj] at h
+  exact S.rv_sound h
 
 end Coh

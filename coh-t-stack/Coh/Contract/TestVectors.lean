@@ -258,4 +258,102 @@ example : verifySlabRejectCode sampleConfig badMerkleSlab = some RejectCode.reje
   apply verifySlabRejectCode_of_bad_merkle
   all_goals native_decide
 
+/-!
+# V2 Test Vectors (ByteArray canonical)
+
+These test vectors demonstrate the structural verifier kernel for V2 receipts
+with ByteArray-based Digest types. They mirror the V1 patterns but use the V2
+canonical surfaces.
+-/
+
+namespace V2
+
+-- V2 Sample data using ByteArray digests
+def sampleDigestV2 : Digest :=
+  ⟨#[0x47, 0x45, 0x4E, 0x45, 0x53, 0x49, 0x53⟩  -- "GENESIS" bytes
+
+def samplePrevDigestV2 : Digest :=
+  ⟨#[0x73, 0x74, 0x61, 0x74, 0x65, 0x2D, 0x30⟩  -- "state-0"
+
+def sampleNextDigestV2 : Digest :=
+  ⟨#[0x73, 0x74, 0x61, 0x74, 0x65, 0x2D, 0x31⟩  -- "state-1"
+
+def samplePayloadBytesV2 : ByteArray :=
+  ⟨#[0x70, 0x61, 0x79, 0x6C, 0x6F, 0x61, 0x64, 0x2D, 0x30⟩  -- "payload-0"
+
+/-- Sample valid V2 micro receipt (canonical ByteArray form) -/
+def sampleMicroV2 : MicroReceiptV2 :=
+  { schemaId := "coh.receipt.micro.v1"
+    version := "1.0.0"
+    objectId := "object-0"
+    canonProfileHash := "profile.v1"
+    policyHash := "policy.v1"
+    stepIndex := 0
+    stateHashPrev := samplePrevDigestV2
+    stateHashNext := sampleNextDigestV2
+    chainDigestPrev := sampleDigestV2
+    chainDigestNext := chainUpdate sampleCanonProfile sampleDigestV2 samplePayloadBytesV2
+    canonicalBytes := samplePayloadBytesV2
+    metrics := sampleMetrics }
+
+/-- V2 micro with bad schema -/
+def badSchemaMicroV2 : MicroReceiptV2 :=
+  { sampleMicroV2 with schemaId := "bad.schema" }
+
+/-- V2 micro with empty objectId -/
+def emptyObjectIdMicroV2 : MicroReceiptV2 :=
+  { sampleMicroV2 with objectId := "" }
+
+/-- V2 micro with wrong profile hash -/
+def badProfileMicroV2 : MicroReceiptV2 :=
+  { sampleMicroV2 with canonProfileHash := "wrong-profile" }
+
+/-- V2 micro with invalid state link -/
+def badStateLinkMicroV2 : MicroReceiptV2 :=
+  { sampleMicroV2 with stateHashNext := sampleDigestV2 }  -- state link broken
+
+/-- V2 micro with invalid chain digest -/
+def badChainDigestMicroV2 : MicroReceiptV2 :=
+  { sampleMicroV2 with chainDigestNext := sampleDigestV2 }  -- chain update broken
+
+end V2
+
+-- V2 verification test vectors (theorem-style)
+example : verifyMicroStructV2 sampleConfig samplePrevDigestV2 sampleNextDigestV2
+    sampleDigestV2 sampleMicroV2 = Decision.accept := by
+  simp [verifyMicroStructV2, microV2SchemaOk, microV2StateLinkOk, microV2ChainOk,
+    sampleMicroV2, sampleConfig, samplePrevDigestV2, sampleNextDigestV2, sampleDigestV2,
+    sampleCanonProfile, chainUpdate]
+  decide
+
+example : verifyMicroStructV2 sampleConfig samplePrevDigestV2 sampleNextDigestV2
+    sampleDigestV2 badSchemaMicroV2 = Decision.reject RejectCode.rejectSchema := by
+  simp [verifyMicroStructV2, microV2SchemaOk, microV2StateLinkOk, microV2ChainOk,
+    badSchemaMicroV2, sampleConfig]
+  decide
+
+example : verifyMicroStructV2 sampleConfig samplePrevDigestV2 sampleNextDigestV2
+    sampleDigestV2 emptyObjectIdMicroV2 = Decision.reject RejectCode.rejectSchema := by
+  simp [verifyMicroStructV2, microV2SchemaOk, microV2StateLinkOk, microV2ChainOk,
+    emptyObjectIdMicroV2, sampleConfig]
+  decide
+
+example : verifyMicroStructV2 sampleConfig samplePrevDigestV2 sampleNextDigestV2
+    sampleDigestV2 badProfileMicroV2 = Decision.reject RejectCode.rejectSchema := by
+  simp [verifyMicroStructV2, microV2SchemaOk, microV2StateLinkOk, microV2ChainOk,
+    badProfileMicroV2, sampleConfig]
+  decide
+
+example : verifyMicroStructV2 sampleConfig samplePrevDigestV2 sampleNextDigestV2
+    sampleDigestV2 badStateLinkMicroV2 = Decision.reject RejectCode.rejectStateHashLink := by
+  simp [verifyMicroStructV2, microV2SchemaOk, microV2StateLinkOk, microV2ChainOk,
+    badStateLinkMicroV2, sampleConfig, samplePrevDigestV2, sampleNextDigestV2]
+  decide
+
+example : verifyMicroStructV2 sampleConfig samplePrevDigestV2 sampleNextDigestV2
+    sampleDigestV2 badChainDigestMicroV2 = Decision.reject RejectCode.rejectChainDigest := by
+  simp [verifyMicroStructV2, microV2SchemaOk, microV2StateLinkOk, microV2ChainOk,
+    badChainDigestMicroV2, sampleConfig, sampleDigestV2, sampleCanonProfile, chainUpdate]
+  decide
+
 end Coh.Contract
