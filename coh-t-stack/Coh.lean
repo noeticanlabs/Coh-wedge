@@ -8,6 +8,7 @@ import Coh.Trace
 import Coh.Spectral
 import Coh.Selection
 import Coh.Bridges.ContractSoundness
+import Coh.Category.GovCatCtx
 
 /-!
 Top-level Coh library surface.

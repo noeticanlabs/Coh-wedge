@@ -313,6 +313,77 @@ theorem rv_contract_correctness
   unfold rv
   simp [microContractPred]
 
+/-!
+## Structural view lemmas (synonyms and projectors)
+
+These lemmas expose `microContractPred` as a definitional conjunction and
+provide convenient projectors for downstream use. They are intentionally kept
+`simp`-friendly to reduce boilerplate in proofs.
+-/
+
+@[simp]
+theorem microContractPred_iff
+    (cfg : ContractConfig)
+    (prevState nextState : StateHash)
+    (prevChainDigest : ChainDigest)
+    (r : MicroReceipt) :
+    microContractPred cfg prevState nextState prevChainDigest r ↔
+      MicroReceipt.ValidSchema cfg r ∧
+      CanonProfilePinned cfg r ∧
+      ObjectIdValid r ∧
+      NumericValid r ∧
+      policyLawful r ∧
+      r.chainDigestPrev = prevChainDigest ∧
+      chainDigestMatches r ∧
+      stateHashLinkOK prevState nextState r := Iff.rfl
+
+namespace microContractPred
+
+variable {cfg : ContractConfig} {prevState nextState : StateHash}
+variable {prevChainDigest : ChainDigest} {r : MicroReceipt}
+
+theorem schema
+    (h : microContractPred cfg prevState nextState prevChainDigest r) :
+    MicroReceipt.ValidSchema cfg r :=
+  (show _ from h).fst
+
+theorem canon
+    (h : microContractPred cfg prevState nextState prevChainDigest r) :
+    CanonProfilePinned cfg r := by
+  rcases h with ⟨_, hCanon, ..⟩; exact hCanon
+
+theorem objectId
+    (h : microContractPred cfg prevState nextState prevChainDigest r) :
+    ObjectIdValid r := by
+  rcases h with ⟨_, _, hObj, ..⟩; exact hObj
+
+theorem numeric
+    (h : microContractPred cfg prevState nextState prevChainDigest r) :
+    NumericValid r := by
+  rcases h with ⟨_, _, _, hNum, ..⟩; exact hNum
+
+theorem policy
+    (h : microContractPred cfg prevState nextState prevChainDigest r) :
+    policyLawful r := by
+  rcases h with ⟨_, _, _, _, hPol, ..⟩; exact hPol
+
+theorem prevDigest
+    (h : microContractPred cfg prevState nextState prevChainDigest r) :
+    r.chainDigestPrev = prevChainDigest := by
+  rcases h with ⟨_, _, _, _, _, hPrev, ..⟩; exact hPrev
+
+theorem digestOK
+    (h : microContractPred cfg prevState nextState prevChainDigest r) :
+    chainDigestMatches r := by
+  rcases h with ⟨_, _, _, _, _, _, hD, ..⟩; exact hD
+
+theorem stateLink
+    (h : microContractPred cfg prevState nextState prevChainDigest r) :
+    stateHashLinkOK prevState nextState r := by
+  rcases h with ⟨_, _, _, _, _, _, _, hS⟩; exact hS
+
+end microContractPred
+
 theorem rv_reject_of_bad_schema
     (cfg : ContractConfig)
     (prevState nextState : StateHash)

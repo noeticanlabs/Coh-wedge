@@ -4,6 +4,7 @@ import Coh.Contract.RejectCode
 import Coh.Contract.Micro
 import Coh.Contract.Canon
 import Coh.Contract.Slab
+import Coh.Contract.SlabV2
 import Coh.Contract.TestVectors
 import Coh.Contract.Boundary
 import Coh.Contract.MicroV2
