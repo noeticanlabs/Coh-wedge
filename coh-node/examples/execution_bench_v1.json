@@ -1,4 +1,4 @@
-{
+r{
     "benchmark_version": "v1.0",
     "generated": "2026-04-16",
     "description": "Execution layer benchmarks - verify then execute with proof generation",

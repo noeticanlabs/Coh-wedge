@@ -37,5 +37,11 @@ Expected axiom for T5: `Coh.Selection.clifford_algebra_dimension`.
 -- T3 grounding
 #print axioms Coh.Trace.t3_accepted_trace_implies_slab_verified
 
+-- T3 soundness (now complete with no sorry)
+#print axioms Coh.Trace.slab_soundness_theorem
+
+-- Chain telescoping (now requires MetricsContinuous)
+#print axioms Coh.Core.chain_telescoping_theorem
+
 -- T4 grounding
 #print axioms Coh.Spectral.receipt_defect_implies_visibility
