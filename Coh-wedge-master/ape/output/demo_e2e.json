@@ -1,0 +1,48 @@
+{
+  "demo": [
+    {
+      "action": {
+        "action": "transfer_100_tokens",
+        "amount": 100,
+        "target": "alice"
+      },
+      "decision": "Reject",
+      "message": "Missing required signature(s)",
+      "path": "local_accept",
+      "sidecar_status": null
+    },
+    {
+      "action": {
+        "action": "transfer_100_tokens",
+        "amount": 100,
+        "target": "alice"
+      },
+      "decision": "Reject",
+      "message": "Invalid schema_id: invalid.schema.v1 (Expected: coh.receipt.micro.v1)",
+      "path": "local_reject",
+      "sidecar_status": null
+    },
+    {
+      "action": {
+        "action": "transfer_100_tokens",
+        "amount": 100,
+        "target": "alice"
+      },
+      "decision": "Error",
+      "message": "sidecar unavailable",
+      "path": "sidecar_accept",
+      "sidecar_status": null
+    },
+    {
+      "action": {
+        "action": "transfer_100_tokens",
+        "amount": 100,
+        "target": "alice"
+      },
+      "decision": "Reject",
+      "message": "error sending request for url (http://127.0.0.1:3000/v1/execute-verified)",
+      "path": "sidecar_reject",
+      "sidecar_status": null
+    }
+  ]
+}

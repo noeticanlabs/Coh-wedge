@@ -1,0 +1,7 @@
+{
+  "response_ready": false,
+  "status": "PLAN_CREATED",
+  "task_id": "AGENT-2026-0001",
+  "tool_calls": 0,
+  "workspace_ready": true
+}

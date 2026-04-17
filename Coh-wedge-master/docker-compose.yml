@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  verifier:
+    build:
+      context: .
+      dockerfile: coh-node/Dockerfile
+    image: coh-validator:latest
+    container_name: coh-validator
+    # Interactive mode - mount local volume for receipts
+    profiles:
+      - interactive
+    volumes:
+      - ./receipts:/app/receipts:ro
+    command: verify-micro /app/receipts/input.json
+    # Example: verify a chain
+    # command: verify-chain /app/receipts/chain.jsonl
+
+    # Sidecar API (when implemented)
+    # sidecar:
+    #   build:
+    #     context: .
+    #     dockerfile: coh-node/Dockerfile
+    #   image: coh-sidecar:latest
+    #   ports:
+    #     - "3030:3030"
+    #   environment:
+    #     - RUST_LOG=info
+
+    # Dashboard (optional)
+  dashboard:
+    build:
+      context: ./coh-dashboard
+      dockerfile: ../Dockerfile.dashboard
+    image: coh-dashboard:latest
+    container_name: coh-dashboard
+    profiles:
+      - dashboard
+    ports:
+      - "5173:5173"
+    # Uncomment when sidecar is available:
+    # depends_on:
+    #   - sidecar
+    # environment:
+    #   - VITE_API_URL=http://sidecar:3030

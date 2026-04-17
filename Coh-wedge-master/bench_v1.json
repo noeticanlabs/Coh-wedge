@@ -1,0 +1,40 @@
+{
+  "results": [
+    {
+      "name": "micro_verify",
+      "iterations": 1000,
+      "total_ms": 31.295900000000003,
+      "throughput_per_sec": 31953.067334698793,
+      "avg_us": 31.295900000000003
+    },
+    {
+      "name": "micro_parse_verify",
+      "iterations": 1000,
+      "total_ms": 47.1933,
+      "throughput_per_sec": 21189.448502223833,
+      "avg_us": 47.1933
+    },
+    {
+      "name": "chain_verify",
+      "iterations": 1000,
+      "total_ms": 1749.4168000000002,
+      "throughput_per_sec": 571.6190675658311,
+      "avg_us": 1749.4168
+    },
+    {
+      "name": "slab_build",
+      "iterations": 1000,
+      "total_ms": 3015.0568,
+      "throughput_per_sec": 331.66871018814635,
+      "avg_us": 3015.0568
+    },
+    {
+      "name": "ape_generate_verify_mutation",
+      "iterations": 1000,
+      "total_ms": 207.4432,
+      "throughput_per_sec": 4820.596674173943,
+      "avg_us": 207.4432
+    }
+  ],
+  "sidecar_results": []
+}

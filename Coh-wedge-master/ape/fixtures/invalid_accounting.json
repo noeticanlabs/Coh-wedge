@@ -1,0 +1,19 @@
+{
+    "schema_id": "coh.receipt.micro.v1",
+    "version": "1.0.0",
+    "object_id": "agent.workflow.demo",
+    "canon_profile_hash": "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09",
+    "policy_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "step_index": 0,
+    "step_type": "task",
+    "state_hash_prev": "1111111111111111111111111111111111111111111111111111111111111111",
+    "state_hash_next": "2222222222222222222222222222222222222222222222222222222222222222",
+    "chain_digest_prev": "0000000000000000000000000000000000000000000000000000000000000000",
+    "chain_digest_next": "76114b520738a80e18048c2a37734c97b17d6f7e06f94393bbce7949bb87381c",
+    "metrics": {
+        "v_pre": "100",
+        "v_post": "85",
+        "spend": "12",
+        "defect": "0"
+    }
+}

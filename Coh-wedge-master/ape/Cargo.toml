@@ -1,0 +1,29 @@
+[package]
+name = "ape"
+version = "0.1.0"
+edition = "2021"
+description = "Adversarial / Exploratory Proposal Engine - LLM prototype and deterministic generator for Coh Wedge"
+
+[dependencies]
+coh-core = { path = "../coh-node/crates/coh-core" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rand = "0.8"
+thiserror = "1.0"
+clap = { version = "4.0", features = ["derive"] }
+reqwest = { version = "0.12", default-features = false, features = [
+    "blocking",
+    "json",
+    "rustls-tls",
+] }
+
+[dev-dependencies]
+coh-core = { path = "../coh-node/crates/coh-core" }
+
+[features]
+default = []
+llm = []
+
+[[bin]]
+name = "ape"
+path = "src/main.rs"

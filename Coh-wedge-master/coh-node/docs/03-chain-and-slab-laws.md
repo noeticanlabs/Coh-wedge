@@ -1,0 +1,79 @@
+# Chain and Slab Laws
+
+---
+
+## The Chain Digest Rule
+
+Every micro-receipt is cryptographically chained to its predecessor. The chain digest for receipt `i` is:
+
+```
+chain_digest_next[i] = SHA256(
+    "COH_V1_CHAIN" || "|" || chain_digest_prev_bytes[i] || "|" || canonical_json_bytes[i]
+)
+```
+
+Where `canonical_json_bytes[i]` is the alphabetized prehash JSON of receipt `i`, structurally excluding `chain_digest_next` to prevent circularity.
+
+For a chain to be valid:
+```
+chain_digest_prev[i+1] == chain_digest_next[i]   for all i
+```
+
+Any break in this chain is detected as `RejectChainDigest` at the first failing step.
+
+---
+
+## Chain Linkage Requirements (verify-chain)
+
+For a JSONL chain to pass, **all three** of the following must hold across consecutive receipts:
+
+1. **Step index continuity**: `step_index[i+1] == step_index[i] + 1`
+2. **State hash linkage**: `state_hash_prev[i+1] == state_hash_next[i]`
+3. **Digest linkage**: `chain_digest_prev[i+1] == chain_digest_next[i]`
+
+Failure in any linkage reports the exact failing step index.
+
+---
+
+## The Slab
+
+A **Slab Receipt** is a compact, self-contained summary of a verified chain segment. It is produced by `build-slab` and covers a contiguous range `[range_start, range_end]`.
+
+### Slab Fields
+
+| Field | Description |
+|---|---|
+| `range_start` | Step index of the first micro-receipt |
+| `range_end` | Step index of the last micro-receipt |
+| `micro_count` | Total receipts: `range_end - range_start + 1` |
+| `v_pre_first` | Opening potential of the first receipt |
+| `v_post_last` | Closing potential of the last receipt |
+| `total_spend` | Sum of all `spend` values (checked arithmetic) |
+| `total_defect` | Sum of all `defect` values (checked arithmetic) |
+| `merkle_root` | Merkle root of all `chain_digest_next` values (see `04-merkle-challenge-flow.md`) |
+
+### Slab Macro-Inequality (verify-slab)
+
+The slab enforces the aggregate accounting law:
+
+```
+v_post_last + total_spend <= v_pre_first + total_defect
+```
+
+This is the **Lawful Composition theorem**: if the law holds for every micro-step, it necessarily holds for the aggregate. The theorem is proved in `coh-lean` as `lawful_composition`.
+
+---
+
+## Reject Code Taxonomy
+
+| Code | Trigger |
+|---|---|
+| `RejectSchema` | Invalid `schema_id`, `version`, or empty `object_id` |
+| `RejectCanonProfile` | `canon_profile_hash` does not match expected constant |
+| `RejectChainDigest` | Computed digest ≠ stored `chain_digest_next` |
+| `RejectStateHashLink` | `state_hash_prev[i+1] ≠ state_hash_next[i]` |
+| `RejectNumericParse` | Non-decimal string or invalid hex in numeric field |
+| `RejectOverflow` | Checked arithmetic overflow |
+| `RejectPolicyViolation` | Accounting law inequality violated |
+| `RejectSlabSummary` | Slab macro-inequality violated or range/count invalid |
+| `RejectSlabMerkle` | Computed Merkle root ≠ stored `merkle_root` |

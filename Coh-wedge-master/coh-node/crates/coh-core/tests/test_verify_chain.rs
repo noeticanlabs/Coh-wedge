@@ -1,0 +1,121 @@
+use coh_core::canon::*;
+use coh_core::hash::compute_chain_digest;
+use coh_core::types::*;
+use coh_core::verify_chain::verify_chain;
+use std::convert::TryFrom;
+
+const VALID_PROFILE: &str = "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09";
+
+fn signature(index: u64) -> SignatureWire {
+    SignatureWire {
+        signature: format!("sig-verify-chain-{}", index),
+        signer: "tester".to_string(),
+        timestamp: 1_700_000_000 + index,
+    }
+}
+
+fn defect_for_step(index: u64) -> &'static str {
+    match index % 3 {
+        0 => "2",
+        1 => "1",
+        _ => "0",
+    }
+}
+
+fn create_valid_wire(index: u64, prev_digest: String, prev_state: String) -> MicroReceiptWire {
+    let mut wire = MicroReceiptWire {
+        schema_id: "coh.receipt.micro.v1".to_string(),
+        version: "1.0.0".to_string(),
+        object_id: "demo.obj".to_string(),
+        canon_profile_hash: VALID_PROFILE.to_string(),
+        policy_hash: "0".repeat(64),
+        step_index: index,
+        step_type: Some("compute".to_string()),
+        signatures: Some(vec![signature(index)]),
+        state_hash_prev: prev_state.clone(),
+        state_hash_next: format!("{:064x}", index + 1),
+        chain_digest_prev: prev_digest,
+        chain_digest_next: "0".repeat(64),
+        metrics: MetricsWire {
+            v_pre: "100".to_string(),
+            v_post: "99".to_string(),
+            spend: "1".to_string(),
+            defect: defect_for_step(index).to_string(),
+        },
+    };
+    seal_wire(&mut wire);
+    wire
+}
+
+fn seal_wire(wire: &mut MicroReceiptWire) {
+    let r = MicroReceipt::try_from(wire.clone()).unwrap();
+    let prehash = to_prehash_view(&r);
+    let bytes = to_canonical_json_bytes(&prehash).unwrap();
+    wire.chain_digest_next = compute_chain_digest(r.chain_digest_prev, &bytes).to_hex();
+}
+
+#[test]
+fn test_chain_accept_valid_3_steps() {
+    let w0 = create_valid_wire(0, "0".repeat(64), "0".repeat(64));
+    let w1 = create_valid_wire(1, w0.chain_digest_next.clone(), w0.state_hash_next.clone());
+    let w2 = create_valid_wire(2, w1.chain_digest_next.clone(), w1.state_hash_next.clone());
+
+    let res = verify_chain(vec![w0, w1, w2]);
+    assert_eq!(res.decision, Decision::Accept);
+    assert_eq!(res.steps_verified, 3);
+    assert_eq!(res.last_step_index, 2);
+}
+
+#[test]
+fn test_chain_reject_broken_digest_link() {
+    let w0 = create_valid_wire(0, "0".repeat(64), "0".repeat(64));
+    let mut w1 = create_valid_wire(1, w0.chain_digest_next.clone(), w0.state_hash_next.clone());
+    w1.chain_digest_prev = "1".repeat(64); // Break link
+    seal_wire(&mut w1); // But keep it internally valid
+
+    let res = verify_chain(vec![w0, w1]);
+    assert_eq!(res.decision, Decision::Reject);
+    assert_eq!(res.code, Some(RejectCode::RejectChainDigest));
+    assert_eq!(res.failing_step_index, Some(1));
+}
+
+#[test]
+fn test_chain_reject_empty() {
+    let res = verify_chain(vec![]);
+    assert_eq!(res.decision, Decision::Reject);
+    assert_eq!(res.code, Some(RejectCode::RejectSchema));
+}
+
+#[test]
+fn test_chain_reject_invalid_first_receipt() {
+    let mut w0 = create_valid_wire(0, "0".repeat(64), "0".repeat(64));
+    w0.schema_id = "invalid".to_string(); // Make first receipt invalid
+
+    let res = verify_chain(vec![w0]);
+    assert_eq!(res.decision, Decision::Reject);
+    assert_eq!(res.failing_step_index, Some(0));
+}
+
+#[test]
+fn test_chain_reject_broken_step_index() {
+    let w0 = create_valid_wire(0, "0".repeat(64), "0".repeat(64));
+    let mut w1 = create_valid_wire(5, w0.chain_digest_next.clone(), w0.state_hash_next.clone()); // Wrong index
+    seal_wire(&mut w1);
+
+    let res = verify_chain(vec![w0, w1]);
+    assert_eq!(res.decision, Decision::Reject);
+    assert_eq!(res.code, Some(RejectCode::RejectSchema)); // Index discontinuity uses RejectSchema
+    assert_eq!(res.failing_step_index, Some(5));
+}
+
+#[test]
+fn test_chain_reject_broken_state_link() {
+    let w0 = create_valid_wire(0, "0".repeat(64), "0".repeat(64));
+    let mut w1 = create_valid_wire(1, w0.chain_digest_next.clone(), "1".repeat(64)); // Wrong state
+    seal_wire(&mut w1);
+
+    let res = verify_chain(vec![w0, w1]);
+    assert_eq!(res.decision, Decision::Reject);
+    assert_eq!(res.code, Some(RejectCode::RejectStateHashLink));
+    assert_eq!(res.failing_step_index, Some(1));
+}

@@ -1,0 +1,145 @@
+{
+  "summary": "Full verifier rejects 95.0% of attacks vs Schema-only 30.5% and Rule-only 75.0%",
+  "baselines": [
+    {
+      "system": "Full Verifier",
+      "rejected": 190,
+      "escaped": 0,
+      "rejection_rate": 95.0
+    },
+    {
+      "system": "Schema Only",
+      "rejected": 61,
+      "escaped": 129,
+      "rejection_rate": 30.5
+    },
+    {
+      "system": "Rule Only",
+      "rejected": 150,
+      "escaped": 40,
+      "rejection_rate": 75.0
+    }
+  ],
+  "per_strategy_escapes": [
+    {
+      "strategy": "mutation",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 10,
+      "rule_only_escapes": 0
+    },
+    {
+      "strategy": "recombination",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 10,
+      "rule_only_escapes": 0
+    },
+    {
+      "strategy": "violation",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 6,
+      "rule_only_escapes": 0
+    },
+    {
+      "strategy": "overflow",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 7,
+      "rule_only_escapes": 2
+    },
+    {
+      "strategy": "contradiction",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 10,
+      "rule_only_escapes": 1
+    },
+    {
+      "strategy": "spec_gaming",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 10,
+      "rule_only_escapes": 9
+    },
+    {
+      "strategy": "dist_shift",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 10,
+      "rule_only_escapes": 4
+    },
+    {
+      "strategy": "temporal_drift",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 10,
+      "rule_only_escapes": 0
+    },
+    {
+      "strategy": "ambiguity",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 8,
+      "rule_only_escapes": 0
+    },
+    {
+      "strategy": "adv_alignment",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 10,
+      "rule_only_escapes": 0
+    },
+    {
+      "strategy": "non_term",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 10,
+      "rule_only_escapes": 4
+    },
+    {
+      "strategy": "livelock",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 10,
+      "rule_only_escapes": 0
+    },
+    {
+      "strategy": "state_bomb",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 0,
+      "rule_only_escapes": 0
+    },
+    {
+      "strategy": "resource_x",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 8,
+      "rule_only_escapes": 0
+    },
+    {
+      "strategy": "parser_bug",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 10,
+      "rule_only_escapes": 0
+    },
+    {
+      "strategy": "shadow_chain",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 0,
+      "rule_only_escapes": 0
+    },
+    {
+      "strategy": "gradient_descent",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 0,
+      "rule_only_escapes": 10
+    },
+    {
+      "strategy": "oracle_manip",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 0,
+      "rule_only_escapes": 0
+    },
+    {
+      "strategy": "type_confusion",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 0,
+      "rule_only_escapes": 10
+    },
+    {
+      "strategy": "reflexive",
+      "full_verifier_escapes": 0,
+      "schema_only_escapes": 0,
+      "rule_only_escapes": 0
+    }
+  ]
+}

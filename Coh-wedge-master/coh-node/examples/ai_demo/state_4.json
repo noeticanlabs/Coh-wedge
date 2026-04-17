@@ -1,0 +1,7 @@
+{
+  "response_ready": true,
+  "status": "FINAL_RESPONSE_EMITTED",
+  "task_id": "AGENT-2026-0001",
+  "tool_calls": 1,
+  "workspace_ready": true
+}

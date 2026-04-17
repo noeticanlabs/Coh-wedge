@@ -1,0 +1,21 @@
+{
+    "schema_id": "coh.receipt.slab.v1",
+    "version": "1.0.0",
+    "object_id": "agent.workflow.demo",
+    "canon_profile_hash": "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09",
+    "policy_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "range_start": 0,
+    "range_end": 3,
+    "micro_count": 4,
+    "chain_digest_prev": "0000000000000000000000000000000000000000000000000000000000000000",
+    "chain_digest_next": "d83cdb09d502855e4f4181e1ee9c1b1d11d2951d2857d335fa1ed01d877350c9",
+    "state_hash_first": "1111111111111111111111111111111111111111111111111111111111111111",
+    "state_hash_last": "5555555555555555555555555555555555555555555555555555555555555555",
+    "merkle_root": "3b0e13328732f6f2c3b7680b15345a4399dfd151234ee4ce8d9a2bca587b6aa8",
+    "summary": {
+        "total_spend": "999",
+        "total_defect": "1",
+        "v_pre_first": "100",
+        "v_post_last": "55"
+    }
+}

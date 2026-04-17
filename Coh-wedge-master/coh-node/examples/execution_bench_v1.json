@@ -1,0 +1,30 @@
+r{
+    "benchmark_version": "v1.0",
+    "generated": "2026-04-16",
+    "description": "Execution layer benchmarks - verify then execute with proof generation",
+    "execution_modes": {
+        "dry_run": {
+            "description": "Verify + compute proof, no state change",
+            "avg_time_us": 16.1,
+            "iterations": 308000
+        },
+        "real": {
+            "description": "Verify + execute + proof, state changes",
+            "avg_time_us": 14.2,
+            "iterations": 354000
+        },
+        "simulation": {
+            "description": "What-if analysis, compute without executing",
+            "avg_time_us": 13.2,
+            "iterations": 369000
+        }
+    },
+    "verification": {
+        "verify_only": {
+            "description": "Pure verification (baseline for comparison)",
+            "avg_time_us": 15.9,
+            "iterations": 298000
+        }
+    },
+    "notes": "All operations complete in <20µs. Execution is faster than verification alone due to early rejection path. Real mode includes state store writes."
+}

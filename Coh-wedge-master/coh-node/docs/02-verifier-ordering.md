@@ -1,0 +1,90 @@
+# Verifier Ordering
+
+The `verify_micro` function applies checks in a strict, frozen 6-step order. Steps are ordered by cost: cheapest and most-likely-to-fail first. The first failing check halts verification and returns a typed rejection.
+
+---
+
+## Step Order
+
+### Step 1 — Wire to Runtime Parse
+
+Convert the JSON wire struct to typed runtime values:
+- Decimal strings → `u128`
+- Hex strings → `Hash32`
+
+**Failure code**: `RejectNumericParse`
+
+---
+
+### Step 2 — Schema and Version Check
+
+Verify `schema_id == "coh.receipt.micro.v1"` and `version == "1.0.0"`.
+
+**Failure code**: `RejectSchema`
+
+---
+
+### Step 3 — Object ID Sanity
+
+Verify `object_id` is non-empty and non-whitespace.
+
+**Failure code**: `RejectSchema`
+
+---
+
+### Step 4 — Canon Profile Hash
+
+Verify `canon_profile_hash` matches the expected protocol constant:
+
+```
+4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09
+```
+
+This hash pins the canonical profile version. A mismatch means the receipt was produced for a different protocol version.
+
+**Failure code**: `RejectCanonProfile`
+
+---
+
+### Step 5 — Policy Inequality
+
+Verify the accounting law:
+
+```
+v_post + spend <= v_pre + defect
+```
+
+Both sides are computed with checked arithmetic. Any overflow is also a rejection.
+
+**Failure code**: `RejectPolicyViolation` or `RejectOverflow`
+
+---
+
+### Step 6 — Cryptographic Digest
+
+Compute the expected `chain_digest_next`:
+
+```
+SHA256("COH_V1_CHAIN" || "|" || chain_digest_prev_bytes || "|" || canonical_json_bytes)
+```
+
+Compare against the `chain_digest_next` field in the receipt.
+
+**Failure code**: `RejectChainDigest`
+
+---
+
+## Why This Order?
+
+1. Parsing must succeed before any other check can run.
+2. Schema/version/profile checks are O(1) comparisons — eliminate mismatched receipts immediately.
+3. Policy check is pure arithmetic — cheaper than hashing.
+4. Digest check is last because it requires canonicalization + SHA-256.
+
+---
+
+## Verification Order for Chain, Slab
+
+For `verify_chain`: each receipt is fully verified by `verify_micro`, then cross-receipt linkage is checked (step_index continuity, state_hash linkage, chain_digest linkage).
+
+For `verify_slab`: range/count checks first, then macro inequality, then optional Merkle root check (`verify_slab_with_leaves`).
