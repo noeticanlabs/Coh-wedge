@@ -1,4 +1,4 @@
-# Coh Stacked System: Chain of Constructions ✅ COMPLETE
+11# Coh Stacked System: Chain of Constructions ✅ COMPLETE
 
 This document maps the conceptual pipeline to concrete modules and declarations in this repo. All implementation steps are complete. Canonical choices locked: CohCat Bool RV for semantics, NNReal for quantitative enrichment.
 

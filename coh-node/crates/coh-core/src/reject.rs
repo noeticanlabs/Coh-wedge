@@ -32,4 +32,7 @@ pub enum RejectCode {
     TimeBudgetExceeded,
     MemoryBudgetExceeded,
     DepthLimitExceeded,
+    // Measurement failures
+    RejectDissipationViolation,
+    RejectInvalidMapping,
 }

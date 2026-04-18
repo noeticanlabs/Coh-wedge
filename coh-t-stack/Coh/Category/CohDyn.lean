@@ -102,6 +102,10 @@ theorem cost_subadditive (A : Obj) (V : A.X → NNReal) {x y z : A.X}
 theorem cost_id_zero (A : Obj) (V : A.X → NNReal) (x : A.X) :
   path_cost A V (DynHom.nil x) = 0 := rfl
 
+/-- Simplified cost signature for a governed system A and trace p. -/
+def cost (A : CohObj) {x y : A.X} (p : DynHom A x y) : NNReal :=
+  path_cost A A.V p
+
 /- SmallCategory instance over A.X using verified paths as homs. [PROVED] -/
 def CohDyn (A : Obj) : SmallCategory A.X :=
   { Hom := fun x y => DynHom A x y

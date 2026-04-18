@@ -10,6 +10,9 @@ pub mod vectors;
 pub mod verify_chain;
 pub mod verify_micro;
 pub mod verify_slab;
+pub mod measurement;
+#[cfg(test)]
+mod vectors_measurement;
 
 pub use build_slab::build_slab;
 pub use execute::{ExecuteResponse, ExecutionEngine, ExecutionMode};
