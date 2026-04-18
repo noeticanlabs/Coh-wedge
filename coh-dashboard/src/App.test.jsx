@@ -98,6 +98,9 @@ describe('App Behavioral Tests', () => {
     expect(loadDashboardData).toHaveBeenCalledWith(expect.objectContaining({
       scenarioKey: 'reject_policy_violation'
     }));
+
+    // Wait for the dashboard to reload
+    await waitFor(() => expect(screen.queryByText(/Loading AI demo data/i)).not.toBeInTheDocument());
   });
 
   it('updates inspector when a timeline step is clicked', async () => {
@@ -129,6 +132,6 @@ describe('App Behavioral Tests', () => {
       preferLiveVerification: true
     }));
 
-    expect(screen.getByText(/Live verify enabled/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Live verify enabled/i)).toBeInTheDocument();
   });
 });
