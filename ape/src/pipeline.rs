@@ -107,9 +107,10 @@ mod tests {
             chain_digest_next: "0".repeat(64),
             metrics: MetricsWire {
                 v_pre: "100".to_string(),
-                v_post: "80".to_string(),
-                spend: "15".to_string(),
+                v_post: "100".to_string(),
+                spend: "0".to_string(),
                 defect: "0".to_string(),
+                authority: "0".to_string(),
             },
         }
     }

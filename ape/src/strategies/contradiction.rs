@@ -95,6 +95,7 @@ fn generate_contradiction(rng: &mut SeededRng) -> Candidate {
             v_post: "150".to_string(), // Post > Pre (contradiction!)
             spend: "20".to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     };
 

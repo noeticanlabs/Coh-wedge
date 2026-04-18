@@ -361,6 +361,7 @@ fn generate_valid_base_micro(rng: &mut SeededRng) -> MicroReceiptWire {
             v_post: v_post.to_string(),
             spend: spend.to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     };
 

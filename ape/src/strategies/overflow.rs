@@ -106,6 +106,7 @@ fn generate_overflow(rng: &mut SeededRng) -> Candidate {
             v_post: "0".to_string(),
             spend: "1".to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     };
 

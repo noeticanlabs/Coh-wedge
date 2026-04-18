@@ -41,15 +41,16 @@ fn create_sample(rng: &mut SeededRng, step: u64) -> MicroReceiptWire {
         step_index: step,
         step_type: Some("recombination".to_string()),
         signatures: Some(vec![]),
-        state_hash_prev: format!("{:064x}", step),
-        state_hash_next: format!("{:064x}", step + 1),
-        chain_digest_prev: "0".repeat(64),
+        state_hash_prev: format!("{:064x}", rng.next() as u64),
+        state_hash_next: format!("{:064x}", rng.next() as u64),
+        chain_digest_prev: chain_digest_prev_hex,
         chain_digest_next: "0".repeat(64),
         metrics: coh_core::types::MetricsWire {
             v_pre: v_pre.to_string(),
             v_post: v_post.to_string(),
             spend: spend.to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     };
 

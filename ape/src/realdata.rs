@@ -39,10 +39,10 @@ pub fn generate_runtime_ai_micro() -> Result<MicroReceiptWire, FixtureError> {
 
 pub fn generate_runtime_ai_chain(steps: usize) -> Result<Vec<MicroReceiptWire>, FixtureError> {
     let patterns = [
-        ("100", "88", "12", "0"),
-        ("88", "80", "7", "1"),
-        ("80", "68", "11", "0"),
-        ("68", "55", "12", "0"),
+        ("100", "88", "12", "0", "0"),
+        ("88", "80", "7", "1", "0"),
+        ("80", "68", "11", "0", "0"),
+        ("68", "55", "12", "0", "0"),
     ];
 
     let mut chain = Vec::with_capacity(steps);
@@ -51,7 +51,7 @@ pub fn generate_runtime_ai_chain(steps: usize) -> Result<Vec<MicroReceiptWire>, 
 
     for i in 0..steps {
         let next_state = format!("{:064x}", (i + 2) as u64);
-        let (v_pre, v_post, spend, defect) = patterns[i % patterns.len()];
+        let (v_pre, v_post, spend, defect, authority) = patterns[i % patterns.len()];
         let mut receipt = MicroReceiptWire {
             schema_id: "coh.receipt.micro.v1".to_string(),
             version: "1.0.0".to_string(),
@@ -60,8 +60,8 @@ pub fn generate_runtime_ai_chain(steps: usize) -> Result<Vec<MicroReceiptWire>, 
                 .to_string(),
             policy_hash: "0".repeat(64),
             step_index: i as u64,
-            step_type: None,
-            signatures: None,
+            step_type: Some("realdata".to_string()),
+            signatures: Some(vec![]),
             state_hash_prev: prev_state.clone(),
             state_hash_next: next_state.clone(),
             chain_digest_prev: prev_digest.clone(),
@@ -71,6 +71,7 @@ pub fn generate_runtime_ai_chain(steps: usize) -> Result<Vec<MicroReceiptWire>, 
                 v_post: v_post.to_string(),
                 spend: spend.to_string(),
                 defect: defect.to_string(),
+                authority: authority.to_string(),
             },
         };
         receipt.chain_digest_next = seal(&receipt)?;

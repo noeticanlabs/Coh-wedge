@@ -25,6 +25,7 @@ pub struct LlmResponse {
     pub v_post: u128,
     pub spend: u128,
     pub defect: u128,
+    pub authority: u128,
     pub state_hash_prev: String,
     pub state_hash_next: String,
 }
@@ -39,6 +40,7 @@ impl LlmResponse {
             v_post: self.v_post.to_string(),
             spend: self.spend.to_string(),
             defect: self.defect.to_string(),
+            authority: self.authority.to_string(),
         };
 
         let mut wire = coh_core::types::MicroReceiptWire {
@@ -134,10 +136,10 @@ impl LlmAdapter for MockLlmAdapter {
 
         Ok(LlmResponse {
             step_index: step,
-            v_pre,
             v_post,
             spend,
             defect,
+            authority: 0,
             state_hash_prev: format!("{:064x}", step),
             state_hash_next: format!("{:064x}", step + 1),
         })

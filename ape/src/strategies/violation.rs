@@ -90,6 +90,7 @@ fn generate_violation(rng: &mut SeededRng) -> Candidate {
             v_post: "80".to_string(),
             spend: "15".to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     };
 
