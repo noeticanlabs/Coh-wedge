@@ -116,7 +116,7 @@ impl LlmAdapter for MockLlmAdapter {
                 .parse()
                 .unwrap_or(0)
         } else {
-            self.seed as u64
+            self.seed
         };
 
         // Simulate LLM behavior: consumes resources, outputs state
@@ -124,7 +124,7 @@ impl LlmAdapter for MockLlmAdapter {
         let spend = rng.next() as u128 % 30 + 1;
 
         // Decide valid or hallucinated
-        let (v_post, defect) = if self.produce_invalid && rng.next() % 2 == 0 {
+        let (v_post, defect) = if self.produce_invalid && rng.next().is_multiple_of(2) {
             // Hallucination: claim value higher than should be
             (v_pre + 50, 0) // Invalid!
         } else {

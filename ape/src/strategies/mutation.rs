@@ -30,7 +30,7 @@ fn mutate_micro(wire: &MicroReceiptWire, rng: &mut SeededRng) -> Candidate {
             // Tamper with payload but keep original digest (Integrity attack)
             // Modify metrics to change what the receipt claims
             if let Ok(v) = wire.metrics.v_pre.parse::<u128>() {
-                let delta = (rng.next() as i64 - 0x40000000i64).abs() as u128 % 20;
+                let delta = (rng.next() as i64 - 0x40000000i64).unsigned_abs() as u128 % 20;
                 m.metrics.v_pre = (v.saturating_sub(delta)).to_string();
             }
             // DO NOT recompute chain_digest_next - this is the attack!

@@ -294,8 +294,8 @@ pub fn reflexive_attack(input: &Input, rng: &mut SeededRng) -> Candidate {
     let mut result = Vec::with_capacity(len + 1);
 
     // Add original chain (truncated)
-    for i in 0..len - 1 {
-        result.push(chain[i].clone());
+    for item in chain.iter().take(len - 1) {
+        result.push(item.clone());
     }
 
     // Last element - create self-reference or back-reference
