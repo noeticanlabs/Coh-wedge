@@ -98,6 +98,7 @@ pub struct SlabReceiptWire {
     pub summary: SlabSummaryWire,
 }
 
+#[derive(Clone)]
 pub struct Metrics {
     pub v_pre: u128,
     pub v_post: u128,
@@ -106,6 +107,7 @@ pub struct Metrics {
     pub authority: u128,
 }
 
+#[derive(Clone)]
 pub struct MicroReceipt {
     pub schema_id: String,
     pub version: String,

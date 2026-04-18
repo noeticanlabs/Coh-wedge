@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use crate::measurement::{Measurement, map_chain, verify_chain_dissipation};
-    use crate::types::{Hash32, MicroReceipt, Metrics};
+    use crate::measurement::{map_chain, verify_chain_dissipation, Measurement};
+    use crate::types::{Hash32, Metrics, MicroReceipt};
     use std::convert::TryInto;
 
     struct Identity;
@@ -47,7 +47,7 @@ mod tests {
             // This violator "cleans" it by setting defect to zero.
             let mut r = receipt.clone();
             r.metrics.defect = 0;
-            Some((r.state_hash_prev, r, r.state_hash_next))
+            Some((r.state_hash_prev, r.clone(), r.state_hash_next))
         }
     }
 
@@ -57,18 +57,22 @@ mod tests {
             schema_id: "test".to_string(),
             version: "1.0.0".to_string(),
             object_id: "obj".to_string(),
-            canon_profile_hash: Hash32([0;32]),
-            policy_hash: Hash32([0;32]),
+            canon_profile_hash: Hash32([0; 32]),
+            policy_hash: Hash32([0; 32]),
             step_index: 0,
             step_type: None,
             signatures: None,
-            state_hash_prev: Hash32([1;32]),
-            state_hash_next: Hash32([2;32]),
-            chain_digest_prev: Hash32([0;32]),
-            chain_digest_next: Hash32([0;32]),
+            state_hash_prev: Hash32([1; 32]),
+            state_hash_next: Hash32([2; 32]),
+            chain_digest_prev: Hash32([0; 32]),
+            chain_digest_next: Hash32([0; 32]),
             metrics: Metrics {
-                v_pre, v_post, spend, defect, authority: 0
-            }
+                v_pre,
+                v_post,
+                spend,
+                defect,
+                authority: 0,
+            },
         }
     }
 
@@ -82,13 +86,18 @@ mod tests {
     fn test_dissipation_violation() {
         struct ExpensiveMeasurement;
         impl Measurement for ExpensiveMeasurement {
-            fn map_step(&self, p: &Hash32, r: &MicroReceipt, n: &Hash32) -> Option<(Hash32, MicroReceipt, Hash32)> {
+            fn map_step(
+                &self,
+                p: &Hash32,
+                r: &MicroReceipt,
+                n: &Hash32,
+            ) -> Option<(Hash32, MicroReceipt, Hash32)> {
                 let mut mapped = r.clone();
                 mapped.metrics.spend += 10; // Increase cost!
                 Some((*p, mapped, *n))
             }
         }
-        
+
         let chain = vec![mock_receipt(100, 80, 20, 0)];
         // Should fail oplax dissipation check
         assert!(!verify_chain_dissipation(&ExpensiveMeasurement, &chain));
@@ -99,14 +108,14 @@ mod tests {
         use crate::measurement::detect_collapse;
         let chain1 = vec![mock_receipt(100, 80, 20, 0)]; // state 1 -> 2
         let mut chain2 = vec![mock_receipt(100, 80, 20, 0)];
-        chain2[0].state_hash_prev = Hash32([3;32]); // state 3 -> 2
-        
+        chain2[0].state_hash_prev = Hash32([3; 32]); // state 3 -> 2
+
         let traces = vec![chain1, chain2];
         let collapses = detect_collapse(&Compression, &traces);
-        
+
         // Compression maps s1 and s3 to t0.
         assert!(collapses.len() > 0);
-        assert!(collapses[0].source_hashes.contains(&Hash32([1;32])));
-        assert!(collapses[0].source_hashes.contains(&Hash32([3;32])));
+        assert!(collapses[0].source_hashes.contains(&Hash32([1; 32])));
+        assert!(collapses[0].source_hashes.contains(&Hash32([3; 32])));
     }
 }

@@ -136,6 +136,7 @@ impl LlmAdapter for MockLlmAdapter {
 
         Ok(LlmResponse {
             step_index: step,
+            v_pre,
             v_post,
             spend,
             defect,

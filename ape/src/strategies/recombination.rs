@@ -5,6 +5,7 @@
 use crate::proposal::Candidate;
 use crate::proposal::Input;
 use crate::seed::SeededRng;
+use coh_core::types::MicroReceipt;
 use coh_core::types::MicroReceiptWire;
 
 /// Run recombination strategy - generates micro receipts with broken chain links
@@ -43,7 +44,7 @@ fn create_sample(rng: &mut SeededRng, step: u64) -> MicroReceiptWire {
         signatures: Some(vec![]),
         state_hash_prev: format!("{:064x}", rng.next() as u64),
         state_hash_next: format!("{:064x}", rng.next() as u64),
-        chain_digest_prev: chain_digest_prev_hex,
+        chain_digest_prev: format!("{:064x}", rng.next() as u64),
         chain_digest_next: "0".repeat(64),
         metrics: coh_core::types::MetricsWire {
             v_pre: v_pre.to_string(),

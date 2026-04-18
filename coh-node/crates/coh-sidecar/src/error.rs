@@ -50,6 +50,9 @@ impl From<RejectCode> for CohErrorCode {
             // Cumulative drift failures (GradientDescent defense)
             | RejectCode::CumulativeDriftDetected => CohErrorCode::E003,
 
+            // Measurement/oplax failures -> E003 (policy-style quantitative violation)
+            RejectCode::RejectDissipationViolation | RejectCode::RejectInvalidMapping => CohErrorCode::E003,
+
             // State link -> E004
             RejectCode::RejectStateHashLink => CohErrorCode::E004,
         }
