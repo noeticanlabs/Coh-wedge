@@ -126,6 +126,7 @@ where
                 v_post: "50".to_string(),
                 spend: "50".to_string(),
                 defect: "0".to_string(),
+                authority: "0".to_string(),
             },
         };
 

@@ -152,6 +152,7 @@ fn generate_chain(steps: usize, _breach_at: Option<usize>) -> Vec<MicroReceiptWi
                 v_post: v_post.to_string(),
                 spend: "10".to_string(),
                 defect: "0".to_string(),
+                authority: "0".to_string(),
             },
         };
 

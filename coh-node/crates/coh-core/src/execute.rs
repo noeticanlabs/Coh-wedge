@@ -235,13 +235,14 @@ mod tests {
                 .to_string(),
             chain_digest_prev: "0000000000000000000000000000000000000000000000000000000000000000"
                 .to_string(),
-            chain_digest_next: "431bf30f44950ef6f3d60e75bc2fd891a2f259fe218c8cf19655acf149dc85ba"
+            chain_digest_next: "d6439d130820e2e0cf58f082db4b5d39ebed5dba4b30164f3a1955ca635357ba"
                 .to_string(),
             metrics: crate::types::MetricsWire {
                 v_pre: "100".to_string(),
                 v_post: "88".to_string(),
                 spend: "12".to_string(),
                 defect: "0".to_string(),
+                authority: "0".to_string(),
             },
         };
 
@@ -262,7 +263,7 @@ mod tests {
         assert_eq!(proof.schema_id, "coh.receipt.execution.v1");
         assert_eq!(
             proof.parent_receipt_hash,
-            "431bf30f44950ef6f3d60e75bc2fd891a2f259fe218c8cf19655acf149dc85ba"
+            "d6439d130820e2e0cf58f082db4b5d39ebed5dba4b30164f3a1955ca635357ba"
         );
     }
 
@@ -311,6 +312,7 @@ mod tests {
                 v_post: "99".to_string(),
                 spend: "1".to_string(),
                 defect: "0".to_string(),
+                authority: "0".to_string(),
             },
         };
 

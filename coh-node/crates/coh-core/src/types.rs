@@ -40,6 +40,7 @@ pub struct MetricsWire {
     pub v_post: String,
     pub spend: String,
     pub defect: String,
+    pub authority: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -73,6 +74,7 @@ pub struct MicroReceiptWire {
 pub struct SlabSummaryWire {
     pub total_spend: String,
     pub total_defect: String,
+    pub total_authority: String,
     pub v_pre_first: String,
     pub v_post_last: String,
 }
@@ -101,6 +103,7 @@ pub struct Metrics {
     pub v_post: u128,
     pub spend: u128,
     pub defect: u128,
+    pub authority: u128,
 }
 
 pub struct MicroReceipt {
@@ -122,6 +125,7 @@ pub struct MicroReceipt {
 pub struct SlabSummary {
     pub total_spend: u128,
     pub total_defect: u128,
+    pub total_authority: u128,
     pub v_pre_first: u128,
     pub v_post_last: u128,
 }
@@ -145,6 +149,7 @@ pub struct SlabReceipt {
 
 #[derive(Serialize)]
 pub struct MetricsPrehash {
+    pub authority: String,
     pub defect: String,
     pub spend: String,
     pub v_post: String,
@@ -241,6 +246,7 @@ impl TryFrom<MetricsWire> for Metrics {
             v_post: parse_u128(&w.v_post)?,
             spend: parse_u128(&w.spend)?,
             defect: parse_u128(&w.defect)?,
+            authority: parse_u128(&w.authority)?,
         })
     }
 }
@@ -272,6 +278,7 @@ impl TryFrom<SlabSummaryWire> for SlabSummary {
         Ok(SlabSummary {
             total_spend: parse_u128(&w.total_spend)?,
             total_defect: parse_u128(&w.total_defect)?,
+            total_authority: parse_u128(&w.total_authority)?,
             v_pre_first: parse_u128(&w.v_pre_first)?,
             v_post_last: parse_u128(&w.v_post_last)?,
         })

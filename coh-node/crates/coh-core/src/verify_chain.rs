@@ -30,6 +30,7 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
     // Trajectory invariants
     let mut seen_states: std::collections::HashSet<String> = std::collections::HashSet::new();
     let mut total_defect: u128 = 0;
+    let mut total_authority: u128 = 0;
     let mut prev_defect: Option<u128> = None;
     let mut no_progress_count: usize = 0;
 
@@ -179,6 +180,25 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
 
         // 3b. Progress check (NoProgressLoop) - defect must decrease or terminal
         total_defect += r.metrics.defect;
+        total_authority = match total_authority.checked_add(r.metrics.authority) {
+            Some(v) => v,
+            None => {
+                return VerifyChainResult {
+                    decision: Decision::Reject,
+                    code: Some(RejectCode::TrajectoryCostExceeded),
+                    message: format!(
+                        "Trajectory authority overflow at step {}: total authority exceeds u128",
+                        step_idx
+                    ),
+                    steps_verified: i as u64,
+                    first_step_index: first_index,
+                    last_step_index: last_good_index,
+                    final_chain_digest: current_digest,
+                    failing_step_index: Some(step_idx),
+                    steps_verified_before_failure: Some(i as u64),
+                };
+            }
+        };
         if let Some(prev) = prev_defect {
             if r.metrics.defect >= prev {
                 no_progress_count += 1;
@@ -256,14 +276,14 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
     // The Accounting Law telescopes: v_post_last + cumulative_spend <= v_pre_first + total_defect
     if let Some(v_pre_0) = first_v_pre {
         let lhs = last_v_post.checked_add(cumulative_spend);
-        let rhs = v_pre_0.checked_add(total_defect);
+        let rhs = v_pre_0.checked_add(total_defect).and_then(|v| v.checked_add(total_authority));
         match (lhs, rhs) {
             (Some(l), Some(r)) if l > r => {
                 return VerifyChainResult {
                     decision: Decision::Reject,
                     code: Some(RejectCode::CumulativeDriftDetected),
                     message: format!(
-                        "Cumulative drift detected: v_post_last + cumulative_spend ({}) > v_pre_first + total_defect ({})",
+                        "Cumulative drift detected: v_post_last + cumulative_spend ({}) > v_pre_first + total_defect + total_authority ({})",
                         l, r
                     ),
                     steps_verified: (last_good_index - first_index + 1),

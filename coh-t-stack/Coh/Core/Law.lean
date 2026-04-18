@@ -17,7 +17,7 @@ def Accepted (r : Receipt) : Prop :=
 
 /-- Oplax lawfulness with additive slack. -/
 def LawfulUpTo (Δ : ℝ) (r : Receipt) : Prop :=
-  r.post + r.spend ≤ r.pre + r.defect + r.authority + Δ
+  r.post + r.spend ≤ r.pre + r.defect + r.authority + Δ ∧ r.spend ≤ r.pre
 
 theorem lawful_iff_lawfulUpTo_zero (r : Receipt) :
     Lawful r ↔ LawfulUpTo 0 r := by

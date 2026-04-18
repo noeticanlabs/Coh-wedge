@@ -31,6 +31,7 @@ mod tests {
                 v_post: "60".to_string(),
                 spend: "20".to_string(),
                 defect: "0".to_string(),
+                authority: "0".to_string(),
             },
         };
 

@@ -179,6 +179,7 @@ fn run_with_coh() {
                 v_post: v_post.to_string(),
                 spend: spend.to_string(),
                 defect: defect.to_string(),
+                authority: "0".to_string(),
             },
         };
         receipt.chain_digest_next = seal(&receipt);
@@ -251,16 +252,17 @@ fn run_with_coh() {
                 println!(
                     "  {} {}",
                     "VIOLATION:     ".bold(),
-                    "v_post + spend  >  v_pre + defect".red().bold()
+                    "v_post + spend  >  v_pre + defect + authority".red().bold()
                 );
                 println!(
-                    "  {} {} + {} = {}  >  {} + {} = {}",
+                    "  {} {} + {} = {}  >  {} + {} + {} = {}",
                     "ARITHMETIC:    ".bold(),
                     v_post.to_string().red(),
                     spend.to_string().red(),
                     (v_post + spend).to_string().red().bold(),
                     v_pre.to_string().yellow(),
                     defect.to_string().yellow(),
+                    "0".to_string().yellow(),
                     (v_pre + defect).to_string().yellow().bold()
                 );
                 println!(

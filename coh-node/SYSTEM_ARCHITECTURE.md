@@ -52,7 +52,7 @@ Output: MicroReceipt with:
   "schema_id": "coh.receipt.micro.v1",
   "state_hash_prev": "...",
   "chain_digest_prev": "...",
-  "metrics": { "v_pre": "100", "spend": "15" },
+  "metrics": { "v_pre": "100", "v_post": "85", "spend": "15", "defect": "0", "authority": "0" },
   "action": { ... }
 }
 ```
@@ -75,7 +75,7 @@ Output: MicroReceipt with:
 3. **Chain Digest Continuity** → `chain_digest_prev` matches prior `chain_digest_next`
 4. **Accounting Law** → `v_post + spend ≤ v_pre + defect + authority`
 5. **Policy/Permissions** → Action allowed for this object
-6. **Domain Constraints** → Parameters within valid ranges
+6. **Domain Constraints** → `spend ≤ v_pre` and "No Vacuous Zeros" (Economic activity required)
 
 ### 5. Execution Layer (Post-Accept)
 

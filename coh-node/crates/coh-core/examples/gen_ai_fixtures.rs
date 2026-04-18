@@ -37,21 +37,22 @@ fn main() {
         "88",
         "12",
         "0",
+        "0",
     );
     let digest0 = compute_digest(&receipt0);
     receipt0.chain_digest_next = digest0.clone();
 
-    let mut receipt1 = create_receipt(1, &state_hashes[1], &state_hashes[2], "88", "80", "7", "1");
+    let mut receipt1 = create_receipt(1, &state_hashes[1], &state_hashes[2], "88", "80", "7", "1", "0");
     receipt1.chain_digest_prev = digest0.clone();
     let digest1 = compute_digest(&receipt1);
     receipt1.chain_digest_next = digest1.clone();
 
-    let mut receipt2 = create_receipt(2, &state_hashes[2], &state_hashes[3], "80", "68", "11", "0");
+    let mut receipt2 = create_receipt(2, &state_hashes[2], &state_hashes[3], "80", "68", "11", "0", "0");
     receipt2.chain_digest_prev = digest1.clone();
     let digest2 = compute_digest(&receipt2);
     receipt2.chain_digest_next = digest2.clone();
 
-    let mut receipt3 = create_receipt(3, &state_hashes[3], &state_hashes[4], "68", "55", "12", "0");
+    let mut receipt3 = create_receipt(3, &state_hashes[3], &state_hashes[4], "68", "55", "12", "0", "0");
     receipt3.chain_digest_prev = digest2.clone();
     let digest3 = compute_digest(&receipt3);
     receipt3.chain_digest_next = digest3.clone();
@@ -227,6 +228,7 @@ fn create_receipt(
     v_post: &str,
     spend: &str,
     defect: &str,
+    authority: &str,
 ) -> MicroReceiptWire {
     MicroReceiptWire {
         schema_id: "coh.receipt.micro.v1".to_string(),
@@ -246,6 +248,7 @@ fn create_receipt(
             v_post: v_post.to_string(),
             spend: spend.to_string(),
             defect: defect.to_string(),
+            authority: authority.to_string(),
         },
     }
 }
@@ -317,6 +320,7 @@ fn build_valid_chain(object_id: &str, len: usize) -> Vec<MicroReceiptWire> {
                 v_post: "99".to_string(),
                 spend: "1".to_string(),
                 defect: defect_for_step(step).to_string(),
+                authority: "0".to_string(),
             },
         };
         receipt.chain_digest_next = compute_digest(&receipt);
@@ -357,6 +361,7 @@ fn build_semi_realistic_chain(object_id: &str, len: usize) -> Vec<MicroReceiptWi
                 v_post: posts[idx].to_string(),
                 spend: spends[idx].to_string(),
                 defect: defect_for_step(step).to_string(),
+                authority: "0".to_string(),
             },
         };
         receipt.chain_digest_next = compute_digest(&receipt);

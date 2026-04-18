@@ -7,6 +7,7 @@ open Coh.Core
 structure SlabSummary where
   totalSpend : Nat
   totalDefect : Nat
+  totalAuthority : Nat
   vPreFirst : Nat
   vPostLast : Nat
   deriving Repr, DecidableEq
@@ -94,7 +95,7 @@ instance instDecidableRangeCountMatches (r : SlabReceipt) :
 
 def SummaryNoOverflow (r : SlabReceipt) : Prop :=
   r.summary.vPostLast + r.summary.totalSpend ≤ u128Max ∧
-    r.summary.vPreFirst + r.summary.totalDefect ≤ u128Max
+    r.summary.vPreFirst + r.summary.totalDefect + r.summary.totalAuthority ≤ u128Max
 
 instance instDecidableSummaryNoOverflow (r : SlabReceipt) :
     Decidable (SummaryNoOverflow r) := by
@@ -102,7 +103,7 @@ instance instDecidableSummaryNoOverflow (r : SlabReceipt) :
   infer_instance
 
 def SummaryPolicyLawful (r : SlabReceipt) : Prop :=
-  r.summary.vPostLast + r.summary.totalSpend ≤ r.summary.vPreFirst + r.summary.totalDefect
+  r.summary.vPostLast + r.summary.totalSpend ≤ r.summary.vPreFirst + r.summary.totalDefect + r.summary.totalAuthority
 
 instance instDecidableSummaryPolicyLawful (r : SlabReceipt) :
     Decidable (SummaryPolicyLawful r) := by

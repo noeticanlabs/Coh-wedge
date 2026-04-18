@@ -1,4 +1,4 @@
-﻿import Coh.Kernel.Receipt
+import Coh.Kernel.Receipt
 import Coh.Kernel.Verifier
 import Mathlib.Tactic.Linarith
 
@@ -51,7 +51,15 @@ theorem transition_comp_lawful (r2 r1 : Receipt) (h2 : Lawful r2) (h1 : Lawful r
     (h_compat : r1.post = r2.pre) : Lawful (transition_comp r2 r1) := by
   unfold Lawful transition_comp at *
   dsimp at *
-  linarith
+  cases h1; cases h2
+  constructor
+  · linarith
+  · /- 
+      Note: (r1.spend + r2.spend <= r1.pre) holds if (r1.defect + r1.authority >= 0).
+      In the strict Coh model, defects and authority are non-negative value-creation events.
+    -/
+    have h1_v : r1.post + r1.spend ≤ r1.pre + r1.defect + r1.authority := by linarith
+    linarith
 
 /-- T1: Strict Coh System definition
     A strict Coh system consists of:

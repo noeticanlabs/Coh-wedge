@@ -34,6 +34,7 @@ fn create_valid_wire() -> MicroReceiptWire {
             v_post: "80".to_string(),
             spend: "20".to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     }
 }
@@ -67,6 +68,18 @@ fn test_micro_rhs_overflow() {
     assert_eq!(res.decision, Decision::Reject);
     assert_eq!(res.code, Some(RejectCode::RejectOverflow));
     assert!(res.message.contains("v_pre + defect"));
+}
+
+#[test]
+fn test_micro_authority_overflow() {
+    let mut wire = create_valid_wire();
+    wire.metrics.v_pre = u128::MAX.to_string();
+    wire.metrics.authority = "1".to_string();
+
+    let res = verify_micro(wire);
+    assert_eq!(res.decision, Decision::Reject);
+    assert_eq!(res.code, Some(RejectCode::RejectOverflow));
+    assert!(res.message.contains("v_pre + defect + authority"));
 }
 
 #[test]

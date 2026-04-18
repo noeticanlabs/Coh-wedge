@@ -28,6 +28,7 @@ fn test_canonical_json_order() {
             v_post: "80".to_string(),
             spend: "15".to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     };
 
@@ -36,7 +37,7 @@ fn test_canonical_json_order() {
     let bytes = to_canonical_json_bytes(&prehash).unwrap();
     let json_str = String::from_utf8(bytes).unwrap();
 
-    let expected = r#"{"canon_profile_hash":"0000000000000000000000000000000000000000000000000000000000000001","chain_digest_prev":"0000000000000000000000000000000000000000000000000000000000000005","metrics":{"defect":"0","spend":"15","v_post":"80","v_pre":"100"},"object_id":"demo.obj","policy_hash":"0000000000000000000000000000000000000000000000000000000000000002","schema_id":"coh.receipt.micro.v1","signatures":null,"state_hash_next":"0000000000000000000000000000000000000000000000000000000000000004","state_hash_prev":"0000000000000000000000000000000000000000000000000000000000000003","step_index":0,"step_type":null,"version":"1.0.0"}"#;
+    let expected = r#"{"canon_profile_hash":"0000000000000000000000000000000000000000000000000000000000000001","chain_digest_prev":"0000000000000000000000000000000000000000000000000000000000000005","metrics":{"authority":"0","defect":"0","spend":"15","v_post":"80","v_pre":"100"},"object_id":"demo.obj","policy_hash":"0000000000000000000000000000000000000000000000000000000000000002","schema_id":"coh.receipt.micro.v1","signatures":null,"state_hash_next":"0000000000000000000000000000000000000000000000000000000000000004","state_hash_prev":"0000000000000000000000000000000000000000000000000000000000000003","step_index":0,"step_type":null,"version":"1.0.0"}"#;
 
     assert_eq!(json_str, expected, "Canonical JSON drift detected!");
 }
@@ -65,6 +66,7 @@ fn test_digest_stability_vector() {
             v_post: "80".to_string(),
             spend: "15".to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     };
 
@@ -75,8 +77,8 @@ fn test_digest_stability_vector() {
     let digest = compute_chain_digest(r.chain_digest_prev, &bytes);
     let hex = digest.to_hex();
 
-    // Actual value computed by the finalized v1 logic
-    let expected = "fcb388f57c37af0cafc3553dab375751aeb6ff0debe6ac6da77ae44e1d45aa57";
+    // Actual value computed by the finalized v1 logic (including authority: "0")
+    let expected = "aad998c01594bc9e5041f635e029e3a36bdf7f70fff0647c814ecaa9fe59f08d";
     assert_eq!(hex, expected, "Digest semantics drift detected!");
 }
 
@@ -100,6 +102,7 @@ fn test_digest_self_exclusion() {
             v_post: "5".to_string(),
             spend: "5".to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     };
 

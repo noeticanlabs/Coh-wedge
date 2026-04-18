@@ -105,7 +105,20 @@ pub fn verify_slab_envelope(wire: SlabReceiptWire) -> VerifySlabResult {
         }
     };
     let right_side = match r.summary.v_pre_first.safe_add(r.summary.total_defect) {
-        Ok(val) => val,
+        Ok(val) => match val.safe_add(r.summary.total_authority) {
+            Ok(total) => total,
+            Err(e) => {
+                return VerifySlabResult {
+                    decision: Decision::Reject,
+                    code: Some(e),
+                    message: "Overflow (v_pre + defect + authority)".to_string(),
+                    range_start: r.range_start,
+                    range_end: r.range_end,
+                    micro_count: Some(r.micro_count),
+                    merkle_root: Some(r.merkle_root.to_hex()),
+                }
+            }
+        },
         Err(e) => {
             return VerifySlabResult {
                 decision: Decision::Reject,

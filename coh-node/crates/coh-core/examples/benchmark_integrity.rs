@@ -118,6 +118,7 @@ fn generate_demo_chain(steps: usize, breach_at: Option<usize>) -> Vec<MicroRecei
                 v_post: v_post.to_string(),
                 spend: spend.to_string(),
                 defect: defect.to_string(),
+                authority: "0".to_string(),
             },
         };
 

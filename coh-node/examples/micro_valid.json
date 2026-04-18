@@ -13,6 +13,7 @@
     "v_pre": "100",
     "v_post": "80",
     "spend": "15",
-    "defect": "0"
+    "defect": "0",
+    "authority": "0"
   }
 }

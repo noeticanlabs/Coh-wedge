@@ -33,6 +33,7 @@ fn create_valid_wire() -> MicroReceiptWire {
             v_post: "80".to_string(),
             spend: "20".to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     }
 }

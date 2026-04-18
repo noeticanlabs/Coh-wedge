@@ -17,6 +17,7 @@ pub fn to_prehash_view(r: &MicroReceipt) -> MicroReceiptPrehash {
             v_post: r.metrics.v_post.to_string(),
             spend: r.metrics.spend.to_string(),
             defect: r.metrics.defect.to_string(),
+            authority: r.metrics.authority.to_string(),
         },
         object_id: r.object_id.clone(),
         policy_hash: r.policy_hash.to_hex(),

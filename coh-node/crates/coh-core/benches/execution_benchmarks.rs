@@ -28,13 +28,14 @@ fn bench_execution(c: &mut Criterion) {
             .to_string(),
         chain_digest_prev: "0000000000000000000000000000000000000000000000000000000000000000"
             .to_string(),
-        chain_digest_next: "431bf30f44950ef6f3d60e75bc2fd891a2f259fe218c8cf19655acf149dc85ba"
+        chain_digest_next: "d6439d130820e2e0cf58f082db4b5d39ebed5dba4b30164f3a1955ca635357ba"
             .to_string(),
         metrics: coh_core::types::MetricsWire {
             v_pre: "100".to_string(),
             v_post: "88".to_string(),
             spend: "12".to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     };
 
@@ -108,13 +109,14 @@ fn bench_verify_before_execute(c: &mut Criterion) {
             .to_string(),
         chain_digest_prev: "0000000000000000000000000000000000000000000000000000000000000000"
             .to_string(),
-        chain_digest_next: "431bf30f44950ef6f3d60e75bc2fd891a2f259fe218c8cf19655acf149dc85ba"
+        chain_digest_next: "d6439d130820e2e0cf58f082db4b5d39ebed5dba4b30164f3a1955ca635357ba"
             .to_string(),
         metrics: coh_core::types::MetricsWire {
             v_pre: "100".to_string(),
             v_post: "88".to_string(),
             spend: "12".to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     };
 

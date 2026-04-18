@@ -43,6 +43,7 @@ pub fn build_slab(receipts: Vec<MicroReceiptWire>) -> BuildSlabResult {
     // 2. Aggregate totals and collect leaves
     let mut total_spend: u128 = 0;
     let mut total_defect: u128 = 0;
+    let mut total_authority: u128 = 0;
     let first_wire = receipts.first().unwrap();
     let last_wire = receipts.last().unwrap();
 
@@ -98,6 +99,22 @@ pub fn build_slab(receipts: Vec<MicroReceiptWire>) -> BuildSlabResult {
                 }
             }
         };
+        total_authority = match total_authority.safe_add(r.metrics.authority) {
+            Ok(val) => val,
+            Err(e) => {
+                return BuildSlabResult {
+                    decision: Decision::Reject,
+                    code: Some(e),
+                    message: format!("Total authority overflow: {:?}", e),
+                    range_start: None,
+                    range_end: None,
+                    micro_count: None,
+                    merkle_root: None,
+                    output: None,
+                    slab: None,
+                }
+            }
+        };
         leaves.push(r.chain_digest_next);
     }
 
@@ -106,6 +123,7 @@ pub fn build_slab(receipts: Vec<MicroReceiptWire>) -> BuildSlabResult {
     let summary = SlabSummaryWire {
         total_spend: total_spend.to_string(),
         total_defect: total_defect.to_string(),
+        total_authority: total_authority.to_string(),
         v_pre_first: first_wire.metrics.v_pre.clone(),
         v_post_last: last_wire.metrics.v_post.clone(),
     };

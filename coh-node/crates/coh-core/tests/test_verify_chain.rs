@@ -41,6 +41,7 @@ fn create_valid_wire(index: u64, prev_digest: String, prev_state: String) -> Mic
             v_post: "99".to_string(),
             spend: "1".to_string(),
             defect: defect_for_step(index).to_string(),
+            authority: "0".to_string(),
         },
     };
     seal_wire(&mut wire);

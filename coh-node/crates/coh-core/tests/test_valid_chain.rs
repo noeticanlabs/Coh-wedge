@@ -68,6 +68,7 @@ fn create_valid_wire(
             v_post: "99".to_string(),
             spend: "1".to_string(),
             defect: defect.to_string(),
+            authority: "0".to_string(),
         },
     };
     seal_wire(&mut wire);
@@ -103,6 +104,7 @@ fn create_wire_with_metrics(
             v_post: v_post.to_string(),
             spend: spend.to_string(),
             defect: defect.to_string(),
+            authority: "0".to_string(),
         },
     };
     seal_wire(&mut wire);

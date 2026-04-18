@@ -200,7 +200,8 @@ fn print_memory_estimate(steps: usize) {
         + receipt.metrics.v_pre.len()
         + receipt.metrics.v_post.len()
         + receipt.metrics.spend.len()
-        + receipt.metrics.defect.len();
+        + receipt.metrics.defect.len()
+        + receipt.metrics.authority.len();
 
     let struct_overhead = 256; // approximate
     let per_receipt = string_costs + struct_overhead;
@@ -247,6 +248,7 @@ fn generate_ai_chain(steps: usize) -> Vec<MicroReceiptWire> {
                 v_post: v_post.to_string(),
                 spend: spend.to_string(),
                 defect: defect.to_string(),
+                authority: "0".to_string(),
             },
         };
         receipt.chain_digest_next = seal(&receipt);

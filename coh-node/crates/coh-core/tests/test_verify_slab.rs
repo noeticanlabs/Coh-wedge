@@ -21,6 +21,7 @@ fn create_valid_slab() -> SlabReceiptWire {
         summary: SlabSummaryWire {
             total_spend: "20".to_string(),
             total_defect: "0".to_string(),
+            total_authority: "0".to_string(),
             v_pre_first: "100".to_string(),
             v_post_last: "80".to_string(),
         },
