@@ -1,4 +1,4 @@
-﻿import Coh.Crypto.SHA256Spec
+import Coh.Crypto.SHA256Spec
 import Coh.Crypto.JCS
 
 namespace Coh.Crypto
@@ -24,7 +24,7 @@ def canonicalDigestInputBytes (r : MicroReceipt) : ByteSeq :=
 
 /-- The receipt payload agrees with the canonical JCS bytes fed into hashing. -/
 def PayloadMatchesCanonicalJson (r : MicroReceipt) : Prop :=
-  r.canonicalPayload = canonicalMicroJson r
+  (canonicalize r).toString = canonicalMicroJson r
 
 instance instDecidablePayloadMatchesCanonicalJson (r : MicroReceipt) :
     Decidable (PayloadMatchesCanonicalJson r) := by
@@ -52,13 +52,13 @@ theorem hashBytes_refines_sha256_spec_at_chain_boundary (input : ByteSeq) :
 theorem digestUpdate_refines_sha256_spec
     (r : MicroReceipt)
     (hPayload : PayloadMatchesCanonicalJson r) :
-    digestUpdate r.chainDigestPrev r.canonicalPayload = sha256_spec (canonicalDigestInputBytes r) := by
+    digestUpdate r.chainDigestPrev (canonicalize r).toString = sha256_spec (canonicalDigestInputBytes r) := by
   simp [digestUpdate, sha256_spec, digestPreimage, canonicalDigestInputBytes, rustChainDigestInputBytes, hPayload]
 
 theorem compute_chain_digest_eq_spec
     (r : MicroReceipt)
     (hPayload : PayloadMatchesCanonicalJson r) :
-    digestUpdate r.chainDigestPrev r.canonicalPayload =
+    digestUpdate r.chainDigestPrev (canonicalize r).toString =
       sha256_spec
         (rustChainDigestInputBytes r.chainDigestPrev
           (receiptProjectionCanonicalJson (receiptProjectionOf r))) := by

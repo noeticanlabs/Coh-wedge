@@ -32,7 +32,6 @@ structure SlabReceiptV2 where
   stateHashLast    : Digest
   /-- We keep Merkle root as String to reuse the existing Merkle axiom surface. -/
   merkleRoot       : String
-  merkleWitnessValid : Bool
   summary          : SlabSummary
   /-- Canonical bytes of the summary payload used in chain update. -/
   canonicalBytes   : ByteArray

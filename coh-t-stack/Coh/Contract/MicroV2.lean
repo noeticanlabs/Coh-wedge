@@ -24,6 +24,8 @@ structure MicroReceiptV2 where
   canonProfileHash : String
   policyHash       : String
   stepIndex        : Nat
+  stepType         : Option StepType
+  signatures       : Option (List Signature)
   stateHashPrev    : Digest
   stateHashNext    : Digest
   chainDigestPrev  : Digest

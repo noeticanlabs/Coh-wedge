@@ -36,14 +36,14 @@ theorem chain_preimage_eq (r : MicroReceipt) :
 theorem digestUpdate_bytes_eq_canonicalDigestInputBytes
     (r : MicroReceipt)
     (hPayload : PayloadMatchesCanonicalJson r) :
-    digestUpdate r.chainDigestPrev r.canonicalPayload = hashBytes (canonicalDigestInputBytes r) :=
+    digestUpdate r.chainDigestPrev (canonicalize r).toString = hashBytes (canonicalDigestInputBytes r) :=
   Coh.Crypto.digestUpdate_refines_sha256_spec r hPayload
 
 /-- Compute chain digest matches the spec. -/
 theorem compute_chain_digest_eq_spec
     (r : MicroReceipt)
     (hPayload : PayloadMatchesCanonicalJson r) :
-    digestUpdate r.chainDigestPrev r.canonicalPayload =
+    digestUpdate r.chainDigestPrev (canonicalize r).toString =
       sha256_spec
         (rustChainDigestInputBytes r.chainDigestPrev
           (receiptProjectionCanonicalJson (receiptProjectionOf r))) :=

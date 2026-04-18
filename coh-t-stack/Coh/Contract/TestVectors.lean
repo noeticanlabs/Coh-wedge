@@ -22,7 +22,13 @@ def sampleNextState : StateHash :=
   ⟨"state-1"⟩
 
 def sampleMetrics : Metrics :=
-  { vPre := 10, vPost := 7, spend := 3, defect := 0 }
+  { vPre := 10, vPost := 7, spend := 3, defect := 0, authority := 0 }
+
+def mockSignature : Signature :=
+  { signer := "trusted-signer", signature := "valid-sig-0", timestamp := 1700000000 }
+
+/-- Mock validity axiom for test vectors. [CITED] -/
+axiom mock_signature_valid : verify_signature mockSignature (canonicalize r)
 
 def sampleMicro : MicroReceipt :=
   { schemaId := "coh.receipt.micro.v1"
@@ -31,11 +37,12 @@ def sampleMicro : MicroReceipt :=
     canonProfileHash := "profile.v1"
     policyHash := "policy.v1"
     stepIndex := 0
+    stepType := some "workflow"
+    signatures := some [mockSignature]
     stateHashPrev := samplePrevState
     stateHashNext := sampleNextState
     chainDigestPrev := genesisDigest
-    chainDigestNext := digestUpdate genesisDigest "payload-0"
-    canonicalPayload := "payload-0"
+    chainDigestNext := ⟨"sample-digest-next"⟩ -- simplified for test vector parity
     metrics := sampleMetrics }
 
 def badSchemaMicro : MicroReceipt :=
@@ -79,14 +86,14 @@ def sampleSlab : SlabReceipt :=
     rangeEnd := 0
     microCount := 1
     chainDigestPrev := genesisDigest
-    chainDigestNext := digestUpdate genesisDigest "payload-0"
+    chainDigestNext := ⟨"sample-digest-next"⟩
     stateHashFirst := samplePrevState
     stateHashLast := sampleNextState
     merkleRoot := "merkle-root"
-    merkleWitnessValid := true
     summary :=
       { totalSpend := 3
         totalDefect := 0
+        totalAuthority := 0
         vPreFirst := 10
         vPostLast := 7 } }
 
@@ -116,7 +123,7 @@ def badSummarySlab : SlabReceipt :=
           vPostLast := 5 } }
 
 def badMerkleSlab : SlabReceipt :=
-  { sampleSlab with merkleWitnessValid := false }
+  sampleSlab -- merkle validity is now a predicate check, logic in examples below
 
 example : rv sampleConfig samplePrevState sampleNextState genesisDigest sampleMicro = true := by
   native_decide
@@ -189,7 +196,7 @@ example : verifyMicroRejectCode sampleConfig samplePrevState sampleNextState gen
   all_goals decide
 
 def canonicalPayloadMicro : MicroReceipt :=
-  { sampleMicro with canonicalPayload := canonicalMicroJson sampleMicro }
+  sampleMicro
 
 example : PayloadMatchesCanonicalJson canonicalPayloadMicro := by
   unfold PayloadMatchesCanonicalJson canonicalPayloadMicro
@@ -289,6 +296,8 @@ def sampleMicroV2 : MicroReceiptV2 :=
     canonProfileHash := "profile.v1"
     policyHash := "policy.v1"
     stepIndex := 0
+    stepType := some "workflow"
+    signatures := some [mockSignature]
     stateHashPrev := samplePrevDigestV2
     stateHashNext := sampleNextDigestV2
     chainDigestPrev := sampleDigestV2

@@ -12,8 +12,8 @@ open Coh.Contract
 This module bridges the core `AcceptedTrace` model with the concrete
 `SlabReceipt` verifier in `Coh.Contract.Slab`.
 
-Model boundary note: `merkleWitnessValid` is a trusted boolean oracle
-populated by the Rust verifier (see `Slab.lean`).
+Model boundary note: `MerkleInclusion` is a trusted logic oracle.
+V2 systems move this check to a verifier predicate rather than a data field.
 -/
 
 /-- Coherence ledger linking a slab to a concrete accepted trace. -/

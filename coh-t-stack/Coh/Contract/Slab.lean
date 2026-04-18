@@ -54,7 +54,10 @@ These are NOT mathematical axioms that can be "proved" from Mathlib; they are
 the ground-truth of our security model's cryptographic boundary.
 -/
 
-/-- Boundary Claim: Abstract specification for Merkle inclusion. [CITED] -/
+/-- Boundary Claim: Abstract specification for Merkle inclusion. [CITED] 
+Model boundary note: `MerkleInclusion` is a trusted logic oracle.
+V2 systems move this check to a verifier predicate rather than a data field.
+-/
 axiom MerkleInclusion (root : String) (objectId : String) : Prop
 
 /-- MerklePathValid is now a property defined by the Inclusion Oracle. [PROVED] -/
@@ -119,9 +122,6 @@ instance instDecidableSummaryConsistent (r : SlabReceipt) :
 def verifySlabEnvelope (cfg : ContractConfig) (r : SlabReceipt) : Bool :=
   decide (SlabReceipt.ValidSchema cfg r ∧ SummaryConsistent r)
 
-def verifySlabWithMerkle (cfg : ContractConfig) (r : SlabReceipt) : Bool :=
-  decide (SlabReceipt.ValidSchema cfg r ∧ SummaryConsistent r ∧ MerklePathValid r)
-
 def verifySlabEnvelopeRejectCode (cfg : ContractConfig) (r : SlabReceipt) : Option RejectCode :=
   if ¬ SlabReceipt.ValidSchema cfg r then some RejectCode.rejectSchema
   else if ¬ NonemptySlab r then some RejectCode.rejectSlabSummary
@@ -162,7 +162,7 @@ theorem verify_slab_accept_of_valid_merkle_summary
     (hSummary : SummaryConsistent r)
     (hMerkle : MerklePathValid r) :
     verifySlab cfg r = true := by
-  unfold verifySlab verifySlabWithMerkle
+  unfold verifySlab
   simp [hSchema, hSummary, hMerkle]
 
 theorem verifySlabRejectCode_none_of_valid_merkle_summary
