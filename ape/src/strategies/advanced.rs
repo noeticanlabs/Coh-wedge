@@ -411,6 +411,7 @@ mod tests {
         match &candidate {
             Candidate::Chain(c) => assert!(!c.is_empty()),
             Candidate::Micro(_) => {}
+            Candidate::Slab(_) => {}
         }
     }
 
@@ -422,6 +423,7 @@ mod tests {
         match &candidate {
             Candidate::Chain(c) => assert!(!c.is_empty()),
             Candidate::Micro(_) => {}
+            Candidate::Slab(_) => {}
         }
     }
 
@@ -434,6 +436,7 @@ mod tests {
         assert!(match &candidate {
             Candidate::Chain(c) => !c.is_empty(),
             Candidate::Micro(_) => true,
+            Candidate::Slab(_) => true,
         });
     }
 
@@ -445,6 +448,7 @@ mod tests {
         assert!(match &candidate {
             Candidate::Chain(c) => !c.is_empty(),
             Candidate::Micro(_) => true,
+            Candidate::Slab(_) => true,
         });
     }
 
@@ -456,6 +460,7 @@ mod tests {
         assert!(match &candidate {
             Candidate::Chain(c) => !c.is_empty(),
             Candidate::Micro(_) => true,
+            Candidate::Slab(_) => true,
         });
     }
 }

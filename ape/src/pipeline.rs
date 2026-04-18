@@ -141,7 +141,7 @@ mod tests {
         let micro = sample_micro();
         let input = Input::from_micro(micro);
 
-        let result = run_pipeline(&input, Strategy::Overflow, 42);
+        let _result = run_pipeline(&input, Strategy::Overflow, 42);
 
         // Overflow typically rejects
         // (not guaranteed due to random, but likely)
@@ -152,7 +152,7 @@ mod tests {
         let micro = sample_micro();
         let input = Input::from_micro(micro);
 
-        let result = run_pipeline(&input, Strategy::Contradiction, 42);
+        let _result = run_pipeline(&input, Strategy::Contradiction, 42);
 
         // Contradiction should reject (accounting violation)
     }
