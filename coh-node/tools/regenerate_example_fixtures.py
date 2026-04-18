@@ -18,26 +18,21 @@ def hx(value: int) -> str:
 
 
 def canonical_prehash(receipt: dict) -> bytes:
-    prehash = {
-        "canon_profile_hash": receipt["canon_profile_hash"],
-        "chain_digest_prev": receipt["chain_digest_prev"],
-        "metrics": {
-            "defect": receipt["metrics"]["defect"],
-            "spend": receipt["metrics"]["spend"],
-            "v_post": receipt["metrics"]["v_post"],
-            "v_pre": receipt["metrics"]["v_pre"],
-        },
-        "object_id": receipt["object_id"],
-        "policy_hash": receipt["policy_hash"],
-        "schema_id": receipt["schema_id"],
-        "signatures": receipt.get("signatures"),
-        "state_hash_next": receipt["state_hash_next"],
-        "state_hash_prev": receipt["state_hash_prev"],
-        "step_index": receipt["step_index"],
-        "step_type": receipt.get("step_type"),
-        "version": receipt["version"],
-    }
-    return json.dumps(prehash, separators=(",", ":")).encode("utf-8")
+    # Deep copy to avoid mutating the original
+    prehash = json.loads(json.dumps(receipt))
+    # chain_digest_next is the result of the hash, not part of the input
+    if "chain_digest_next" in prehash:
+        del prehash["chain_digest_next"]
+    
+    # Ensure metrics has authority for JCS
+    if "metrics" in prehash and "authority" not in prehash["metrics"]:
+        prehash["metrics"]["authority"] = "0"
+    
+    # Ensure SlabSummary has total_authority
+    if "summary" in prehash and "total_authority" not in prehash["summary"]:
+        prehash["summary"]["total_authority"] = "0"
+
+    return json.dumps(prehash, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
 def compute_chain_digest(prev_digest_hex: str, receipt: dict) -> str:
@@ -88,6 +83,7 @@ def base_receipt(step_index: int, state_prev: str, state_next: str, v_pre: str, 
             "v_post": v_post,
             "spend": spend,
             "defect": defect,
+            "authority": "0",
         },
     }
 
@@ -127,6 +123,7 @@ def make_slab(valid_chain: list[dict]) -> dict:
         "summary": {
             "total_spend": str(total_spend),
             "total_defect": str(total_defect),
+            "total_authority": "0",
             "v_pre_first": valid_chain[0]["metrics"]["v_pre"],
             "v_post_last": valid_chain[-1]["metrics"]["v_post"],
         },
@@ -138,7 +135,7 @@ def write_json(path: Path, value: dict) -> None:
 
 
 def write_jsonl(path: Path, records: list[dict]) -> None:
-    path.write_text("\n".join(json.dumps(record, separators=(",", ":")) for record in records) + "\n", encoding="utf-8")
+    path.write_text("\n".join(json.dumps(record, sort_keys=True, separators=(",", ":")) for record in records) + "\n", encoding="utf-8")
 
 
 def main() -> None:

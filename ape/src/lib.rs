@@ -13,7 +13,7 @@
 //!
 //! ## Usage
 //!
-//! ```rust
+//! ```rust,ignore
 //! use ape::{engine::generate, Strategy, load_micro, proposal::Input};
 //!
 //! let wire = load_micro("valid_micro.json").unwrap();

@@ -106,7 +106,7 @@ const App = () => {
               onClick={() => setPreferLiveVerification((current) => !current)}
               aria-label={preferLiveVerification ? 'Live verify enabled' : 'Enable live verify'}
             >
-              <Zap size={14} /> {preferLiveVerification ? 'Live verify enabled' : 'Enable live verify'}
+              <Zap size={14} aria-hidden="true" /> {preferLiveVerification ? 'Live verify enabled' : 'Enable live verify'}
             </button>
           </div>
         </div>
