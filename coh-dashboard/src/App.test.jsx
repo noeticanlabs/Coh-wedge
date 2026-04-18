@@ -129,6 +129,6 @@ describe('App Behavioral Tests', () => {
       preferLiveVerification: true
     }));
 
-    expect(screen.getByText(/Live verify enabled/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Live verify enabled/i })).toBeInTheDocument();
   });
 });

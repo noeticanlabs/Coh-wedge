@@ -5,7 +5,6 @@
 use crate::proposal::Candidate;
 use crate::proposal::Input;
 use crate::seed::SeededRng;
-use coh_core::types::MicroReceipt;
 use coh_core::types::MicroReceiptWire;
 
 /// Run recombination strategy - generates micro receipts with broken chain links

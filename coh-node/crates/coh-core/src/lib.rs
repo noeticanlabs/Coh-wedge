@@ -3,16 +3,16 @@ pub mod canon;
 pub mod execute;
 pub mod hash;
 pub mod math;
+pub mod measurement;
 pub mod merkle;
 pub mod reject;
 pub mod types;
 pub mod vectors;
+#[cfg(test)]
+mod vectors_measurement;
 pub mod verify_chain;
 pub mod verify_micro;
 pub mod verify_slab;
-pub mod measurement;
-#[cfg(test)]
-mod vectors_measurement;
 
 pub use build_slab::build_slab;
 pub use execute::{ExecuteResponse, ExecutionEngine, ExecutionMode};

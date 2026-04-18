@@ -42,17 +42,44 @@ fn main() {
     let digest0 = compute_digest(&receipt0);
     receipt0.chain_digest_next = digest0.clone();
 
-    let mut receipt1 = create_receipt(1, &state_hashes[1], &state_hashes[2], "88", "80", "7", "1", "0");
+    let mut receipt1 = create_receipt(
+        1,
+        &state_hashes[1],
+        &state_hashes[2],
+        "88",
+        "80",
+        "7",
+        "1",
+        "0",
+    );
     receipt1.chain_digest_prev = digest0.clone();
     let digest1 = compute_digest(&receipt1);
     receipt1.chain_digest_next = digest1.clone();
 
-    let mut receipt2 = create_receipt(2, &state_hashes[2], &state_hashes[3], "80", "68", "11", "0", "0");
+    let mut receipt2 = create_receipt(
+        2,
+        &state_hashes[2],
+        &state_hashes[3],
+        "80",
+        "68",
+        "11",
+        "0",
+        "0",
+    );
     receipt2.chain_digest_prev = digest1.clone();
     let digest2 = compute_digest(&receipt2);
     receipt2.chain_digest_next = digest2.clone();
 
-    let mut receipt3 = create_receipt(3, &state_hashes[3], &state_hashes[4], "68", "55", "12", "0", "0");
+    let mut receipt3 = create_receipt(
+        3,
+        &state_hashes[3],
+        &state_hashes[4],
+        "68",
+        "55",
+        "12",
+        "0",
+        "0",
+    );
     receipt3.chain_digest_prev = digest2.clone();
     let digest3 = compute_digest(&receipt3);
     receipt3.chain_digest_next = digest3.clone();

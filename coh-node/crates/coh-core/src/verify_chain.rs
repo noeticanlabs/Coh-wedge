@@ -276,7 +276,9 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
     // The Accounting Law telescopes: v_post_last + cumulative_spend <= v_pre_first + total_defect
     if let Some(v_pre_0) = first_v_pre {
         let lhs = last_v_post.checked_add(cumulative_spend);
-        let rhs = v_pre_0.checked_add(total_defect).and_then(|v| v.checked_add(total_authority));
+        let rhs = v_pre_0
+            .checked_add(total_defect)
+            .and_then(|v| v.checked_add(total_authority));
         match (lhs, rhs) {
             (Some(l), Some(r)) if l > r => {
                 return VerifyChainResult {

@@ -9,7 +9,6 @@ use coh_core::types::{Decision, MicroReceiptWire};
 use coh_core::{build_slab, verify_chain, verify_micro};
 use serde::Serialize;
 use serde_json::{json, Value};
-use std::path::Path;
 use std::time::Instant;
 
 #[derive(Parser)]
@@ -230,7 +229,9 @@ fn run_demo(
                 .map(|p| p.to_path_buf())
                 .unwrap_or_else(|| std::env::current_dir().unwrap());
             let out_path = root.join("coh-dashboard/public/demo/sidecar_valid.jsonl");
-            if let Err(e) = save_valid_receipts_to_jsonl(&[valid_receipt.clone()], &out_path) {
+            if let Err(e) =
+                save_valid_receipts_to_jsonl(std::slice::from_ref(&valid_receipt), &out_path)
+            {
                 eprintln!("Warning: Failed to save valid receipts: {}", e);
             } else {
                 println!("[demo] Saved valid receipt to {:?}", out_path);

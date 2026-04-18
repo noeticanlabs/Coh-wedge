@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { loadDashboardData, generateCandidatesImpl, SCENARIO_OPTIONS } from './data/cohData';
 import TrajectoryGraph from './components/TrajectoryGraph';
+import { Zap } from 'lucide-react';
 
 const WITNESS_SHORT = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'];
 
@@ -101,16 +102,11 @@ const App = () => {
           <div>
             <button
               type="button"
-              onClick={() => {
-                setPreferLiveVerification(true);
-                setLiveStatusText('Live verify enabled');
-              }}
+              className={`button ${preferLiveVerification ? 'button-primary' : 'button-secondary'}`}
+              onClick={() => setPreferLiveVerification((current) => !current)}
             >
-              Enable live verify
+              <Zap size={14} /> {preferLiveVerification ? 'Live verify enabled' : 'Enable live verify'}
             </button>
-            {preferLiveVerification && (
-              <div className="monospace" style={{ marginTop: '0.25rem' }}>{liveStatusText}</div>
-            )}
           </div>
         </div>
       </header>

@@ -2,9 +2,9 @@ use crate::math::{CheckedMath, MathResult};
 use crate::types::{Hash32, MicroReceipt};
 use std::collections::HashMap;
 
-/// A Measurement in Coh is a verification-preserving morphism (CohHom) 
+/// A Measurement in Coh is a verification-preserving morphism (CohHom)
 /// between governed systems.
-/// 
+///
 /// It must preserve:
 /// 1. Structural regularity (Step validity)
 /// 2. Quantitative regularity (Oplax / Dissipation)
@@ -38,46 +38,47 @@ pub fn trace_cost(chain: &[MicroReceipt]) -> MathResult<u128> {
 /// Enforces chain continuity invariants: post_i == pre_{i+1}.
 pub fn map_chain<M: Measurement>(m: &M, chain: &[MicroReceipt]) -> Option<Vec<MicroReceipt>> {
     let mut result = Vec::with_capacity(chain.len());
-    
+
     for r in chain {
-        let (mapped_pre, mapped_r, mapped_post) = m.map_step(&r.state_hash_prev, r, &r.state_hash_next)?;
-        
+        let (mapped_pre, mapped_r, mapped_post) =
+            m.map_step(&r.state_hash_prev, r, &r.state_hash_next)?;
+
         // Safety: verify continuity invariant in the mapped dynamics
         if let Some(prev) = result.last() as Option<&MicroReceipt> {
             if prev.state_hash_next != mapped_pre {
                 return None; // Mapping breaks categorical composition
             }
         }
-        
+
         // Ensure the mapped receipt reflects the mapped states
         if mapped_r.state_hash_prev != mapped_pre || mapped_r.state_hash_next != mapped_post {
             return None;
         }
-        
+
         result.push(mapped_r);
     }
-    
+
     Some(result)
 }
 
-/// Verify the Oplax dissipation constraint: 
+/// Verify the Oplax dissipation constraint:
 /// The cost of observable dynamics cannot exceed the cost of hidden dynamics.
 pub fn verify_chain_dissipation<M: Measurement>(m: &M, source_chain: &[MicroReceipt]) -> bool {
     let target_chain = match map_chain(m, source_chain) {
         Some(c) => c,
         None => return false,
     };
-    
+
     let source_cost = match trace_cost(source_chain) {
         Ok(c) => c,
         Err(_) => return false,
     };
-    
+
     let target_cost = match trace_cost(&target_chain) {
         Ok(c) => c,
         Err(_) => return false,
     };
-    
+
     target_cost <= source_cost
 }
 
@@ -91,7 +92,7 @@ pub struct CollapseInfo {
 /// Returns a map of target states that are reachable from distinct source states.
 pub fn detect_collapse<M: Measurement>(m: &M, traces: &[Vec<MicroReceipt>]) -> Vec<CollapseInfo> {
     let mut mapping: HashMap<Hash32, Vec<Hash32>> = HashMap::new();
-    
+
     for chain in traces {
         for r in chain {
             let s_pre = r.state_hash_prev;
@@ -103,9 +104,13 @@ pub fn detect_collapse<M: Measurement>(m: &M, traces: &[Vec<MicroReceipt>]) -> V
             }
         }
     }
-    
-    mapping.into_iter()
+
+    mapping
+        .into_iter()
         .filter(|(_, sources)| sources.len() > 1)
-        .map(|(target, sources)| CollapseInfo { target_hash: target, source_hashes: sources })
+        .map(|(target, sources)| CollapseInfo {
+            target_hash: target,
+            source_hashes: sources,
+        })
         .collect()
 }
