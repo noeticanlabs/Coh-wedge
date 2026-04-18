@@ -33,7 +33,9 @@ pub mod strategies;
 pub use adapter::{LlmAdapter, LlmResponse, MockLlmAdapter};
 pub use engine::generate;
 pub use fixtures::{load_chain, load_micro, load_slab, FixtureError};
-pub use http::{execute_verified, ExecuteVerifiedRequest, SidecarResponse};
+pub use http::{
+    execute_verified, save_valid_receipts_to_jsonl, ExecuteVerifiedRequest, SidecarResponse,
+};
 pub use pipeline::{run_pipeline, PipelineResult};
 pub use proposal::Strategy;
 pub use proposal::{Candidate, Proposal};

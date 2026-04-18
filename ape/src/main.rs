@@ -1,4 +1,4 @@
-use ape::http::{execute_verified, ExecuteVerifiedRequest};
+use ape::http::{execute_verified, save_valid_receipts_to_jsonl, ExecuteVerifiedRequest};
 use ape::proposal::{Candidate, Input, Strategy};
 use ape::realdata::{
     generate_runtime_ai_chain, generate_runtime_ai_micro, load_ai_demo_chain, load_ai_demo_micro,
@@ -9,6 +9,7 @@ use coh_core::types::{Decision, MicroReceiptWire};
 use coh_core::{build_slab, verify_chain, verify_micro};
 use serde::Serialize;
 use serde_json::{json, Value};
+use std::path::Path;
 use std::time::Instant;
 
 #[derive(Parser)]
@@ -42,7 +43,7 @@ enum Commands {
     Demo {
         #[arg(long, default_value = "both")]
         mode: String,
-        #[arg(long, default_value = "http://127.0.0.1:3000")]
+        #[arg(long, default_value = "http://127.0.0.1:3030")]
         sidecar_url: String,
         #[arg(long, default_value_t = 42)]
         seed: u64,
@@ -52,7 +53,7 @@ enum Commands {
     Bench {
         #[arg(long, default_value_t = 1000)]
         iterations: usize,
-        #[arg(long, default_value = "http://127.0.0.1:3000")]
+        #[arg(long, default_value = "http://127.0.0.1:3030")]
         sidecar_url: String,
         #[arg(long, default_value_t = false)]
         with_sidecar: bool,
@@ -61,7 +62,7 @@ enum Commands {
     StrategyDemo {
         #[arg(long, default_value_t = 100)]
         iterations: usize,
-        #[arg(long, default_value = "http://127.0.0.1:3000")]
+        #[arg(long, default_value = "http://127.0.0.1:3030")]
         sidecar_url: String,
         #[arg(long, default_value_t = false)]
         with_sidecar: bool,
@@ -70,7 +71,7 @@ enum Commands {
     Dominance {
         #[arg(long, default_value_t = 100)]
         iterations: usize,
-        #[arg(long, default_value = "http://127.0.0.1:3000")]
+        #[arg(long, default_value = "http://127.0.0.1:3030")]
         sidecar_url: String,
     },
 }
@@ -220,6 +221,22 @@ fn run_demo(
             action: action_value.clone(),
         };
         let accept_resp = execute_verified(sidecar_url, &accept_payload);
+
+        // Save valid receipts to JSONL for dashboard
+        if accept_resp.is_ok() {
+            // Get root project directory (go up from ape/)
+            let root = std::env::current_dir()?
+                .parent()
+                .map(|p| p.to_path_buf())
+                .unwrap_or_else(|| std::env::current_dir().unwrap());
+            let out_path = root.join("coh-dashboard/public/demo/sidecar_valid.jsonl");
+            if let Err(e) = save_valid_receipts_to_jsonl(&[valid_receipt.clone()], &out_path) {
+                eprintln!("Warning: Failed to save valid receipts: {}", e);
+            } else {
+                println!("[demo] Saved valid receipt to {:?}", out_path);
+            }
+        }
+
         outputs.push(DemoResult {
             path: "sidecar_accept".to_string(),
             decision: if accept_resp.is_ok() {

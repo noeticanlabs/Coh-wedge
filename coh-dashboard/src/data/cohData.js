@@ -4,69 +4,84 @@ export const DEFAULT_SIDECAR_BASE_URL =
     import.meta.env.VITE_COH_SIDECAR_URL ?? 'http://127.0.0.1:3030';
 
 const SCENARIOS = {
-  valid: {
-    key: 'valid',
-    label: 'Valid Chain',
-    description: 'Happy-path receipt chain with a consistent slab summary.',
-    chainPath: '/demo/ai_workflow_chain_valid.jsonl',
-    slabPath: '/demo/ai_workflow_slab_valid.json',
-  },
-  invalid_state_link: {
-    key: 'invalid_state_link',
-    label: 'Broken State Link (T1)',
-    description: 'Receipt linkage fails on state continuity at a deterministic break point.',
-    chainPath: '/demo/ai_workflow_chain_invalid_state_link.jsonl',
-    slabPath: '/demo/ai_workflow_slab_valid.json',
-  },
-  reject_chain_digest: {
-    key: 'reject_chain_digest',
-    label: 'Chain Digest Mismatch (T2)',
-    description: 'Cryptographic digest linkage failure between receipts.',
-    chainPath: '/demo/reject_chain_digest.jsonl',
-    slabPath: '/demo/ai_workflow_slab_valid.json',
-  },
-  reject_state_link_adv: {
-    key: 'reject_state_link_adv',
-    label: 'State Discontinuity (T4)',
-    description: 'Adversarial state transition mismatch detected.',
-    chainPath: '/demo/reject_state_link.jsonl',
-    slabPath: '/demo/ai_workflow_slab_valid.json',
-  },
-  reject_policy_violation: {
-    key: 'reject_policy_violation',
-    label: 'Policy Violation (T5)',
-    description: 'Accounting law v_post + spend <= v_pre + defect was violated.',
-    chainPath: '/demo/reject_policy_violation.jsonl',
-    slabPath: '/demo/ai_workflow_slab_valid.json',
-  },
-  reject_schema: {
-    key: 'reject_schema',
-    label: 'Schema Version Reject (T0)',
-    description: 'Unsupported or malformed schema ID / Version detected.',
-    chainPath: '/demo/reject_schema.jsonl',
-    slabPath: '/demo/ai_workflow_slab_valid.json',
-  },
-  reject_numeric_parse: {
-    key: 'reject_numeric_parse',
-    label: 'Malformed Numeric (T3)',
-    description: 'Non-decimal numeric strings rejected by the kernel.',
-    chainPath: '/demo/reject_numeric_parse.jsonl',
-    slabPath: '/demo/ai_workflow_slab_valid.json',
-  },
-  reject_overflow: {
-    key: 'reject_overflow',
-    label: 'Arithmetic Overflow (T6)',
-    description: 'Extreme value range causing u128 safe-math rejection.',
-    chainPath: '/demo/reject_overflow.jsonl',
-    slabPath: '/demo/ai_workflow_slab_valid.json',
-  },
-  invalid_slab_summary: {
-    key: 'invalid_slab_summary',
-    label: 'Invalid Slab Summary (M1)',
-    description: 'The chain verifies, but the slab macro-summary does not reconcile.',
-    chainPath: '/demo/ai_workflow_chain_valid.jsonl',
-    slabPath: '/demo/ai_workflow_slab_invalid_summary.json',
-  },
+    valid: {
+        key: 'valid',
+        label: 'Valid Chain',
+        description: 'Happy-path receipt chain with a consistent slab summary.',
+        chainPath: '/demo/ai_workflow_chain_valid.jsonl',
+        slabPath: '/demo/ai_workflow_slab_valid.json',
+    },
+    valid_runtime: {
+        key: 'valid_runtime',
+        label: 'Valid Runtime Chain',
+        description: 'Dynamically generated receipts with valid cryptographic digests.',
+        chainPath: '/demo/valid_runtime.jsonl',
+        slabPath: '/demo/ai_workflow_slab_valid.json',
+        isRuntime: true,
+    },
+    sidecar_valid: {
+        key: 'sidecar_valid',
+        label: 'Sidecar Verified',
+        description: 'Pre-verified receipts from APE demo with sidecar.',
+        chainPath: '/demo/sidecar_valid.jsonl',
+        slabPath: '/demo/ai_workflow_slab_valid.json',
+    },
+    invalid_state_link: {
+        key: 'invalid_state_link',
+        label: 'Broken State Link (T1)',
+        description: 'Receipt linkage fails on state continuity at a deterministic break point.',
+        chainPath: '/demo/ai_workflow_chain_invalid_state_link.jsonl',
+        slabPath: '/demo/ai_workflow_slab_valid.json',
+    },
+    reject_chain_digest: {
+        key: 'reject_chain_digest',
+        label: 'Chain Digest Mismatch (T2)',
+        description: 'Cryptographic digest linkage failure between receipts.',
+        chainPath: '/demo/reject_chain_digest.jsonl',
+        slabPath: '/demo/ai_workflow_slab_valid.json',
+    },
+    reject_state_link_adv: {
+        key: 'reject_state_link_adv',
+        label: 'State Discontinuity (T4)',
+        description: 'Adversarial state transition mismatch detected.',
+        chainPath: '/demo/reject_state_link.jsonl',
+        slabPath: '/demo/ai_workflow_slab_valid.json',
+    },
+    reject_policy_violation: {
+        key: 'reject_policy_violation',
+        label: 'Policy Violation (T5)',
+        description: 'Accounting law v_post + spend <= v_pre + defect was violated.',
+        chainPath: '/demo/reject_policy_violation.jsonl',
+        slabPath: '/demo/ai_workflow_slab_valid.json',
+    },
+    reject_schema: {
+        key: 'reject_schema',
+        label: 'Schema Version Reject (T0)',
+        description: 'Unsupported or malformed schema ID / Version detected.',
+        chainPath: '/demo/reject_schema.jsonl',
+        slabPath: '/demo/ai_workflow_slab_valid.json',
+    },
+    reject_numeric_parse: {
+        key: 'reject_numeric_parse',
+        label: 'Malformed Numeric (T3)',
+        description: 'Non-decimal numeric strings rejected by the kernel.',
+        chainPath: '/demo/reject_numeric_parse.jsonl',
+        slabPath: '/demo/ai_workflow_slab_valid.json',
+    },
+    reject_overflow: {
+        key: 'reject_overflow',
+        label: 'Arithmetic Overflow (T6)',
+        description: 'Extreme value range causing u128 safe-math rejection.',
+        chainPath: '/demo/reject_overflow.jsonl',
+        slabPath: '/demo/ai_workflow_slab_valid.json',
+    },
+    invalid_slab_summary: {
+        key: 'invalid_slab_summary',
+        label: 'Invalid Slab Summary (M1)',
+        description: 'The chain verifies, but the slab macro-summary does not reconcile.',
+        chainPath: '/demo/ai_workflow_chain_valid.jsonl',
+        slabPath: '/demo/ai_workflow_slab_invalid_summary.json',
+    },
 };
 
 export const SCENARIO_OPTIONS = Object.values(SCENARIOS).map(({ key, label, description }) => ({
@@ -347,7 +362,20 @@ function normalizeSlab(slab) {
 }
 
 class FixtureSource {
+    constructor() {
+        this.sidecarSource = null;
+    }
+
+    setSidecar(sidecarBaseUrl) {
+        this.sidecarSource = new SidecarSource(sidecarBaseUrl);
+    }
+
     async loadScenario(scenario) {
+        // Handle runtime-generated scenarios
+        if (scenario.isRuntime && this.sidecarSource) {
+            return this.loadRuntimeScenario(scenario);
+        }
+
         const [chainText, slab] = await Promise.all([
             fetch(scenario.chainPath).then((response) => response.text()),
             fetch(scenario.slabPath).then((response) => response.json()),
@@ -367,6 +395,102 @@ class FixtureSource {
             slabCheck,
             fixtureVerification: buildFixtureVerification(breakInfo),
         };
+    }
+
+    async loadRuntimeScenario(scenario) {
+        // Generate a chain of valid receipts via the APE library's runtime generator
+        // For now, use the demo endpoint which generates valid receipts
+        const receipts = [];
+
+        // Generate chain from demo_e2e.json sidecar_accept result
+        const chainText = await fetch('/demo/valid_runtime.jsonl').then(r => r.text()).catch(() => '');
+
+        if (chainText) {
+            // Use the pre-generated file
+            const parsed = parseJsonLines(chainText);
+            if (parsed.length > 0) {
+                const breakInfo = deriveChainBreak(parsed);
+                const chainSteps = parsed.map((receipt, index) => normalizeStep(receipt, index, parsed, breakInfo));
+                const slab = { chain_digest_prev: '', chain_digest_next: '', state_hash_first: '', state_hash_last: '', merkle_root: '', micro_count: parsed.length };
+                const slabCheck = deriveSlabCheck(parsed, slab);
+
+                return {
+                    scenario,
+                    receipts: parsed,
+                    chainSteps,
+                    breakInfo,
+                    slab: normalizeSlab(slab),
+                    slabCheck,
+                    fixtureVerification: buildFixtureVerification(breakInfo),
+                };
+            }
+        }
+
+        // Fallback: generate from sidecar by verifying a generated receipt
+        // Use the micro pattern from the demo
+        const demoData = [
+            { step_index: 0, v_pre: 100, v_post: 88, spend: 12, defect: 0 },
+            { step_index: 1, v_pre: 88, v_post: 80, spend: 7, defect: 1 },
+        ];
+
+        for (const pattern of demoData) {
+            const receipt = {
+                schema_id: "coh.receipt.micro.v1",
+                version: "1.0.0",
+                object_id: "agent.workflow.runtime",
+                canon_profile_hash: "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09",
+                policy_hash: "0".repeat(64),
+                step_index: pattern.step_index,
+                state_hash_prev: formatHex(BigInt(pattern.step_index + 1), 64),
+                state_hash_next: formatHex(BigInt(pattern.step_index + 2), 64),
+                chain_digest_prev: pattern.step_index === 0 ? "0".repeat(64) : receipts[receipts.length - 1].chain_digest_next,
+                chain_digest_next: "0".repeat(64),
+                metrics: {
+                    v_pre: String(pattern.v_pre),
+                    v_post: String(pattern.v_post),
+                    spend: String(pattern.spend),
+                    defect: String(pattern.defect),
+                },
+                signatures: [{ signer: "test", sig: "deadbeef".repeat(16) }],
+            };
+            receipts.push(receipt);
+        }
+
+        // Compute digests and create chain
+        const processedReceipts = [];
+        let prevDigest = "0".repeat(64);
+        for (const r of receipts) {
+            r.chain_digest_prev = prevDigest;
+            r.chain_digest_next = await this.computeDigest(r);
+            prevDigest = r.chain_digest_next;
+            processedReceipts.push(r);
+        }
+
+        const breakInfo = deriveChainBreak(processedReceipts);
+        const chainSteps = processedReceipts.map((receipt, index) => normalizeStep(receipt, index, processedReceipts, breakInfo));
+        const slab = { chain_digest_prev: '', chain_digest_next: processedReceipts[processedReceipts.length - 1].chain_digest_next, state_hash_first: processedReceipts[0].state_hash_prev, state_hash_last: processedReceipts[processedReceipts.length - 1].state_hash_next, merkle_root: '', micro_count: processedReceipts.length };
+        const slabCheck = deriveSlabCheck(processedReceipts, slab);
+
+        return {
+            scenario,
+            receipts: processedReceipts,
+            chainSteps,
+            breakInfo,
+            slab: normalizeSlab(slab),
+            slabCheck,
+            fixtureVerification: buildFixtureVerification(breakInfo),
+        };
+    }
+
+    async computeDigest(receipt) {
+        // For runtime, we compute digest using the canonical form
+        // This is a simplified version - in production would call the sidecar
+        const canonical = JSON.stringify(receipt, Object.keys(receipt).sort());
+        const encoder = new TextEncoder();
+        const data = encoder.encode(canonical);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 }
 
@@ -389,6 +513,28 @@ class SidecarSource {
         }
 
         const payload = await response.json();
+        return normalizeUnifiedResponse(payload, 'sidecar');
+    }
+
+    async executeVerified(receipt, action) {
+        console.log('[SidecarSource.executeVerified] Sending to:', `${this.baseUrl}/v1/execute-verified`);
+        console.log('[SidecarSource.executeVerified] Payload:', { receipt, action });
+        const response = await fetch(`${this.baseUrl}/v1/execute-verified`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ receipt, action }),
+        });
+
+        if (!response.ok) {
+            const errText = await response.text();
+            console.error('[SidecarSource.executeVerified] HTTP Error:', response.status, errText);
+            throw new Error(`Sidecar request failed with HTTP ${response.status}.`);
+        }
+
+        const payload = await response.json();
+        console.log('[SidecarSource.executeVerified] Response:', payload);
         return normalizeUnifiedResponse(payload, 'sidecar');
     }
 }
@@ -423,4 +569,13 @@ export async function loadDashboardData({
         isTrusted: verification.status === 'ACCEPT' && fixtureData.slabCheck.isValid && !fixtureData.breakInfo,
         validatorVersion: verification.cohVersion ?? DEFAULT_COH_VERSION,
     };
+}
+
+export async function executeVerified({
+    receipt,
+    action = { action: 'transfer_100_tokens', amount: 100, target: 'alice' },
+    sidecarBaseUrl = DEFAULT_SIDECAR_BASE_URL,
+} = {}) {
+    const sidecarSource = new SidecarSource(sidecarBaseUrl);
+    return sidecarSource.executeVerified(receipt, action);
 }

@@ -1,5 +1,6 @@
 # Rust
 target/
+**/target*/
 Cargo.lock
 **/*.rs.bk
 
@@ -25,3 +26,6 @@ docs/book/
 .lake/
 lake-packages/
 build/
+
+# Generated Data
+coh-dashboard/public/demo/sidecar_valid.jsonl

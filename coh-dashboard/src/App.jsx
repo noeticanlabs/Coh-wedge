@@ -18,6 +18,7 @@ import {
   DEFAULT_SIDECAR_BASE_URL,
   SCENARIO_OPTIONS,
   loadDashboardData,
+  executeVerified,
 } from './data/cohData';
 
 function truncateHash(value, lead = 12, tail = 8) {
@@ -46,6 +47,12 @@ export default function App() {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
+  const [actionName, setActionName] = useState('transfer_100_tokens');
+  const [actionAmount, setActionAmount] = useState(100);
+  const [actionTarget, setActionTarget] = useState('alice');
+  const [executing, setExecuting] = useState(false);
+  const [execution, setExecution] = useState(null);
+  const [executionError, setExecutionError] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -92,6 +99,34 @@ export default function App() {
       cancelled = true;
     };
   }, [scenarioKey, preferLiveVerification, reloadTick]);
+
+  async function runExecute() {
+    console.log('[Execute] Starting execution with sidecar:', DEFAULT_SIDECAR_BASE_URL);
+    setExecuting(true);
+    setExecution(null);
+    setExecutionError(null);
+    try {
+      const receipt = (dashboardData?.chainSteps?.[selectedIdx]?.raw) ?? (dashboardData?.chainSteps?.[0]?.raw);
+      console.log('[Execute] Receipt:', receipt);
+      if (!receipt) {
+        throw new Error('No receipt available to execute');
+      }
+      const actionPayload = { action: actionName, amount: Number(actionAmount), target: actionTarget };
+      console.log('[Execute] Action:', actionPayload);
+      const result = await executeVerified({
+        receipt,
+        action: actionPayload,
+        sidecarBaseUrl: DEFAULT_SIDECAR_BASE_URL,
+      });
+      console.log('[Execute] Result:', result);
+      setExecution(result);
+    } catch (e) {
+      console.error('[Execute] Error:', e);
+      setExecutionError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setExecuting(false);
+    }
+  }
 
   const scenario = dashboardData?.scenario;
   const chainSteps = dashboardData?.chainSteps ?? [];
@@ -273,6 +308,15 @@ export default function App() {
                 <button type="button" className="button button-secondary" onClick={() => setReloadTick((tick) => tick + 1)}>
                   <RefreshCw size={14} /> Reload data
                 </button>
+                <div className="command-field" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <span>Action</span>
+                  <input className="command-select" style={{ width: 180 }} value={actionName} onChange={(e) => setActionName(e.target.value)} />
+                  <input className="command-select" style={{ width: 100 }} type="number" value={actionAmount} onChange={(e) => setActionAmount(e.target.value)} />
+                  <input className="command-select" style={{ width: 160 }} value={actionTarget} onChange={(e) => setActionTarget(e.target.value)} />
+                  <button type="button" className="button button-primary" disabled={executing} onClick={() => { console.log('[Execute] Button clicked!'); runExecute(); }}>
+                    <Code size={14} /> {executing ? 'Executing…' : execution ? 'Done - Click to retry' : 'Execute verified'}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -373,6 +417,11 @@ export default function App() {
                       </div>
                     </div>
                   ) : null}
+                </div>
+                <div className={`summary-card ${executionError ? 'break-card' : ''}`}>
+                  <span className="summary-label">Execution result</span>
+                  <strong>{execution?.status ?? (executionError ? 'Error' : '—')}</strong>
+                  <p>{execution?.reason ?? executionError ?? 'Submit verified action to sidecar.'}</p>
                 </div>
               </div>
             </div>

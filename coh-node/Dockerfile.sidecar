@@ -1,0 +1,34 @@
+# Stage 1: Build sidecar
+FROM rust:1.75-bookworm AS builder
+
+WORKDIR /app
+
+# Copy workspace (only coh-node is needed to build coh-sidecar)
+COPY coh-node/ ./
+
+# Build the sidecar binary
+RUN cargo build --release -p coh-sidecar
+
+# Stage 2: Runtime image
+FROM debian:bookworm-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the sidecar executable
+COPY --from=builder /app/target/release/coh-sidecar /usr/local/bin/
+
+# Non-root user for security
+RUN useradd -m -u 1000 sidecar
+USER sidecar
+
+ENV RUST_LOG=info \
+    COH_HOST=0.0.0.0 \
+    COH_PORT=3030
+
+EXPOSE 3030
+
+ENTRYPOINT ["/usr/local/bin/coh-sidecar"]

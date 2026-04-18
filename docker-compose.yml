@@ -16,18 +16,19 @@ services:
     # Example: verify a chain
     # command: verify-chain /app/receipts/chain.jsonl
 
-    # Sidecar API (when implemented)
-    # sidecar:
-    #   build:
-    #     context: .
-    #     dockerfile: coh-node/Dockerfile
-    #   image: coh-sidecar:latest
-    #   ports:
-    #     - "3030:3030"
-    #   environment:
-    #     - RUST_LOG=info
+  sidecar:
+    build:
+      context: .
+      dockerfile: coh-node/Dockerfile.sidecar
+    image: coh-sidecar:latest
+    container_name: coh-sidecar
+    ports:
+      - "3030:3030"
+    environment:
+      - RUST_LOG=info
+      - COH_HOST=0.0.0.0
 
-    # Dashboard (optional)
+  # Dashboard (optional)
   dashboard:
     build:
       context: ./coh-dashboard

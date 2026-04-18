@@ -23,10 +23,38 @@ pub fn execute_verified(
 ) -> Result<SidecarResponse, reqwest::Error> {
     let client = Client::new();
     let url = format!("{}/v1/execute-verified", base_url.trim_end_matches('/'));
-    client
+    let response = client
         .post(url)
         .json(payload)
         .send()?
         .error_for_status()?
-        .json()
+        .json();
+
+    // Log the receipt for debugging
+    println!(
+        "[execute_verified] Sent receipt: {:?}",
+        payload.receipt.step_index
+    );
+
+    response
+}
+
+/// Save valid receipts to JSONL for dashboard
+pub fn save_valid_receipts_to_jsonl(
+    receipts: &[coh_core::types::MicroReceiptWire],
+    path: &std::path::Path,
+) -> Result<(), Box<dyn std::error::Error>> {
+    use std::fs::File;
+    use std::io::Write;
+    let mut file = File::create(path)?;
+    for receipt in receipts {
+        let json = serde_json::to_string(receipt)?;
+        writeln!(file, "{}", json)?;
+    }
+    println!(
+        "[execute_verified] Saved {} receipts to {:?}",
+        receipts.len(),
+        path
+    );
+    Ok(())
 }
