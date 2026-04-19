@@ -35,7 +35,6 @@ impl Ord for PathEvaluation {
     }
 }
 
-
 /// Compute evaluation metrics for a trajectory using u128 fixed-point
 pub fn evaluate_path(traj: &AdmissibleTrajectory, max_depth: usize) -> PathEvaluation {
     // 1. Minimum Safety Margin (Bottleneck)

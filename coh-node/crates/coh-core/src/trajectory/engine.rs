@@ -20,7 +20,6 @@ pub struct SearchContext {
     pub weight_uncertainty: u128,
 }
 
-
 /// The core Trajectory Engine implementing the 6-step pipeline
 pub fn search(ctx: &SearchContext) -> SearchResult {
     let mut result = SearchResult::new();
@@ -115,7 +114,6 @@ pub fn search(ctx: &SearchContext) -> SearchResult {
                         ctx.weight_cost,
                         ctx.weight_uncertainty,
                     );
-
 
                     next_frontier.push(next_traj);
                     result.frontier_stats.admissible_found += 1;
