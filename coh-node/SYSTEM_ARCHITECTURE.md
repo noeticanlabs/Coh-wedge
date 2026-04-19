@@ -21,6 +21,35 @@ graph TD
 
 ---
 
+## GCCP - Governed Compute Control Plane
+
+The GCCP module provides compute-specific state governance built on top of coh-core:
+
+### State Components
+- **ThermalState** (T): Die temperature, hotspot temp, thermal slope
+- **PowerState** (P): Instantaneous draw, cap, margin
+- **QueueState** (Q): Depth, age pressure, class mix
+- **UtilizationState** (U): Compute, memory BW, interconnect
+- **MemoryState** (M): Used, BW, fragmentation
+- **RiskState** (R): Retry, timeout, throttling
+- **BudgetState** (B): Energy, latency, stability budgets
+- **ControlContext** (Πc): Policy hash, profile, mode, class
+
+### Demo
+Run the GCCP demo:
+```bash
+cargo run --example gccp_demo
+```
+
+### Test Vectors
+- `vectors/gccp/valid_gccp_*.jsonl` - Valid compute transitions
+- `vectors/gccp/reject_gccp_*.jsonl` - Rejected compute transitions
+
+### See Also
+- [plans/GCCP_V1_GAP_ANALYSIS.md](../plans/GCCP_V1_GAP_ANALYSIS.md)
+
+---
+
 ## Component Mapping
 
 ### 1. APE Dataset → Action Generation
@@ -30,6 +59,7 @@ graph TD
 | Valid workflows | `coh-node/vectors/valid/` | Correct multi-step chains |
 | Adversarial | `coh-node/vectors/adversarial/` | Attack strategies |
 | Semi-realistic | `coh-node/vectors/semi_realistic/` | Real-world edge cases |
+| **GCCP** | `coh-node/vectors/gccp/` | Compute governance vectors |
 
 ### 2. APE Engine → Proposal Generator
 
