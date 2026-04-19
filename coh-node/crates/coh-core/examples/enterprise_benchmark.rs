@@ -999,7 +999,7 @@ fn main() {
     let domains = vec![
         ("Financial", DomainState::Financial(FinancialState { balance: 10000, initial_balance: 10000, status: FinancialStatus::Idle, current_invoice_amount: 0 })),
         ("Agent", DomainState::Agent(AgentState { complexity_index: 0, complexity_budget: 100, authority_level: 0, status: AgentStatus::Observing })),
-        ("Ops", DomainState::Ops(OpsState { status: OpsStatus::Open, materials_logged: false, stall_risk: 0.0, resource_readiness: 1.0 })),
+        ("Ops", DomainState::Ops(OpsState { status: OpsStatus::Open, materials_logged: false, stall_risk: 0, resource_readiness: coh_core::trajectory::domain::COH_PRECISION as u64 })),
     ];
 
     println!("┌──────────────────────┬─────────────┬─────────────┬─────────────┬─────────────┐");

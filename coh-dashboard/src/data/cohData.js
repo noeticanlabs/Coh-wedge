@@ -185,14 +185,14 @@ export async function generateCandidatesImpl(initialReceipt, options = {}) {
         domain: domain,
         data: domain === 'financial' ? {
             balance: Number(initialReceipt.metrics.v_post),
-            initial_balance: 1000000,
+            initial_balance: 1000 * COH_PRECISION,
             status: 'Idle',
             current_invoice_amount: 0
         } : domain === 'ops' ? {
             status: 'Open',
             materials_logged: false,
-            stall_risk: 0.1,
-            resource_readiness: 0.9
+            stall_risk: Math.round(0.1 * COH_PRECISION),
+            resource_readiness: Math.round(0.9 * COH_PRECISION)
         } : {
             complexity_index: 0,
             complexity_budget: 100,
