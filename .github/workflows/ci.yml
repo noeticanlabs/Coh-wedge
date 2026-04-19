@@ -117,8 +117,8 @@ jobs:
       - name: Build
         run: cargo build
 
-      - name: Run tests (coh-core only)
-        run: cargo test -p coh-core
+      - name: Run tests
+        run: cargo test
 
   formal-verification:
     name: Lean T-Stack Verification

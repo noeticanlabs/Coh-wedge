@@ -40,6 +40,7 @@ const mockDashboardData = {
       },
       continuity: { stateLabel: 'Continuous', digestLabel: 'Verified' },
       objectId: 'test-obj',
+      raw: {},
     }
   ],
   candidates: [
@@ -95,7 +96,7 @@ describe('App Behavioral Tests', () => {
     expect(screen.getByText(/Deterministic Execution Verification/i)).toBeInTheDocument();
 
     // Check for grounded metrics in Evidence Panel (rendered via evaluation mock)
-    expect(screen.getByText(/Safety Bottleneck: 0.95/)).toBeInTheDocument();
+    expect(await screen.findByText(/Safety Bottleneck: 0.95/)).toBeInTheDocument();
   });
 
   it('handles scenario selection change via CI markers', async () => {
