@@ -180,6 +180,31 @@ jobs:
         run: |
           cargo run --example benchmark_integrity -p coh-core
 
+  trajectory-audit:
+    name: Trajectory Equivalence Audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: coh-node
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Restore Cargo cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            coh-node/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('coh-node/Cargo.lock') }}
+
+      - name: Run Equivalence Vectors
+        run: cargo test trajectory::equivalence_tests
+
   dashboard-test:
     name: Dashboard UI Test
     runs-on: ubuntu-latest

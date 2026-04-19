@@ -10,7 +10,7 @@ pub struct VerifyChainRequest {
     pub receipts: Vec<MicroReceiptWire>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct UnifiedResponse<T> {
     pub request_id: String,
     pub coh_version: String,
@@ -120,7 +120,7 @@ const MAX_BEAM: usize = 8;
 const MAX_DEPTH: usize = 6;
 const SEARCH_TIMEOUT_MS: u64 = 500;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct TrajectorySearchRequest {
     pub context: SearchContext,
 }
@@ -176,4 +176,60 @@ pub async fn trajectory_search_handler(
 
 pub async fn health_check() -> impl IntoResponse {
     "COH_V1_OK"
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use coh_core::trajectory::{DomainState, FinancialState, FinancialStatus, ScoringWeights, SearchContext};
+    use axum::body::Body;
+    use axum::http::{Request, StatusCode};
+    use tower::util::ServiceExt;
+    use axum::Router;
+    use axum::routing::post;
+    use http_body_util::BodyExt; // For collect()
+
+    fn test_app() -> Router {
+        Router::new().route("/trajectory/search", post(trajectory_search_handler))
+    }
+
+    #[tokio::test]
+    async fn test_trajectory_search_budget_guard() {
+        let app = test_app();
+        
+        // Context exceeding budget
+        let idle_f = FinancialState {
+            balance: 1000,
+            initial_balance: 1000,
+            status: FinancialStatus::Idle,
+            current_invoice_amount: 0,
+        };
+        let context = SearchContext {
+            initial_state: DomainState::Financial(idle_f.clone()),
+            target_state: DomainState::Financial(idle_f),
+            max_depth: 10, // MAX is 6
+            beam_width: 10, // MAX is 8
+            weights: ScoringWeights::default(),
+        };
+        let req_payload = TrajectorySearchRequest { context };
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/trajectory/search")
+                    .header("Content-Type", "application/json")
+                    .body(Body::from(serde_json::to_string(&req_payload).unwrap()))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let res: UnifiedResponse<SearchResult> = serde_json::from_slice(&body).unwrap();
+        
+        assert_eq!(res.status, Decision::Reject);
+        assert!(res.error.unwrap().message.contains("Search budget exceeded"));
+    }
 }

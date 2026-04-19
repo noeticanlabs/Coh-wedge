@@ -4,9 +4,9 @@ use axum::{
     Json,
 };
 use coh_core::reject::RejectCode;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum CohErrorCode {
     E001, // Malformed Input / Schema / Overflow
     E002, // Cryptographic Failure (Digest/Merkle)
@@ -59,7 +59,7 @@ impl From<RejectCode> for CohErrorCode {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ApiError {
     pub code: CohErrorCode,
     pub message: String,
