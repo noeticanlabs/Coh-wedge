@@ -75,6 +75,7 @@ fn create_valid_wire(
     wire
 }
 
+#[allow(clippy::too_many_arguments)]
 fn create_wire_with_metrics(
     index: u64,
     prev_digest: String,

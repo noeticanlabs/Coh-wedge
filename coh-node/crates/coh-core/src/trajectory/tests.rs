@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod trajectory_tests {
     use crate::trajectory::domain::{
         AgentState, AgentStatus, FinancialAction, FinancialState, FinancialStatus, OpsAction,
         OpsState, OpsStatus,

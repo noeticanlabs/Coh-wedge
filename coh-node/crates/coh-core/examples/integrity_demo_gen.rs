@@ -93,6 +93,7 @@ fn main() {
     println!("Generated demo fixtures in examples/");
 }
 
+#[allow(clippy::too_many_arguments)]
 fn create_receipt(
     step: u64,
     prev_state: &str,

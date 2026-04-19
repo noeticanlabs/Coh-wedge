@@ -40,7 +40,7 @@ mod tests {
         let bytes = to_canonical_json_bytes(&prehash).unwrap();
         let json_str = String::from_utf8(bytes).unwrap();
 
-        let digest = compute_chain_digest(r.chain_digest_prev, &json_str.as_bytes());
+        let digest = compute_chain_digest(r.chain_digest_prev, json_str.as_bytes());
         println!("Generated Digest Step 1: {}", digest.to_hex());
     }
 }

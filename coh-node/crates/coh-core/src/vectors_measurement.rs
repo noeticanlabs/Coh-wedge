@@ -35,6 +35,7 @@ mod tests {
 
     /// Reflection Violation: A measurement that "invents validity".
     /// It maps an "illegal" source receipt to a "legal" target receipt.
+    #[allow(dead_code)]
     struct ReflectionViolator;
     impl Measurement for ReflectionViolator {
         fn map_step(
@@ -114,7 +115,7 @@ mod tests {
         let collapses = detect_collapse(&Compression, &traces);
 
         // Compression maps s1 and s3 to t0.
-        assert!(collapses.len() > 0);
+        assert!(!collapses.is_empty());
         assert!(collapses[0].source_hashes.contains(&Hash32([1; 32])));
         assert!(collapses[0].source_hashes.contains(&Hash32([3; 32])));
     }

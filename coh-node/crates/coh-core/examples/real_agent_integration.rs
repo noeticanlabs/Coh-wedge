@@ -22,7 +22,7 @@ fn main() {
 
     let mut current_state = format!("{:064x}", 1u64);
     let mut prev_digest = "0".repeat(64);
-    let mut current_vault_value = 1000;
+    let mut current_vault_value: u128 = 1000;
 
     for step in 1..=3 {
         println!("--- AGENT STEP {} ---", step);
@@ -38,7 +38,7 @@ fn main() {
         // 2. ADAPTER LAYER
         // Convert LLM metadata into a Coh MicroReceipt.
         let next_state = format!("{:064x}", step + 1);
-        let v_pre = current_vault_value as u128;
+        let v_pre = current_vault_value;
 
         // LLM claims a spend and a new vault balance (v_post).
         let spend = llm_payload.spend;

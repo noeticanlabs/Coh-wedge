@@ -247,6 +247,7 @@ fn main() {
     println!("STEP3_DIGEST={}", digest3);
 }
 
+#[allow(clippy::too_many_arguments)]
 fn create_receipt(
     step_index: u64,
     state_hash_prev: &str,

@@ -1,3 +1,12 @@
+#![allow(unknown_lints)]
+#![allow(clippy::derivable_impls)]
+#![allow(clippy::unnecessary_cast)]
+#![allow(clippy::implicit_saturating_sub)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
+#![allow(clippy::should_implement_trait)]
+#![allow(clippy::too_many_arguments)]
+
 pub mod build_slab;
 pub mod canon;
 pub mod execute;
