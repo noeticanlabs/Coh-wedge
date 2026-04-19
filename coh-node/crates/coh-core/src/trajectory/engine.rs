@@ -42,7 +42,7 @@ pub fn search(ctx: &SearchContext) -> SearchResult {
 
             // Step 1: Expand
             let actions = admissible_actions(current_semantic_state);
-            
+
             if actions.is_empty() {
                 if !traj.steps.is_empty() {
                     result.admissible.push(traj.clone());
@@ -142,7 +142,7 @@ pub fn search(ctx: &SearchContext) -> SearchResult {
         if frontier.is_empty() {
             break;
         }
-        
+
         if depth == ctx.max_depth - 1 {
             result.admissible.extend(frontier.clone());
         }

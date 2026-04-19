@@ -176,14 +176,14 @@ pub fn admissible_actions(state: &DomainState) -> Vec<Action> {
                         amount: fs.current_invoice_amount,
                     }));
                 }
-                
+
                 // Only propose inadmissible action if balance is above a risk threshold
                 if fs.balance > 100 * COH_PRECISION {
                     actions.push(Action::Financial(FinancialAction::IssuePayment {
                         amount: fs.balance.saturating_add(500 * COH_PRECISION),
                     }));
                 }
-                
+
                 actions
             }
             FinancialStatus::Paid => vec![],
