@@ -266,7 +266,8 @@ export async function generateCandidatesImpl(initialReceipt, options = {}) {
                 alignment: 0,
                 normalizedCost: 1.0
             },
-            receipts: [edge.receipt],
+            receipts: Array(edge.receipt.step_index).fill({}).concat([edge.receipt]),
+            firstFailureIndex: edge.receipt.step_index,
             violationDelta: edge.verification.violation_delta,
             rejectCode: edge.verification.code,
             witnesses: edge.witnesses.map(w => ({

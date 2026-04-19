@@ -170,13 +170,19 @@ pub fn admissible_actions(state: &DomainState) -> Vec<Action> {
             })],
             FinancialStatus::Invoiced => vec![Action::Financial(FinancialAction::VerifyVendor)],
             FinancialStatus::ReadyToPay => {
+                let mut actions = vec![];
                 if fs.balance >= fs.current_invoice_amount {
-                    vec![Action::Financial(FinancialAction::IssuePayment {
+                    actions.push(Action::Financial(FinancialAction::IssuePayment {
                         amount: fs.current_invoice_amount,
-                    })]
-                } else {
-                    vec![]
+                    }));
                 }
+                
+                // Intentionally propose an inadmissible action to demonstrate Wedge safety filtering
+                actions.push(Action::Financial(FinancialAction::IssuePayment {
+                    amount: fs.balance.saturating_add(500),
+                }));
+                
+                actions
             }
             FinancialStatus::Paid => vec![],
         },

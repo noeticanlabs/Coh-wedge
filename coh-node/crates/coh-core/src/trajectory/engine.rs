@@ -68,6 +68,7 @@ pub fn search(ctx: &SearchContext) -> SearchResult {
                     &action,
                     &next_semantic_state,
                     prev_digest,
+                    depth as u64,
                 );
 
                 // Step 3: Verify
@@ -156,6 +157,7 @@ fn grounded_receipt_wire(
     action: &Action,
     next: &DomainState,
     prev_digest: Hash32,
+    depth: u64,
 ) -> MicroReceiptWire {
     // Derive grounded metrics
     let (v_pre, v_post_or_meta) = prev.to_metrics_tuple();
@@ -172,7 +174,7 @@ fn grounded_receipt_wire(
         canon_profile_hash: "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09"
             .to_string(),
         policy_hash: "0".repeat(64),
-        step_index: 0,
+        step_index: depth,
         step_type: Some(format!("{:?}", action)),
         signatures: Some(vec![crate::types::SignatureWire {
             signature: "sig".to_string(),

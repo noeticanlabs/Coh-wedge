@@ -106,12 +106,12 @@ const TrajectoryGraph = ({ candidates, selectedId, onSelect }) => {
           const { points, originalPoints, isSelectable, isSelected, firstFailureIndex, score } = tau;
 
           // Determine truncation point
-          const truncateAt = !isSelectable && firstFailureIndex !== null
+          const truncateAt = !isSelectable && firstFailureIndex != null
             ? Math.min(firstFailureIndex + 1, points.length)
             : points.length;
 
           const visiblePoints = points.slice(0, truncateAt);
-          const hasFailure = !isSelectable && firstFailureIndex !== null;
+          const hasFailure = !isSelectable && firstFailureIndex != null;
 
           // Line color based on validity
           const lineColor = isSelected
