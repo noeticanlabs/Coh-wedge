@@ -1,0 +1,21 @@
+{
+  "title": "The Coh Category: Verifier-Certified Trace Composition and Projection-Induced Semantic Cost",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "description": "A foundational categorical framework for verifier-certified execution traces with exact rational bookkeeping and a projection-induced semantic cost law.",
+  "creators": [
+    {
+      "name": "Ellington, Micheal",
+      "affiliation": "NoeticanLabs"
+    }
+  ],
+  "keywords": [
+    "category theory",
+    "formal methods",
+    "verification",
+    "Lean 4",
+    "computational semantics"
+  ],
+  "license": "CC-BY-NC-4.0",
+  "access_right": "open"
+}

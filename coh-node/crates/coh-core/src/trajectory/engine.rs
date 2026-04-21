@@ -179,6 +179,7 @@ fn grounded_receipt_wire(
         schema_id: "coh.receipt.micro.v1".to_string(),
         version: "1.0.0".to_string(),
         object_id: "traj.edge".to_string(),
+        public_key: None,
         canon_profile_hash: "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09"
             .to_string(),
         policy_hash: "0".repeat(64),
@@ -187,6 +188,7 @@ fn grounded_receipt_wire(
         signatures: Some(vec![crate::types::SignatureWire {
             signature: "sig".to_string(),
             signer: "system".to_string(),
+            public_key: None,
             timestamp: 0,
         }]),
         state_hash_prev,

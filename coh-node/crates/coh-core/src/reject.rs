@@ -15,6 +15,7 @@ pub enum RejectCode {
     RejectIntervalInvalid,
     RejectMissingSignature,
     RejectMissingObjectId,
+    RejectInvalidSignature,
     // Trajectory failures
     NoProgressLoop,
     StateCycleDetected,
@@ -25,6 +26,7 @@ pub enum RejectCode {
     VacuousZeroReceipt,
     SpendExceedsBalance,
     SemanticTypeViolation,
+    RejectSemanticExecutionMismatch,
     // Cumulative drift failures (GradientDescent defense — Q1)
     CumulativeDriftDetected,
     // Resource/governance failures

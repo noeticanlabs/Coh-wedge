@@ -1,120 +1,83 @@
-# Lean → Rust Traceability Matrix
+# Lean ↔ Rust Traceability Matrix
 
-**Generated**: 2026-04-16  
-**Purpose**: Establish formal connection between Lean proofs and Rust implementation
+This document maps the theoretical definitions in the Lean formal stack (`coh-t-stack`) to their runtime implementations in the Rust node (`coh-node`).
 
----
+## Core Accounting Law
 
-## Overview
+**Lean Definition:**
+- [`coh-t-stack/Coh/Kernel/Verifier.lean`](coh-t-stack/Coh/Kernel/Verifier.lean): `Lawful (r : Receipt)`
 
-The Lean formal proofs and Rust implementation share a **bidirectional contract**:
+**Paper Law:** `v_post + spend <= v_pre + defect + authority`
 
-- **Lean proves**: All receipts passing `rv` satisfy the contract invariants
-- **Rust implements**: The `verify_micro` function exactly mirrors the `rv` predicate
+| Lean Concept | Lean Definition Location | Rust Implementation | Rust Location |
+|------------|-------------------------|-------------------|------------------|
+| `v_post` | `r.post` | `r.metrics.v_post` | [`coh-node/crates/coh-core/src/types.rs`](coh-node/crates/coh-core/src/types.rs) |
+| `v_pre` | `r.pre` | `r.metrics.v_pre` | [`coh-node/crates/coh-core/src/types.rs`](coh-node/crates/coh-core/src/types.rs) |
+| `spend` | `r.spend` | `r.metrics.spend` | [`coh-node/crates/coh-core/src/types.rs`](coh-node/crates/coh-core/src/types.rs) |
+| `defect` | `r.defect` | `r.metrics.defect` | [`coh-node/crates/coh-core/src/types.rs`](coh-node/crates/coh-core/src/types.rs) |
+| `authority` | `r.authority` | `r.metrics.authority` | [`coh-node/crates/coh-core/src/types.rs`](coh-node/crates/coh-core/src/types.rs) |
+| Verifier Logic | `verify` | [`verify_micro()`](coh-node/crates/coh-core/src/verify_micro.rs) | [`coh-node/crates/coh-core/src/verify_micro.rs`](coh-node/crates/coh-core/src/verify_micro.rs) |
 
-This document maps each Lean lemma to its Rust implementation branch.
+## Certified Traces and Composition
 
----
+**Lean Definition:**
+- [`coh-t-stack/Coh/Core/Trace.lean`](coh-t-stack/Coh/Core/Trace.lean): `AcceptedTrace`, `totalSpend`, `totalDefect`
 
-## Core Theorem: `rv_contract_correctness`
+**Paper Law:** Telescoping inequality: `v_post_last + Σ spend <= v_pre_first + Σ defect`
 
-**Lean Location**: [`coh-t-stack/Coh/Contract/Micro.lean:299`](coh-t-stack/Coh/Contract/Micro.lean#L299)
+| Lean Concept | Lean Definition Location | Rust Implementation | Rust Location |
+|------------|-------------------------|-------------------|------------------|
+| `Trace` | `List MicroReceipt` | `Vec<MicroReceipt>` (wire) | [`coh-node/crates/coh-core/src/types.rs`](coh-node/crates/coh-core/src/types.rs) |
+| `AcceptedTrace` | `inductive` | [`verify_chain()`](coh-node/crates/coh-core/src/verify_chain.rs) | [`coh-node/crates/coh-core/src/verify_chain.rs`](coh-node/crates/coh-core/src/verify_chain.rs) |
+| `totalSpend` | `foldl` | cumulative tracking in [`verify_chain.rs`](coh-node/crates/coh-core/src/verify_chain.rs) | [`coh-node/crates/coh-core/src/verify_chain.rs`](coh-node/crates/coh-core/src/verify_chain.rs) |
+| `totalDefect` | `foldl` | cumulative tracking in [`verify_chain.rs`](coh-node/crates/coh-core/src/verify_chain.rs) | [`coh-node/crates/coh-core/src/verify_chain.rs`](coh-node/crates/coh-core/src/verify_chain.rs) |
+| Continuity | `MetricsContinuous` | continuity checks in [`verify_chain.rs`](coh-node/crates/coh-core/src/verify_chain.rs) | [`coh-node/crates/coh-core/src/verify_chain.rs`](coh-node/crates/coh-core/src/verify_chain.rs) |
+| Trace Determinism | `acceptedTrace_endState_eq_finalStateHash` | deterministic hash computation | [`coh-node/crates/coh-core/src/hash.rs`](coh-node/crates/coh-core/src/hash.rs) |
 
-```lean
-theorem rv_contract_correctness
-    (cfg : ContractConfig)
-    (prevState nextState : StateHash)
-    (prevChainDigest : ChainDigest)
-    (r : MicroReceipt) :
-    rv cfg prevState nextState prevChainDigest r = true ↔
-      MicroReceipt.ValidSchema cfg r ∧
-        CanonProfilePinned cfg r ∧
-        ObjectIdValid r ∧
-        NumericValid r ∧
-        policyLawful r ∧
-        r.chainDigestPrev = prevChainDigest ∧
-        chainDigestMatches r ∧
-        stateHashLinkOK prevState nextState r
-```
+## Category and Morphisms
 
-**Rust Equivalent**: [`coh-node/crates/coh-core/src/verify_micro.rs:11`](coh-node/crates/coh-core/src/verify_micro.rs#L11)
+**Lean Definition:**
+- [`coh-t-stack/Coh/Category/CohDyn.lean`](coh-t-stack/Coh/Category/CohDyn.lean): `DynHom`, `Step`, `path_cost`
 
-The `verify_micro` function returns `Decision::Accept` if and only if all 8 conditions hold.
+| Lean Concept | Lean Definition Location | Rust Implementation | Rust Location |
+|------------|-------------------------|-------------------|------------------|
+| `DynHom` | `inductive` | [`ExecutionProof`](coh-node/crates/coh-core/src/execute.rs) | [`coh-node/crates/coh-core/src/execute.rs`](coh-node/crates/coh-core/src/execute.rs) |
+| `path_cost` | `step_cost` + sum | [`step_cost()`](coh-node/crates/coh-core/src/measurement.rs) | [`coh-node/crates/coh-core/src/measurement.rs`](coh-node/crates/coh-core/src/measurement.rs) |
+| `CohDyn` | SmallCategory | Execution loop in [`engine.rs`](coh-node/crates/coh-core/src/trajectory/engine.rs) | [`coh-node/crates/coh-core/src/trajectory/engine.rs`](coh-node/crates/coh-core/src/trajectory/engine.rs) |
 
----
+## Measurement and Collapse
 
-## Traceability Map
+**Lean Definition:**
+- [`coh-t-stack/Coh/Category/Measurement.lean`](coh-t-stack/Coh/Category/Measurement.lean): `Measurement`, `collapses`, `is_oplax`, `Fiber`
 
-| # | Lean Lemma | Lean Condition | Rust Implementation | Rust Branch |
-|---|-----------|----------------|---------------------|-------------|
-| 1 | `ValidSchema` | Schema ID + version match | [`verify_micro.rs:31-56`](coh-node/crates/coh-core/src/verify_micro.rs#L31) | Schema check |
-| 2 | `CanonProfilePinned` | Canon profile hash matches | [`verify_micro.rs`](coh-node/crates/coh-core/src/verify_micro.rs) | Canon profile check |
-| 3 | `ObjectIdValid` | Object ID non-empty | [`verify_micro.rs:59-72`](coh-node/crates/coh-core/src/verify_micro.rs#L59) | Object ID sanity |
-| 4 | `NumericValid` | All metrics parse as u128 | [`verify_micro.rs:15-28`](coh-node/crates/coh-core/src/verify_micro.rs#L15) | Wire → Runtime conversion |
-| 5 | `policyLawful` | Accounting law: `v_post + spend ≤ v_pre + defect + authority` | [`verify_micro.rs`](coh-node/crates/coh-core/src/verify_micro.rs) | Policy check |
-| 6 | `chainDigestPrev = prevChainDigest` | Previous digest matches | [`verify_micro.rs`](coh-node/crates/coh-core/src/verify_micro.rs) | Chain digest check |
-| 7 | `chainDigestMatches` | Current receipt hashes to `chainDigestNext` | [`verify_micro.rs`](coh-node/crates/coh-core/src/verify_micro.rs) | Digest compute + compare |
-| 8 | `stateHashLinkOK` | State transition valid | [`verify_micro.rs`](coh-node/crates/coh-core/src/verify_micro.rs) | State link check |
+| Lean Concept | Lean Definition Location | Rust Implementation | Rust Location |
+|------------|-------------------------|-------------------|------------------|
+| `Measurement` | CohHom | [`Measurement`](coh-node/crates/coh-core/src/measurement.rs) | [`coh-node/crates/coh-core/src/measurement.rs`](coh-node/crates/coh-core/src/measurement.rs) |
+| `collapses` | predicate | [`detect_collapse()`](coh-node/crates/coh-core/src/measurement.rs) | [`coh-node/crates/coh-core/src/measurement.rs`](coh-node/crates/coh-core/src/measurement.rs) |
+| `is_oplax` | predicate | [`verify_chain_dissipation()`](coh-node/crates/coh-core/src/measurement.rs) | [`coh-node/crates/coh-core/src/measurement.rs`](coh-node/crates/coh-core/src/measurement.rs) |
 
----
+## NEW: Semantic Layer (Latest)
 
-## Reject Code Mapping
+**Lean Definition:**
+- [`coh-t-stack/Coh/Core/Semantic.lean`](coh-t-stack/Coh/Core/Semantic.lean): `SemanticSystem`, `HiddenTrace`, `Fiber`, `semanticCost`
 
-| Lean Reject Variant | Rust RejectCode | Condition Triggered |
-|--------------------|-----------------|---------------------|
-| `rv_reject_of_bad_schema` | `RejectCode::RejectSchema` | Schema/version mismatch |
-| `rv_reject_of_bad_canon_profile` | `RejectCode::RejectCanonProfile` | Canon profile hash mismatch |
-| `rv_reject_of_empty_object_id` | `RejectCode::RejectMissingObjectId` | Empty object ID |
-| `rv_reject_of_numeric_overflow` | `RejectCode::RejectOverflow` | u128 overflow |
-| `rv_reject_of_policy_violation` | `RejectCode::RejectPolicyViolation` | Accounting law fails |
-| `rv_reject_of_bad_chain_digest` | `RejectCode::RejectChainDigest` | Chain digest mismatch |
-| `rv_reject_of_bad_state_link` | `RejectCode::RejectStateHashLink` | State hash link broken |
+| Lean Concept | Lean Definition Location | Rust Implementation | Rust Location |
+|------------|-------------------------|-------------------|------------------|
+| `SemanticSystem` | `structure` | [`SemanticConfig`](coh-node/crates/coh-core/src/semantic.rs) | [`coh-node/crates/coh-core/src/semantic.rs`](coh-node/crates/coh-core/src/semantic.rs) |
+| `HiddenTrace` | `List H` | [`HiddenTrace`](coh-node/crates/coh-core/src/semantic.rs) | [`coh-node/crates/coh-core/src/semantic.rs`](coh-node/crates/coh-core/src/semantic.rs) |
+| `project` | `List.map` | [`HiddenTrace::project()`](coh-node/crates/coh-core/src/semantic.rs) | [`coh-node/crates/coh-core/src/semantic.rs`](coh-node/crates/coh-core/src/semantic.rs) |
+| `Fiber` | `Set` (preimage) | [`RealizableFiber`](coh-node/crates/coh-core/src/semantic.rs) | [`coh-node/crates/coh-core/src/semantic.rs`](coh-node/crates/coh-core/src/semantic.rs) |
+| `semanticCost` | `sup` over fiber | [`compute_semantic_cost()`](coh-node/crates/coh-core/src/semantic.rs) | [`coh-node/crates/coh-core/src/semantic.rs`](coh-node/crates/coh-core/src/semantic.rs) |
+| Semantic Subadditivity | `semantic_subadditive` | [`check_semantic_cost_subadditive()`](coh-node/crates/coh-core/src/semantic.rs) | [`coh-node/crates/coh-core/src/semantic.rs`](coh-node/crates/coh-core/src/semantic.rs) |
 
-**Lean Location**: [`coh-t-stack/Coh/Contract/RejectCode.lean:5`](coh-t-stack/Coh/Contract/RejectCode.lean#L5)  
-**Rust Location**: [`coh-node/crates/coh-core/src/reject.rs:4`](coh-node/crates/coh-core/src/reject.rs#L4)
+## Strict-Gap Example
 
----
+**Lean Example:**
+- [`coh-t-stack/Coh/Core/SemanticExample.lean`](coh-t-stack/Coh/Core/SemanticExample.lean): `ToySystem`, `ThetaStar`, `strict_gap`
 
-## Numeric Domain Lock
+| Lean Instance | Lean Location | Proposed Rust Vector | Rust Location |
+|--------------|-------------|-------------------|--------------|
+| `ToySystem` | SemanticExample.lean | N/A (pure Lean proof) | - |
+| Strict Gap | `synCost > semCost` | N/A (pure Lean theorem) | - |
 
-Both Lean and Rust enforce the same numeric bounds:
-
-| Field | Lean Bound | Rust Bound | Lock Mechanism |
-|-------|------------|------------|----------------|
-| `v_pre`, `v_post`, `spend`, `defect`, `authority` | `Nat` (unbounded in Lean, but proof shows ≤ 2^128) | `u128` | Rust `u128::try_from` + Lean `u128Bounds` lemma |
-
-**Lean Proof**: [`coh-t-stack/Coh/Contract/Micro.lean:60`](coh-t-stack/Coh/Contract/Micro.lean#L60) - `u128Bounds` lemma proves all values fit in u128.
-
----
-
-## Invariant Preservation
-
-The contract theorem guarantees:
-
-```
-∀ (cfg : ContractConfig) (prevState nextState : StateHash) 
-    (prevChainDigest : ChainDigest) (r : MicroReceipt),
-  rv cfg prevState nextState prevChainDigest r = true →
-    stateHashLinkOK prevState nextState r
-```
-
-This means **any accepted receipt preserves state continuity** — no gaps, no forks.
-
----
-
-## Gap Analysis
-
-| Gap | Severity | Status | Notes |
-|-----|----------|--------|-------|
-| Slab-level formal proof | Medium | Done \| Lean has `Slab.lean`, needs `rv_slab_correctness` |
-| Chain-level formal proof | Medium | Full \| `Trace.lean` has trace lemmas, Done (impl. in Trace.lean) |
-| End-to-end compositional proof | High | Done (impl. in T3_SlabGrounding.lean) Compose micro → chain → slab |
-| Hash function formalization | Low | Done | `Crypto/HashBridge.lean` connects to Rust SHA256 |
-
----
-
-## Next Steps
-
-1. **Complete slab theorem** — Add `rv_slab_correctness` mirroring Rust `verify_slab.rs`
-2. **Add chain composition** — Prove that chained micro receipts preserve invariants
-3. **Document version lock** — Pin Lean/Rust versions in CI
+**Planned:** Once the Lean example solidifies, create corresponding Rust golden vectors documenting the same gap.

@@ -177,6 +177,10 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
             };
         }
         seen_states.insert(state_key);
+        
+        // --- SECTION: Policy Heuristics (Negotiable Guards) ---
+        // These guards protect against inefficient or non-ideal trajectories 
+        // but are not fundamental mathematical violations.
 
         // 3b. Progress check (NoProgressLoop) - defect must decrease or terminal
         total_defect += r.metrics.defect;
@@ -271,6 +275,9 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
             steps_verified_before_failure: None,
         };
     }
+
+    // --- SECTION: Fundamental Accounting Laws (Non-Negotiable) ---
+    // These checks enforce the global conservation invariants of the system.
 
     // Cumulative telescoping bound check (GradientDescent defense — Q1)
     // The Accounting Law telescopes: v_post_last + cumulative_spend <= v_pre_first + total_defect

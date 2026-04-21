@@ -71,14 +71,9 @@ pub fn verify_micro(wire: MicroReceiptWire) -> VerifyMicroResult {
         };
     }
 
-    // 3.5 Signature Presence
-    let missing_sig = match &r.signatures {
-        None => true,
-        Some(sigs) => sigs.is_empty(),
-    };
-
-    if missing_sig {
-        return VerifyMicroResult {
+    // 3.5 Cryptographic Signature Verification
+    let sigs = match &r.signatures {
+        None => return VerifyMicroResult {
             decision: Decision::Reject,
             code: Some(RejectCode::RejectMissingSignature),
             message: "Missing required signature(s)".to_string(),
@@ -86,7 +81,107 @@ pub fn verify_micro(wire: MicroReceiptWire) -> VerifyMicroResult {
             object_id: Some(r.object_id),
             chain_digest_next: None,
             violation_delta: None,
+        },
+        Some(sigs) if sigs.is_empty() => return VerifyMicroResult {
+            decision: Decision::Reject,
+            code: Some(RejectCode::RejectMissingSignature),
+            message: "Missing required signature(s)".to_string(),
+            step_index: Some(r.step_index),
+            object_id: Some(r.object_id),
+            chain_digest_next: None,
+            violation_delta: None,
+        },
+        Some(sigs) => sigs,
+    };
+
+    // To verify, we need the canonical bytes of the content being signed.
+    // Convention: Sign the canonical JSON of the receipt excluding the signatures field itself.
+    let mut signable_prehash = to_prehash_view(&r);
+    signable_prehash.signatures = None; 
+    let signable_bytes = match to_canonical_json_bytes(&signable_prehash) {
+        Ok(bytes) => bytes,
+        Err(e) => return VerifyMicroResult {
+            decision: Decision::Reject,
+            code: Some(e),
+            message: "Failed to canonicalize signable content".to_string(),
+            step_index: Some(r.step_index),
+            object_id: Some(r.object_id),
+            chain_digest_next: None,
+            violation_delta: None,
+        },
+    };
+
+    for sig_wire in sigs {
+        // Attempt to find public key
+        let pk_hex = sig_wire.public_key.clone().or_else(|| r.public_key.clone());
+        let pk_hex = match pk_hex {
+            Some(pk) => pk,
+            None => return VerifyMicroResult {
+                decision: Decision::Reject,
+                code: Some(RejectCode::RejectMissingSignature),
+                message: format!("Missing public key for signer: {}", sig_wire.signer),
+                step_index: Some(r.step_index),
+                object_id: Some(r.object_id),
+                chain_digest_next: None,
+                violation_delta: None,
+            },
         };
+
+        // Decode public key
+        let mut pk_bytes = [0u8; 32];
+        if hex::decode_to_slice(&pk_hex, &mut pk_bytes).is_err() {
+            return VerifyMicroResult {
+                decision: Decision::Reject,
+                code: Some(RejectCode::RejectNumericParse),
+                message: format!("Invalid public key hex for signer: {}", sig_wire.signer),
+                step_index: Some(r.step_index),
+                object_id: Some(r.object_id),
+                chain_digest_next: None,
+                violation_delta: None,
+            };
+        }
+
+        // Decode signature
+        let mut sig_bytes = [0u8; 64];
+        if hex::decode_to_slice(&sig_wire.signature, &mut sig_bytes).is_err() {
+            return VerifyMicroResult {
+                decision: Decision::Reject,
+                code: Some(RejectCode::RejectNumericParse),
+                message: format!("Invalid signature hex for signer: {}", sig_wire.signer),
+                step_index: Some(r.step_index),
+                object_id: Some(r.object_id),
+                chain_digest_next: None,
+                violation_delta: None,
+            };
+        }
+
+        // Cryptographic verify
+        use ed25519_dalek::{Signature, Verifier, VerifyingKey};
+        let public_key = match VerifyingKey::from_bytes(&pk_bytes) {
+            Ok(pk) => pk,
+            Err(_) => return VerifyMicroResult {
+                decision: Decision::Reject,
+                code: Some(RejectCode::RejectInvalidSignature),
+                message: format!("Malformed Ed25519 public key for signer: {}", sig_wire.signer),
+                step_index: Some(r.step_index),
+                object_id: Some(r.object_id),
+                chain_digest_next: None,
+                violation_delta: None,
+            },
+        };
+        let signature = Signature::from_bytes(&sig_bytes);
+
+        if public_key.verify(&signable_bytes, &signature).is_err() {
+            return VerifyMicroResult {
+                decision: Decision::Reject,
+                code: Some(RejectCode::RejectInvalidSignature),
+                message: format!("Cryptographic signature verification failed for signer: {}", sig_wire.signer),
+                step_index: Some(r.step_index),
+                object_id: Some(r.object_id),
+                chain_digest_next: None,
+                violation_delta: None,
+            };
+        }
     }
 
     // 4. Profile check

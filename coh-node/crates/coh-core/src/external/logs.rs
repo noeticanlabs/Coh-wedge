@@ -35,6 +35,7 @@ fn signature_for(step_index: u64, signer: &str) -> SignatureWire {
     SignatureWire {
         signature: format!("sig-log-{:016}", step_index),
         signer: signer.to_string(),
+        public_key: None,
         timestamp: 1_700_000_000 + step_index,
     }
 }
@@ -66,6 +67,7 @@ pub fn ingest_api_jsonl(path: impl AsRef<Path>) -> Result<Vec<MicroReceiptWire>,
             schema_id: "coh.receipt.micro.v1".to_string(),
             version: "1.0.0".to_string(),
             object_id,
+            public_key: None,
             canon_profile_hash: EXPECTED_CANON_PROFILE_HASH.to_string(),
             policy_hash: "0".repeat(64),
             step_index: i as u64,
@@ -114,6 +116,7 @@ pub fn ingest_pipeline_jsonl(path: impl AsRef<Path>) -> Result<Vec<MicroReceiptW
             schema_id: "coh.receipt.micro.v1".to_string(),
             version: "1.0.0".to_string(),
             object_id,
+            public_key: None,
             canon_profile_hash: EXPECTED_CANON_PROFILE_HASH.to_string(),
             policy_hash: "0".repeat(64),
             step_index: i as u64,
@@ -165,6 +168,7 @@ pub fn ingest_cicd_jsonl(path: impl AsRef<Path>) -> Result<Vec<MicroReceiptWire>
             schema_id: "coh.receipt.micro.v1".to_string(),
             version: "1.0.0".to_string(),
             object_id,
+            public_key: None,
             canon_profile_hash: EXPECTED_CANON_PROFILE_HASH.to_string(),
             policy_hash: "0".repeat(64),
             step_index: i as u64,

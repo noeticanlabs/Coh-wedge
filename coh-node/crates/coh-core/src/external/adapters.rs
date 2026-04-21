@@ -22,6 +22,7 @@ fn valid_signature(step_index: u64, signer: &str) -> SignatureWire {
     SignatureWire {
         signature: format!("sig-{:016}", step_index),
         signer: signer.to_string(),
+        public_key: None,
         timestamp: 1_700_000_000 + step_index,
     }
 }
@@ -68,6 +69,7 @@ impl DomainAdapter for FinancialAdapter {
             schema_id: "coh.receipt.micro.v1".to_string(),
             version: "1.0.0".to_string(),
             object_id: format!("financial.workflow.{}", step_index),
+            public_key: None,
             canon_profile_hash: EXPECTED_CANON_PROFILE_HASH.to_string(),
             policy_hash: POLICY_HASH_ZERO.to_string(),
             step_index,
@@ -180,6 +182,7 @@ impl DomainAdapter for AgentAdapter {
             schema_id: "coh.receipt.micro.v1".to_string(),
             version: "1.0.0".to_string(),
             object_id: format!("agent.workflow.{}", step_index),
+            public_key: None,
             canon_profile_hash: EXPECTED_CANON_PROFILE_HASH.to_string(),
             policy_hash: POLICY_HASH_ZERO.to_string(),
             step_index,
@@ -286,6 +289,7 @@ impl DomainAdapter for OpsAdapter {
             schema_id: "coh.receipt.micro.v1".to_string(),
             version: "1.0.0".to_string(),
             object_id: format!("ops.workflow.{}", step_index),
+            public_key: None,
             canon_profile_hash: EXPECTED_CANON_PROFILE_HASH.to_string(),
             policy_hash: POLICY_HASH_ZERO.to_string(),
             step_index,

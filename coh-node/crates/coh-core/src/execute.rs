@@ -3,7 +3,7 @@
 use crate::reject::RejectCode;
 use crate::types::Decision;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Execution mode determines whether state is actually mutated
@@ -20,7 +20,7 @@ pub enum ExecutionMode {
 pub struct Action {
     pub action_type: String,
     pub target: String,
-    pub params: HashMap<String, serde_json::Value>,
+    pub params: BTreeMap<String, serde_json::Value>,
     pub authority: String,
 }
 
@@ -56,7 +56,7 @@ pub struct ExecuteResponse {
 
 /// State store for tracking state transitions
 pub struct StateStore {
-    states: HashMap<String, State>,
+    states: HashMap<String, Vec<State>>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -75,18 +75,17 @@ impl StateStore {
     }
 
     pub fn get(&self, key: &str) -> Option<State> {
-        self.states.get(key).cloned()
+        self.states.get(key).and_then(|h| h.last()).cloned()
     }
 
-    pub fn set(&mut self, key: &str, state: State) {
-        self.states.insert(key.to_string(), state);
+    pub fn set(&mut self, key: &str, mut state: State) {
+        let history = self.states.entry(key.to_string()).or_default();
+        state.version = history.len() as u64;
+        history.push(state);
     }
 
     pub fn history(&self, key: &str) -> Vec<State> {
-        self.states
-            .get(key)
-            .map(|s| vec![s.clone()])
-            .unwrap_or_default()
+        self.states.get(key).cloned().unwrap_or_default()
     }
 }
 
@@ -139,19 +138,62 @@ impl ExecutionEngine {
 
         // Step 3: Execute based on mode
         let state_next = match mode {
-            ExecutionMode::DryRun => compute_next_state(&state_prev, &action),
+            ExecutionMode::DryRun => match compute_next_state(&state_prev, &action) {
+                Ok(next) => next,
+                Err(e) => return ExecuteResponse {
+                    decision: Decision::Reject,
+                    execution_proof: None,
+                    state_prev: Some(state_prev),
+                    state_next: None,
+                    error: Some(format!("Execution hashing failed: {:?}", e)),
+                    error_code: Some(e),
+                },
+            },
             ExecutionMode::Real => {
-                let next = compute_next_state(&state_prev, &action);
+                let next = match compute_next_state(&state_prev, &action) {
+                    Ok(next) => next,
+                    Err(e) => return ExecuteResponse {
+                        decision: Decision::Reject,
+                        execution_proof: None,
+                        state_prev: Some(state_prev),
+                        state_next: None,
+                        error: Some(format!("Execution hashing failed: {:?}", e)),
+                        error_code: Some(e),
+                    },
+                };
+                
+                // CRITICAL RIGOR CHECK: Compare computed hash with receipt's claimed next state
+                if next != receipt.state_hash_next {
+                    return ExecuteResponse {
+                        decision: Decision::Reject,
+                        execution_proof: None,
+                        state_prev: Some(state_prev),
+                        state_next: Some(next.clone()),
+                        error: Some(format!("Semantic execution mismatch: computed {} but receipt claimed {}", next, receipt.state_hash_next)),
+                        error_code: Some(RejectCode::RejectSemanticExecutionMismatch),
+                    };
+                }
+
                 let new_state = State {
                     id: state_key.clone(),
-                    value: serde_json::json!({ "last_action": action.action_type }),
+                    value: serde_json::json!({ "last_action": action.action_type, "params": action.params }),
                     hash: next.clone(),
-                    version: 0,
+                    version: 0, // Version will be set by StateStore::set
                 };
                 self.state_store.set(&state_key, new_state);
                 next
             }
-            ExecutionMode::Simulation => compute_next_state(&state_prev, &action),
+            ExecutionMode::Simulation => match compute_next_state(&state_prev, &action) {
+                Ok(next) => next,
+                Err(e) => return ExecuteResponse {
+                    decision: Decision::Reject,
+                    execution_proof: None,
+                    state_prev: Some(state_prev),
+                    state_next: None,
+                    error: Some(format!("Execution hashing failed: {:?}", e)),
+                    error_code: Some(e),
+                },
+            },
         };
 
         // Step 4: Generate execution proof
@@ -191,18 +233,22 @@ impl Default for ExecutionEngine {
     }
 }
 
-/// Compute next state hash based on action
-fn compute_next_state(current_state: &str, action: &Action) -> String {
-    use std::collections::hash_map::DefaultHasher;
-    use std::hash::{Hash, Hasher};
+/// Compute next state hash based on action parameters and previous state.
+/// Uses RFC 8785 (JCS) for deterministic canonicalization and SHA-256 for hashing.
+fn compute_next_state(current_state_hash: &str, action: &Action) -> Result<String, RejectCode> {
+    use sha2::{Digest, Sha256};
 
-    let mut hasher = DefaultHasher::new();
-    current_state.hash(&mut hasher);
-    action.action_type.hash(&mut hasher);
-    action.target.hash(&mut hasher);
+    let mut hasher = Sha256::new();
+    hasher.update(current_state_hash.as_bytes());
+    hasher.update(action.action_type.as_bytes());
+    hasher.update(action.target.as_bytes());
 
-    let hash = hasher.finish();
-    format!("{:016x}{:016x}", hash, hash)
+    // Deterministically serialize params using JCS
+    let param_bytes = serde_jcs::to_vec(&action.params).map_err(|_| RejectCode::RejectNumericParse)?;
+    hasher.update(&param_bytes);
+
+    let result = hasher.finalize();
+    Ok(hex::encode(result))
 }
 
 #[cfg(test)]
@@ -218,6 +264,7 @@ mod tests {
             schema_id: "coh.receipt.micro.v1".to_string(),
             version: "1.0.0".to_string(),
             object_id: "agent.workflow.demo".to_string(),
+            public_key: None,
             canon_profile_hash: "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09"
                 .to_string(),
             policy_hash: "0000000000000000000000000000000000000000000000000000000000000000"
@@ -227,6 +274,7 @@ mod tests {
             signatures: Some(vec![crate::types::SignatureWire {
                 signature: "sig-0000000000000000".to_string(),
                 signer: "fixture-signer-0".to_string(),
+                public_key: None,
                 timestamp: 1700000000,
             }]),
             state_hash_prev: "1111111111111111111111111111111111111111111111111111111111111111"
@@ -292,6 +340,7 @@ mod tests {
             schema_id: "coh.receipt.micro.v1".to_string(),
             version: "1.0.0".to_string(),
             object_id: "test_obj".to_string(),
+            public_key: None,
             canon_profile_hash: "4fb5a33116a4e393ad7900f0744e8ec5d1b7a2d67d71003666d628d7a1cded09"
                 .to_string(),
             policy_hash: "0000000000000000000000000000000000000000000000000000000000000000"

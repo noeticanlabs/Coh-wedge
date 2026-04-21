@@ -60,6 +60,7 @@ pub struct MetricsWire {
 pub struct SignatureWire {
     pub signature: String,
     pub signer: String,
+    pub public_key: Option<String>,
     pub timestamp: u64,
 }
 
@@ -69,6 +70,7 @@ pub struct MicroReceiptWire {
     pub schema_id: String,
     pub version: String,
     pub object_id: String,
+    pub public_key: Option<String>, // Receipt-level public key (optional if signature-level exists)
     pub canon_profile_hash: String,
     pub policy_hash: String,
     pub step_index: u64,
@@ -124,6 +126,7 @@ pub struct MicroReceipt {
     pub schema_id: String,
     pub version: String,
     pub object_id: String,
+    pub public_key: Option<String>,
     pub canon_profile_hash: Hash32,
     pub policy_hash: Hash32,
     pub step_index: u64,
@@ -177,6 +180,7 @@ pub struct MicroReceiptPrehash {
     pub metrics: MetricsPrehash,
     pub object_id: String,
     pub policy_hash: String,
+    pub public_key: Option<String>,
     pub schema_id: String,
     pub signatures: Option<Vec<SignatureWire>>,
     pub state_hash_next: String,
@@ -274,6 +278,7 @@ impl TryFrom<MicroReceiptWire> for MicroReceipt {
             schema_id: w.schema_id,
             version: w.version,
             object_id: w.object_id,
+            public_key: w.public_key,
             canon_profile_hash: Hash32::from_hex(&w.canon_profile_hash)?,
             policy_hash: Hash32::from_hex(&w.policy_hash)?,
             step_index: w.step_index,

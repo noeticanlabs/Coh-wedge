@@ -12,6 +12,8 @@ hex.workspace = true
 base64.workspace = true
 thiserror.workspace = true
 colored.workspace = true
+ed25519-dalek = "2.1"
+serde_jcs = "0.1"
 
 [dev-dependencies]
 criterion = { workspace = true }
