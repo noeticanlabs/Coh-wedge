@@ -17,6 +17,10 @@ serde_jcs = "0.1"
 
 [dev-dependencies]
 criterion = { workspace = true }
+proptest = "1.5"
+quickcheck = "1"
+# Fuzzing dependencies
+# libafl = "0.9"  # Uncomment when ready to use LibAFL
 
 [[example]]
 name = "verify_single"

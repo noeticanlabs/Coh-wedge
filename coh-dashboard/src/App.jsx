@@ -5,6 +5,7 @@ import HeroSection from './components/HeroSection';
 import { DecisionBanner, EvidencePanel } from './components/DecisionBanner';
 import { TrajectoryCard, TechnicalTabs } from './components/TrajectoryCard';
 import BenchmarkStrip from './components/BenchmarkStrip';
+import PhaseLoomVisualizer from './components/PhaseLoomVisualizer';
 
 const App = () => {
   const [data, setData] = useState(null);
@@ -91,6 +92,8 @@ const App = () => {
             isTrusted={data?.isTrusted}
             reason={data?.isTrusted ? null : currentStep?.metrics?.reason}
           />
+
+          <PhaseLoomVisualizer />
 
           <TrajectoryCard
             candidates={candidates}
