@@ -1,9 +1,0 @@
-import Coh.Contract.Micro
-import Coh.Core.ReceiptChain
-import Coh.Core.Trace
-#check rv_contract_correctness
-#check accepted_step_implies_chain_digest_correct
-#check accepted_trace_closure
-#check Coh.Contract.rv_contract_correctness
-#check Coh.Core.accepted_step_implies_chain_digest_correct
-#check Coh.Core.accepted_trace_closure

@@ -13,16 +13,30 @@
 //! - Existing kernel serves as the certification oracle for the observable trace projection
 //! - This module introduces the hidden realization and semantic cost layer
 
-use crate::types::Hash32 as StateHash;
 use std::collections::HashSet;
 
-/// Hidden state representation
+/// Canonical hash trait: aligns Rust semantic layer with Lean without leaking infra
+pub trait Hashable {
+    fn hash(&self) -> Vec<u8>;
+}
+
+/// Represents an observable state in the semantic layer (Vec<u8> for Lean alignment)
+pub type ObsState = Vec<u8>;
+
+/// Hidden state: represents a semantic step in the hidden layer
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum HiddenState {
-    /// Constructed from a hidden action representation
     Action(String),
-    /// Terminal state
     Terminal,
+}
+
+impl Hashable for HiddenState {
+    fn hash(&self) -> Vec<u8> {
+        match self {
+            HiddenState::Action(s) => s.as_bytes().to_vec(),
+            HiddenState::Terminal => b"terminal".to_vec(),
+        }
+    }
 }
 
 /// Hidden trace: a sequence of hidden states
@@ -42,9 +56,9 @@ impl HiddenTrace {
         self.states.push(s);
     }
 
-    /// Project to observable trace (as state hashes)
-    pub fn project<P: Fn(&HiddenState) -> StateHash>(&self, projection: P) -> Vec<StateHash> {
-        self.states.iter().map(projectation).collect()
+    /// Project to observable trace (as Vec<u8>)
+    pub fn project<P: Fn(&HiddenState) -> Vec<u8>>(&self, projection: P) -> Vec<u8> {
+        self.states.iter().flat_map(|s| projection(s)).collect()
     }
 }
 
@@ -73,15 +87,12 @@ impl Default for SemanticConfig {
 #[derive(Debug, Clone)]
 pub struct RealizableFiber {
     /// The observable trace that these realize
-    pub observable_trace: Vec<Hash32>,
+    pub observable_trace: Vec<ObsState>,
     /// Hidden realizations (if bounded)
     pub realizations: Vec<HiddenTrace>,
     /// Whether the fiber is known to be finite
     pub is_finite: bool,
 }
-
-/// Represents an observable state (as a hash) in the semantic layer
-pub type ObsState = Hash32;
 
 /// Semantic cost computation result
 #[derive(Debug, Clone)]
@@ -136,9 +147,9 @@ pub fn verify_projection_is_certified(
 /// Note: In the runtime, enumerating all realizations is expensive/exponential.
 /// We implement a bounded enumeration.
 pub fn enumerate_realizable_fiber(
-    obs_trace: &[StateHash],
+    obs_trace: &[ObsState],
     hidden_states: &[HiddenState],
-    project_fn: fn(&HiddenState) -> StateHash,
+    project_fn: fn(&HiddenState) -> ObsState,
     max_depth: usize,
 ) -> RealizableFiber {
     // Naive bounded enumeration: generate all traces up to max_depth
@@ -165,19 +176,19 @@ pub fn enumerate_realizable_fiber(
 ///
 /// This corresponds to the Lean theorem `SemanticSystem.semantic_subadditive`.
 pub fn check_semantic_cost_subadditive(
-    obs1: &[StateHash],
-    obs2: &[StateHash],
+    obs1: &[ObsState],
+    obs2: &[ObsState],
     hidden_cost_fn: fn(&HiddenState) -> u128,
 ) -> bool {
     // Compute semantic costs
-    let fiber1 = enumerate_realizable_fiber(obs1, &[], |s| StateHash::default(), 5);
-    let fiber2 = enumerate_realizable_fiber(obs2, &[], |s| StateHash::default(), 5);
+    let fiber1 = enumerate_realizable_fiber(obs1, &[], |s| s.hash(), 5);
+    let fiber2 = enumerate_realizable_fiber(obs2, &[], |s| s.hash(), 5);
 
     let cost1 = compute_semantic_cost(&fiber1, hidden_cost_fn);
     let cost2 = compute_semantic_cost(&fiber2, hidden_cost_fn);
 
-    let combined: Vec<StateHash> = obs1.iter().chain(obs2.iter()).cloned().collect();
-    let fiber_combined = enumerate_realizable_fiber(&combined, &[], |s| StateHash::default(), 5);
+    let combined: Vec<ObsState> = obs1.iter().chain(obs2.iter()).cloned().collect();
+    let fiber_combined = enumerate_realizable_fiber(&combined, &[], |s| s.hash(), 5);
     let cost_combined = compute_semantic_cost(&fiber_combined, hidden_cost_fn);
 
     cost_combined.value <= cost1.value.saturating_add(cost2.value)
