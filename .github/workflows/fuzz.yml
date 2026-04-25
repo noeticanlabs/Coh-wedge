@@ -1,0 +1,52 @@
+name: Scheduled Fuzzing
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Daily at midnight
+  workflow_dispatch: # Allow manual trigger
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            coh-node/target
+          key: ${{ runner.os }}-fuzz-cargo-${{ hashFiles('coh-node/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-fuzz-cargo-
+
+      - name: Build fuzzer
+        working-directory: coh-node
+        run: cargo build -p coh-fuzz --release
+
+      - name: Run fuzzer (10 minute timeout)
+        working-directory: coh-node
+        run: |
+          mkdir -p crates/coh-fuzz/corpus
+          # Run the fuzzer with a timeout. 
+          # It will exit with 124 if timed out, which we treat as success for the CI.
+          timeout 600s ./target/release/coh-fuzz || [ $? -eq 124 ]
+
+      - name: Archive crashes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzzer-crashes
+          path: coh-node/crashes/
+          if-no-files-found: ignore

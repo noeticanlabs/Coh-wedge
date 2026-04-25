@@ -5,6 +5,7 @@ pub mod hash;
 pub mod math;
 pub mod merkle;
 pub mod reject;
+pub mod trajectory_probability;
 pub mod types;
 pub mod vectors;
 pub mod verify_chain;
@@ -25,6 +26,10 @@ pub use types_v3::{
     SequenceGuard, TieredConfig, VerificationMode,
 };
 pub use verify_micro_v3::{verify_micro_v3, verify_with_mode, VerifyMicroV3Result};
+// Trajectory probability exports
+pub use trajectory_probability::{
+    TrajectoryProbabilityConfig, TrajectoryProbabilityResult, TrajectoryProbabilityVerifier,
+};
 
 pub use types::{BuildSlabResult, VerifyChainResult, VerifyMicroResult, VerifySlabResult};
 pub use types::{Decision, MicroReceiptWire, RejectCode, SlabReceiptWire};

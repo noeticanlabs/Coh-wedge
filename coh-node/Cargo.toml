@@ -4,6 +4,7 @@ members = [
     "crates/coh-cli",
     "crates/coh-python",
     "crates/coh-sidecar",
+    "crates/coh-fuzz",
 ]
 resolver = "2"
 
