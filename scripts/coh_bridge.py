@@ -113,12 +113,15 @@ def verify_receipt_coh(receipt: dict) -> Tuple[str, Optional[str], str]:
     try:
         COH.verify(receipt)
         return ("ACCEPT", None, "coh.verify")
-    except getattr(COH, 'CohVerificationError', Exception) as e:
-        return ("REJECT_MARGIN", str(e), "coh.reject")
-    except getattr(COH, 'CohMalformedError', Exception) as e:
-        return ("MALFORMED", str(e), "coh.malformed")
     except Exception as e:
-        return ("MALFORMED", str(e), "coh.unknown")
+        # Map PyO3 exception names to internal outcomes
+        err_type = type(e).__name__
+        if err_type == "CohVerificationError" or "Verification" in err_type:
+            return ("REJECT_MARGIN", str(e), "coh.reject")
+        elif err_type == "CohMalformedError" or "Malformed" in err_type:
+            return ("MALFORMED", str(e), "coh.malformed")
+        else:
+            return ("MALFORMED", f"[{err_type}] {str(e)}", "coh.unknown")
 
 
 def normalize_receipt(receipt: dict) -> Optional[dict]:
@@ -171,7 +174,8 @@ def verify_chain_coh(chain_receipts: list[dict]) -> Tuple[str, Optional[str], st
         return ("ACCEPT", f"{len(chain_receipts)} steps", "deterministic.chain_ok")
     
     try:
-        chain_json = "\n".join(r for r in chain_receipts)
+        import json
+        chain_json = "\n".join(json.dumps(r) for r in chain_receipts)
         result = COH.verify_chain(chain_json)
         return ("ACCEPT", result, "coh.chain")
     except Exception as e:
