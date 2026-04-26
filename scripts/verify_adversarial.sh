@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 echo "[verify_adversarial] Auditing rejection vectors..."
 
@@ -7,6 +7,9 @@ echo "[verify_adversarial] Auditing rejection vectors..."
 cd "$(dirname "$0")/.."
 
 VALIDATOR_BIN="./coh-node/target/release/coh-validator"
+
+echo "[verify_adversarial] Working directory: $(pwd)"
+echo "[verify_adversarial] Validator binary: $VALIDATOR_BIN"
 
 if [ ! -f "$VALIDATOR_BIN" ]; then
     echo "Error: coh-validator not found at $VALIDATOR_BIN. Build it first."
@@ -17,9 +20,20 @@ FAILED=0
 
 for f in coh-node/vectors/adversarial/reject_*.jsonl; do
     echo "Checking $f..."
-    # Run validator and capture output
-    OUTPUT=$($VALIDATOR_BIN verify-chain "$f" 2>&1)
-    EXIT_CODE=$?
+    if [ ! -f "$f" ]; then
+        echo "FAIL: missing adversarial vector $f"
+        FAILED=$((FAILED + 1))
+        continue
+    fi
+
+    # Run validator and capture output without letting expected REJECT exits trip `set -e`
+    if OUTPUT=$("$VALIDATOR_BIN" verify-chain "$f" 2>&1); then
+        EXIT_CODE=0
+    else
+        EXIT_CODE=$?
+    fi
+
+    echo "[verify_adversarial] Validator exit code for $f: $EXIT_CODE"
     
     if [ $EXIT_CODE -eq 0 ]; then
         echo "FAIL: $f was ACCEPTED but should have been REJECTED"
