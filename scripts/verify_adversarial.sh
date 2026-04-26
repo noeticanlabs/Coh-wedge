@@ -17,15 +17,17 @@ FAILED=0
 
 for f in coh-node/vectors/adversarial/reject_*.jsonl; do
     echo "Checking $f..."
-    # We expect non-zero exit code (1, 2, 3)
-    $VALIDATOR_BIN verify-chain "$f" > /dev/null 2>&1
+    # Run validator and capture output
+    OUTPUT=$($VALIDATOR_BIN verify-chain "$f" 2>&1)
     EXIT_CODE=$?
     
     if [ $EXIT_CODE -eq 0 ]; then
         echo "FAIL: $f was ACCEPTED but should have been REJECTED"
+        echo "$OUTPUT"
         FAILED=$((FAILED + 1))
     elif [ $EXIT_CODE -gt 3 ]; then
         echo "FAIL: $f caused a CRASH or internal error (code $EXIT_CODE)"
+        echo "$OUTPUT"
         FAILED=$((FAILED + 1))
     else
         echo "PASS: $f rejected with code $EXIT_CODE"

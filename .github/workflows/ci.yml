@@ -56,6 +56,14 @@ jobs:
       - name: Run all tests (workspace)
         run: cargo test --workspace
 
+      - name: Rename libcoh.so to coh.so (Linux)
+        shell: bash
+        run: |
+          if [ -f coh-node/target/release/libcoh.so ]; then
+            cp coh-node/target/release/libcoh.so coh-node/target/release/coh.so
+            echo "Successfully renamed libcoh.so to coh.so"
+          fi
+
       - name: Run Property Tests
         run: cargo test -p coh-core --test test_property
 
@@ -158,7 +166,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install requests
+          python3 -m pip install requests matplotlib numpy
 
       - name: Run E2E Script
         shell: bash

@@ -41,8 +41,10 @@ fn benchmark_honest_chain(size: usize) {
     assert!(
         result.decision == coh_core::Decision::Accept
             || result.decision == coh_core::Decision::AbortBudget,
-        "Expected Accept or AbortBudget, got {:?}",
-        result.decision
+        "Expected Accept or AbortBudget, got {:?}. Message: {}. Code: {:?}",
+        result.decision,
+        result.message,
+        result.code
     );
 
     println!("  Decision: {:?}", result.decision);
@@ -108,7 +110,14 @@ fn generate_demo_chain(steps: usize, breach_at: Option<usize>) -> Vec<MicroRecei
             policy_hash: "0".repeat(64),
             step_index: i as u64,
             step_type: None,
-            signatures: None,
+            signatures: Some(vec![coh_core::types::SignatureWire {
+                signature: "0".repeat(128),
+                signer: "0".repeat(64),
+                timestamp: 1_700_000_000,
+                authority_id: None,
+                scope: None,
+                expires_at: None,
+            }]),
             state_hash_prev: prev_state.to_string(),
             state_hash_next: next_state.to_string(),
             chain_digest_prev: prev_digest.to_string(),

@@ -4,7 +4,7 @@ use crate::verify_micro::verify_micro;
 use std::convert::TryFrom;
 
 /// Maximum allowed chain length to prevent state explosion
-const MAX_CHAIN_LENGTH: usize = 1000;
+const MAX_CHAIN_LENGTH: usize = 20000;
 
 #[must_use]
 pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
@@ -181,7 +181,7 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
         // 3b. Progress check (NoProgressLoop) - defect must decrease or terminal
         total_defect += r.metrics.defect;
         if let Some(prev) = prev_defect {
-            if r.metrics.defect >= prev {
+            if r.metrics.defect > 0 && r.metrics.defect >= prev {
                 no_progress_count += 1;
                 if no_progress_count >= 3 {
                     return VerifyChainResult {

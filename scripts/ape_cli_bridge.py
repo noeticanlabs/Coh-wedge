@@ -270,6 +270,8 @@ COH_VALID_FIELDS = {
 }
 
 COH_VALID_METRICS = {"v_pre", "v_post", "spend", "defect"}
+COH_VALID_SIGNATURE = {"signature", "signer", "timestamp", "authority_id", "scope", "expires_at"}
+
 
 
 def normalize_for_coh(receipt: Dict[str, Any]) -> Dict[str, Any]:
@@ -283,7 +285,16 @@ def normalize_for_coh(receipt: Dict[str, Any]) -> Dict[str, Any]:
     # Copy top-level fields
     for key in COH_VALID_FIELDS:
         if key in receipt:
-            normalized[key] = receipt[key]
+            if key == "signatures" and isinstance(receipt[key], list):
+                # Normalize each signature
+                normalized_sigs = []
+                for sig in receipt[key]:
+                    if isinstance(sig, dict):
+                        n_sig = {k: v for k, v in sig.items() if k in COH_VALID_SIGNATURE}
+                        normalized_sigs.append(n_sig)
+                normalized["signatures"] = normalized_sigs
+            else:
+                normalized[key] = receipt[key]
     
     # Filter metrics
     if "metrics" in receipt:
