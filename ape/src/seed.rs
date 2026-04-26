@@ -27,6 +27,7 @@ impl SeededRng {
     /// Generate next random u32
     ///
     /// Uses PCG32 XSH RR (xorshift high, random rotation)
+    #[allow(clippy::should_implement_trait)]
     pub fn next(&mut self) -> u32 {
         // PCG32 step
         let old_state = self.state;
@@ -39,13 +40,11 @@ impl SeededRng {
         let rot = (old_state >> 59) as u32;
 
         // Output with rotation (simple version)
-        let output = if rot == 0 {
+        if rot == 0 {
             xorshifted
         } else {
             xorshifted.rotate_right(rot)
-        };
-
-        output
+        }
     }
 
     /// Generate random u64 (two u32s)
@@ -60,7 +59,7 @@ impl SeededRng {
 
     /// Generate random f64 in [0, 1)
     pub fn next_f64(&mut self) -> f64 {
-        let mantissa = (self.next() as u64 & 0xFFFFFFFFFFFFF) as u64;
+        let mantissa = self.next() as u64 & 0xFFFFFFFFFFFFF;
         mantissa as f64 / (1u64 << 52) as f64
     }
 

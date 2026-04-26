@@ -42,9 +42,14 @@ pre_gate_idx = np.argmin(np.abs(x - pre_gate_x))
 OUT_PATH = Path("ape_cinematic_funnel.png")
 
 # APE CLI Paths
-APE_CLI_PATH = Path("Coh-wedge-master/ape/target/debug/ape.exe")
-if not APE_CLI_PATH.exists():
-    APE_CLI_PATH = Path("Coh-wedge-master/ape/target/release/ape.exe")
+if os.name == 'nt':
+    APE_CLI_PATH = Path("ape/target/release/ape.exe")
+    if not APE_CLI_PATH.exists():
+        APE_CLI_PATH = Path("ape/target/debug/ape.exe")
+else:
+    APE_CLI_PATH = Path("ape/target/release/ape")
+    if not APE_CLI_PATH.exists():
+        APE_CLI_PATH = Path("ape/target/debug/ape")
 
 # =============================================================================
 # COLORS & THEME

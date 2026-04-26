@@ -7,11 +7,14 @@ echo "[ci_e2e] Starting Sidecar in background..."
 cd "$(dirname "$0")/.."
 
 # Start sidecar
-# We use target_sidecar to avoid cache contention
-export CARGO_TARGET_DIR="$(pwd)/coh-node/target_sidecar"
-mkdir -p "$CARGO_TARGET_DIR"
 
-cargo run -p coh-sidecar --release > sidecar.log 2>&1 &
+SIDECAR_BIN="./coh-node/target/release/coh-sidecar"
+if [ ! -f "$SIDECAR_BIN" ]; then
+    echo "Error: coh-sidecar not found at $SIDECAR_BIN. Build it first."
+    exit 1
+fi
+
+$SIDECAR_BIN > sidecar.log 2>&1 &
 SIDECAR_PID=$!
 
 function cleanup {

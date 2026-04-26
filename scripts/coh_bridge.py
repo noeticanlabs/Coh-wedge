@@ -36,6 +36,8 @@ try:
 except ImportError:
     # Try alternative import from coh-node directory
     try:
+        sys.path.insert(0, "coh-node/target/release")
+        sys.path.insert(0, "coh-node/target/debug")
         sys.path.insert(0, "coh-node")
         import coh
         COH = coh

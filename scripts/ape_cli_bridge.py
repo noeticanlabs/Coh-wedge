@@ -31,8 +31,13 @@ FLOAT_DTYPE = "float64"
 # CONFIGURATION
 # =============================================================================
 # Check both release and debug directories
-APE_CLI_PATH = Path("Coh-wedge-master/ape/target/release/ape.exe")
-APE_CLI_DEBUG = Path("Coh-wedge-master/ape/target/debug/ape.exe")
+if os.name == 'nt':
+    APE_CLI_PATH = Path("ape/target/release/ape.exe")
+    APE_CLI_DEBUG = Path("ape/target/debug/ape.exe")
+else:
+    APE_CLI_PATH = Path("ape/target/release/ape")
+    APE_CLI_DEBUG = Path("ape/target/debug/ape")
+
 APE_CLI_FALLBACK = "ape"  # PATH fallback
 
 

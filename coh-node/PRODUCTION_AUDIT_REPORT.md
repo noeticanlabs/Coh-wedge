@@ -14,7 +14,8 @@
 | Core Invariants | ✅ PASS | None |
 | Property Tests | ✅ PASS | None |
 | Differential Tests | ✅ PASS | Resolved (7/7 pass) |
-| CI/CD (fmt/clippy) | ✅ PASS | Resolved (24+ errors fixed) |
+| CI/CD (fmt/clippy) | ✅ PASS | Resolved (31+ errors fixed across coh-node and ape) |
+| APE Hardening | ✅ PASS | Fixed clippy and pathing issues |
 | Security | ✅ PASS | Hardened |
 
 **Overall Production Readiness**: ✅ READY FOR PRODUCTION
@@ -96,8 +97,10 @@
 | Format check | `cargo fmt --check` | ✅ PASS |
 | Lint | `cargo clippy -D warnings` | ✅ PASS (24+ errors fixed) |
 | Adversarial vectors REJECT | All vectors reject | ✅ PASS |
+| APE Build & Test | Clippy & Tests pass | ✅ PASS (7+ clippy errors fixed) |
+| Integration Paths | Cross-platform Python bridges | ✅ PASS |
 
-**Summary**: All G1-G4 critical gaps have been resolved. Code is formatted and lint-free.
+**Summary**: All G1-G4 critical gaps and APE build issues have been resolved. Code is formatted and lint-free across the entire workspace.
 
 ---
 
