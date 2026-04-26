@@ -10,13 +10,15 @@
     {
       "signature": "sig-0000000000000000",
       "signer": "fixture-signer-0",
-      "timestamp": 1700000000
+      "timestamp": 1700000000,
+      "authority_id": "fixture-signer-0",
+      "scope": "*"
     }
   ],
   "state_hash_prev": "1111111111111111111111111111111111111111111111111111111111111111",
   "state_hash_next": "2222222222222222222222222222222222222222222222222222222222222222",
   "chain_digest_prev": "0000000000000000000000000000000000000000000000000000000000000000",
-  "chain_digest_next": "431bf30f44950ef6f3d60e75bc2fd891a2f259fe218c8cf19655acf149dc85ba",
+  "chain_digest_next": "8a8abaa547ff44f8224fc573475cc3919529ff805d6594c637a42cc60c90242b",
   "metrics": {
     "v_pre": "100",
     "v_post": "88",

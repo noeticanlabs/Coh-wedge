@@ -10,7 +10,9 @@
     {
       "signature": "sig-0000000000000000",
       "signer": "fixture-signer-0",
-      "timestamp": 1700000000
+      "timestamp": 1700000000,
+      "authority_id": "fixture-signer-0",
+      "scope": "*"
     }
   ],
   "state_hash_prev": "1111111111111111111111111111111111111111111111111111111111111111",

@@ -1,10 +1,12 @@
-//! Generate AI workflow demo fixtures with proper digests.
+//! Generate AI workflow demo fixtures with proper digests and real signatures.
 //!
 //! Scope:
 //! - emits bounded valid-chain fixtures aligned with current verifier rules
 //! - emits semi-realistic AI workflow fixtures
 //! - does not claim unbounded trajectory coverage
+//! - All fixtures are properly signed with Ed25519
 
+use coh_core::auth::{fixture_signing_key, sign_micro_receipt};
 use coh_core::types::{MetricsWire, MicroReceiptWire, SignatureWire};
 use coh_core::{canon::*, hash::compute_chain_digest};
 use std::convert::TryFrom;
@@ -158,15 +160,25 @@ fn compute_digest(receipt: &MicroReceiptWire) -> String {
     compute_chain_digest(r.chain_digest_prev, &bytes).to_hex()
 }
 
-fn signature_for(step: u64) -> SignatureWire {
-    SignatureWire {
-        signature: format!("sig-{:016x}", step),
-        signer: format!("fixture-signer-{}", step % 3),
-        timestamp: 1_700_000_000 + step,
-        authority_id: Some(format!("fixture-signer-{}", step % 3)),
-        scope: Some("*".to_string()),
-        expires_at: None,
-    }
+fn signature_for(receipt: &MicroReceiptWire, step: u64) -> SignatureWire {
+    // Use the fixture signing key
+    let authority_id = format!("fixture-signer-{}", step % 3);
+    let signing_key = fixture_signing_key(&authority_id);
+    
+    // Sign the receipt (computes digest and signature)
+    let signed = sign_micro_receipt(
+        receipt.clone(),
+        &signing_key,
+        &authority_id,
+        "*",
+        1_700_000_000 + step,
+        None,
+        "MICRO_RECEIPT_V1",
+    ).expect("Failed to sign receipt");
+    
+    // Extract the signature from the signed receipt
+    signed.signatures.unwrap().into_iter().next().unwrap()
+}
 }
 
 fn next_state(seed: u64) -> String {

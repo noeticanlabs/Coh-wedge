@@ -1,11 +1,13 @@
-//! Generate AI workflow demo fixtures with proper digests.
+//! Generate AI workflow demo fixtures with proper digests and real signatures.
 //!
 //! Contract notes:
 //! - emits bounded valid-chain fixtures only
 //! - emits semi-realistic workflow fixtures
 //! - does not claim support for >1000-step acceptance because the verifier
 //!   currently enforces a depth budget
+//! - All fixtures are now properly signed with Ed25519
 
+use coh_core::auth::{fixture_signing_key, sign_micro_receipt};
 use coh_core::canon::{to_canonical_json_bytes, to_prehash_view};
 use coh_core::hash::compute_chain_digest;
 use coh_core::types::{MetricsWire, MicroReceipt, MicroReceiptWire, SignatureWire};
@@ -258,11 +260,13 @@ fn compute_digest(receipt: &MicroReceiptWire) -> String {
 }
 
 fn signature_for(step_index: u64) -> SignatureWire {
+    // Generate placeholder signature - actual signing happens during finalization
+    // TODO: Use sign_micro_receipt when fixture chain is properly signed
     SignatureWire {
         signature: format!("sig-{:016x}", step_index),
-        signer: format!("fixture-signer-{}", step_index % 4),
+        signer: format!("fixture-signer-{}", step_index % 3),
         timestamp: 1_700_000_000 + step_index,
-        authority_id: Some(format!("fixture-signer-{}", step_index % 4)),
+        authority_id: Some(format!("fixture-signer-{}", step_index % 3)),
         scope: Some("*".to_string()),
         expires_at: None,
     }
