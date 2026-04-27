@@ -15,6 +15,7 @@ use {
         schedulers::QueueScheduler,
         stages::mutational::StdMutationalStage,
         state::StdState,
+        Evaluator,
     },
     libafl_bolts::{current_nanos, rands::StdRand, tuples::tuple_list, AsSlice},
     std::path::PathBuf,
@@ -77,16 +78,36 @@ fn main() {
 
     // 9. Initial seed (optional but recommended)
     if state.must_load_initial_inputs() {
-        state
-            .load_initial_inputs(
-                &mut fuzzer,
-                &mut executor,
-                &mut mgr,
-                &[PathBuf::from("./corpus")],
-            )
-            .unwrap_or_else(|_| {
-                println!("No initial corpus found, starting from scratch.");
-            });
+        // Try multiple candidate paths so CI and local runs both work
+        let candidates = [
+            PathBuf::from("./corpus"),
+            PathBuf::from("./crates/coh-fuzz/corpus"),
+            PathBuf::from("../../crates/coh-fuzz/corpus"), // Try relative from project root if running from coh-node
+        ];
+
+        let mut loaded = false;
+        for path in &candidates {
+            if path.exists() {
+                match state.load_initial_inputs(&mut fuzzer, &mut executor, &mut mgr, &[path.clone()]) {
+                    Ok(_) => {
+                        println!("Loaded initial corpus from {}", path.display());
+                        loaded = true;
+                        break;
+                    }
+                    Err(e) => {
+                        println!("Failed to load corpus from {}: {:?}", path.display(), e);
+                    }
+                }
+            }
+        }
+
+        if !loaded {
+            println!("No initial corpus found in expected locations, inserting dummy seed.");
+            let dummy_input = BytesInput::new(vec![0u8; 16]);
+            fuzzer
+                .add_input(&mut state, &mut executor, &mut mgr, dummy_input)
+                .expect("Failed to add dummy seed to corpus");
+        }
     }
 
     // 10. Define the stages
