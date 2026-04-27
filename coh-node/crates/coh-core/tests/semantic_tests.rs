@@ -23,7 +23,7 @@ fn test_defect_bound_violation() {
             v_pre: "100".to_string(),
             v_post: "90".to_string(),
             spend: "10".to_string(),
-            defect: "2".to_string(),
+            defect: "2".to_string(), authority: "0".to_string(),
         },
     };
 
@@ -65,7 +65,7 @@ fn test_identity_spend_violation() {
             v_pre: "100".to_string(),
             v_post: "90".to_string(),
             spend: "1".to_string(),
-            defect: "0".to_string(),
+            defect: "0".to_string(), authority: "0".to_string(),
         },
     };
 
@@ -116,7 +116,7 @@ fn test_valid_transfer() {
             v_pre: "100".to_string(),
             v_post: "95".to_string(),
             spend: "10".to_string(),
-            defect: "5".to_string(), // 95+10 <= 100+5 (105 <= 105)
+            defect: "5".to_string(), authority: "0".to_string(), // 95+10 <= 100+5 (105 <= 105)
         },
     };
 

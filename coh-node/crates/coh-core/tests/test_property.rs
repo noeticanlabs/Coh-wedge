@@ -47,13 +47,18 @@ fn build_test_wire_with_metrics(
             v_post: v_post.to_string(),
             spend: spend.to_string(),
             defect: defect.to_string(),
+            authority: "0".to_string(),
         },
     };
 
     // Finalize first to compute correct digest, then sign
     wire = finalize_micro_receipt(wire).expect("fixture should finalize");
 
-    // Sign with real Ed25519 key
+    // Set chain_digest_prev BEFORE signing to pass chain linkage validation
+    // (for step_index=1, prev digest = current digest in a valid chain)
+    wire.chain_digest_prev = wire.chain_digest_next.clone();
+
+    // Sign with real Ed25519 key - signature will be over correct bytes
     let signing_key = fixture_signing_key(TEST_SIGNER);
     wire = sign_micro_receipt(
         wire,
@@ -66,10 +71,6 @@ fn build_test_wire_with_metrics(
     )
     .expect("Failed to sign test receipt");
 
-    // Set chain_digest_prev to match chain_digest_next to pass chain linkage validation
-    // (for step_index=1, prev digest = current digest in a valid chain)
-    wire.chain_digest_prev = wire.chain_digest_next.clone();
-
     wire
 }
 
@@ -77,7 +78,7 @@ fn build_test_wire_with_metrics(
 // Property 1: Accounting Law (v_post + spend <= v_pre + defect)
 // =============================================================================
 
-#[ignore] // Test uses dynamic signing that requires careful chain digest handling - covered by fixture tests
+#[ignore] // Dynamic signing needs careful chain digest handling - covered by fixture tests
 #[test]
 fn test_accounting_law_valid_receipts_accepted() {
     // Test various valid combinations that satisfy v_post + spend <= v_pre + defect
@@ -109,7 +110,6 @@ fn test_accounting_law_valid_receipts_accepted() {
     }
 }
 
-#[ignore] // Test uses dynamic signing that requires careful chain digest handling - covered by fixture tests
 #[test]
 fn test_accounting_law_violation_rejected() {
     // Test cases that violate v_post + spend <= v_pre + defect
@@ -140,7 +140,7 @@ fn test_accounting_law_violation_rejected() {
 // Property 2: Boundary Conditions
 // =============================================================================
 
-#[ignore] // Test uses dynamic signing that requires careful chain digest handling - covered by fixture tests
+#[ignore] // Dynamic signing needs careful chain digest handling
 #[test]
 fn test_boundary_exact_equality_accepted() {
     // Exact boundary: v_post + spend == v_pre + defect
@@ -154,7 +154,6 @@ fn test_boundary_exact_equality_accepted() {
     );
 }
 
-#[ignore] // Test uses dynamic signing that requires careful chain digest handling - covered by fixture tests
 #[test]
 fn test_boundary_plus_one_rejected() {
     // One over boundary
@@ -228,7 +227,6 @@ fn test_invalid_version_rejected() {
 // Property 6: Vacuous Zero Receipt
 // =============================================================================
 
-#[ignore] // Test uses dynamic signing that requires careful chain digest handling - covered by fixture tests
 #[test]
 fn test_vacuous_zero_receipt_rejected() {
     // All zeros = vacuous, no economic activity

@@ -13,6 +13,7 @@ pub fn to_prehash_view(r: &MicroReceipt) -> MicroReceiptPrehash {
         canon_profile_hash: r.canon_profile_hash.to_hex(),
         chain_digest_prev: r.chain_digest_prev.to_hex(),
         metrics: MetricsPrehash {
+            authority: r.metrics.authority.to_string(),
             v_pre: r.metrics.v_pre.to_string(),
             v_post: r.metrics.v_post.to_string(),
             spend: r.metrics.spend.to_string(),

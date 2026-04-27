@@ -71,7 +71,7 @@ fn main() {
                 v_pre: v_pre.to_string(),
                 v_post: v_post.to_string(),
                 spend: spend.to_string(),
-                defect: defect.to_string(),
+                defect: defect.to_string(), authority: "0".to_string(),
             },
         };
 

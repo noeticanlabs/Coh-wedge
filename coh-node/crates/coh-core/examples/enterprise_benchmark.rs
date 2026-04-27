@@ -22,7 +22,7 @@ fn main() {
         merkle_root: "00".repeat(32),
         summary: SlabSummaryWire {
             total_spend: "1000000".to_string(),
-            total_defect: "10000".to_string(),
+            total_defect: "10000".to_string(), authority: "0".to_string(),
             v_pre_first: "5000000".to_string(),
             v_post_last: "4010000".to_string(),
         },

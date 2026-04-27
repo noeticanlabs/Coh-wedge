@@ -26,6 +26,7 @@ pub struct SignedTransitionPayload {
     pub v_pre: String,
     pub spend: String,
     pub defect: String,
+    pub authority: String,
     pub version: String,
 }
 
@@ -126,6 +127,7 @@ pub fn canonical_signed_transition_bytes(
         v_pre: receipt.metrics.v_pre.to_string(),
         spend: receipt.metrics.spend.to_string(),
         defect: receipt.metrics.defect.to_string(),
+        authority: receipt.metrics.authority.to_string(),
         version: receipt.version.clone(),
     };
 

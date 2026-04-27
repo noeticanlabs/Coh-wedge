@@ -146,12 +146,13 @@ impl TrajectoryProbabilityVerifier {
         step_count: u64,
         cumulative_spend: u128,
         total_defect: u128,
+        total_authority: u128,
         v_pre_first: u128,
         v_post_last: u128,
     ) -> TrajectoryProbabilityResult {
         // Check deterministic accounting law first
         let deterministic_valid = v_post_last.saturating_add(cumulative_spend)
-            <= v_pre_first.saturating_add(total_defect);
+            <= v_pre_first.saturating_add(total_defect).saturating_add(total_authority);
 
         if !self.config.enable_probabilistic {
             // Pure deterministic mode
@@ -173,7 +174,7 @@ impl TrajectoryProbabilityVerifier {
         // 2. Total defect accumulation
         // 3. Number of steps (more steps = higher cumulative risk)
         let lhs = v_post_last.saturating_add(cumulative_spend);
-        let rhs = v_pre_first.saturating_add(total_defect);
+        let rhs = v_pre_first.saturating_add(total_defect).saturating_add(total_authority);
 
         let margin = rhs.saturating_sub(lhs);
         let margin_ratio = if rhs > 0 {
@@ -273,6 +274,7 @@ mod tests {
             1,   // step_count
             15,  // cumulative_spend
             5,   // total_defect
+            0,   // total_authority
             100, // v_pre_first
             80,  // v_post_last
         );
@@ -289,6 +291,7 @@ mod tests {
             1,   // step_count
             20,  // cumulative_spend
             0,   // total_defect
+            0,   // total_authority
             100, // v_pre_first
             90,  // v_post_last
         );

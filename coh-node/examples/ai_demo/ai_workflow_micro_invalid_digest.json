@@ -8,7 +8,7 @@
   "step_type": "workflow",
   "signatures": [
     {
-      "signature": "sig-0000000000000000",
+      "signature": "hfw40MlQtAnjN7VSiyzapgVcRzs+RW2RpRE3UKvHZdYKtcWBe2RrXzlzVfkRF/u8tnKUSCDDyeKrs7DnArs8AQ==",
       "signer": "fixture-signer-0",
       "timestamp": 1700000000,
       "authority_id": "fixture-signer-0",
@@ -23,6 +23,7 @@
     "v_pre": "100",
     "v_post": "88",
     "spend": "12",
-    "defect": "0"
+    "defect": "0",
+    "authority": "0"
   }
 }

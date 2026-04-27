@@ -26,8 +26,9 @@ fn create_valid_receipt(step_index: u64, prev_digest: &str, prev_state: &str) ->
         metrics: MetricsWire {
             v_pre: "100".to_string(),
             v_post: "80".to_string(),
-            spend: "20".to_string(),
-            defect: "0".to_string(),
+            spend: "1".to_string(),
+            defect: "0".to_string(), authority: "0".to_string(),
+
         },
     };
     // Seal the receipt with proper digest

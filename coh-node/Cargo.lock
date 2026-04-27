@@ -398,6 +398,8 @@ name = "coh-core"
 version = "0.1.0"
 dependencies = [
  "base64",
+ "coh-gccp",
+ "coh-time",
  "colored",
  "criterion",
  "ed25519-dalek",
@@ -424,6 +426,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "coh-gccp"
+version = "0.1.0"
+dependencies = [
+ "coh-core",
+ "coh-time",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "coh-sidecar"
 version = "0.1.0"
 dependencies = [
@@ -437,6 +451,17 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "uuid",
+]
+
+[[package]]
+name = "coh-time"
+version = "0.1.0"
+dependencies = [
+ "coh-core",
+ "hex",
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]

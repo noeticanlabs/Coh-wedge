@@ -44,7 +44,7 @@ mod receipt {
         let object_id = format!("llm.{}.{}", model.replace(['/', '-', '.'], "_"), step_index);
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
+            .expect("system clock moved backwards")
             .as_secs();
         MicroReceiptWire {
             schema_id: "coh.receipt.micro.v1".to_string(),
@@ -114,16 +114,18 @@ pub struct Metrics {
 }
 
 impl AppState {
-    pub fn new(upstream_url: String) -> Self {
-        Self {
+    pub fn new(upstream_url: String) -> anyhow::Result<Self> {
+        let http_client = Client::builder()
+            .timeout(std::time::Duration::from_secs(120))
+            .build()
+            .context("Failed to build reqwest client for AppState")?;
+
+        Ok(Self {
             sessions: Arc::new(Mutex::new(std::collections::HashMap::new())),
-            http_client: Client::builder()
-                .timeout(std::time::Duration::from_secs(120))
-                .build()
-                .expect("reqwest client"),
+            http_client,
             upstream_url,
             metrics: Arc::new(Mutex::new(Metrics::default())),
-        }
+        })
     }
 }
 
@@ -245,7 +247,13 @@ pub async fn chat_completions_handler(
 
     // Forward to upstream using reqwest client directly
     let client = &state.http_client;
-    let body = serde_json::to_vec(&payload).expect("serialize payload");
+    let body = serde_json::to_vec(&payload).map_err(|e| {
+        (
+            StatusCode::BAD_REQUEST,
+            Json(ProxyError::new(format!("Serialization failed: {}", e), None)),
+        )
+            .into_response()
+    })?;
 
     let upstream_response = match client
         .post(format!("{}/chat/completions", state.upstream_url))

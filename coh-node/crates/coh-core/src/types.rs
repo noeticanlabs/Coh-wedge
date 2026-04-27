@@ -33,13 +33,31 @@ pub enum Decision {
     AbortBudget,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct MetricsWire {
     pub v_pre: String,
     pub v_post: String,
     pub spend: String,
     pub defect: String,
+    #[serde(default = "default_authority")]
+    pub authority: String,
+}
+
+impl Default for MetricsWire {
+    fn default() -> Self {
+        Self {
+            v_pre: "0".to_string(),
+            v_post: "0".to_string(),
+            spend: "0".to_string(),
+            defect: "0".to_string(),
+            authority: "0".to_string(),
+        }
+    }
+}
+
+fn default_authority() -> String {
+    "0".to_string()
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -81,6 +99,8 @@ pub struct SlabSummaryWire {
     pub total_defect: String,
     pub v_pre_first: String,
     pub v_post_last: String,
+    #[serde(default = "default_authority")]
+    pub authority: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -102,37 +122,44 @@ pub struct SlabReceiptWire {
     pub summary: SlabSummaryWire,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub struct Metrics {
     pub v_pre: u128,
     pub v_post: u128,
     pub spend: u128,
     pub defect: u128,
+    pub authority: u128,
 }
 
 /// A Certified Morphism in the Coh Category.
 /// Mirrors the Slack2Cell and CertifiedMorphism structures in Lean.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct CertifiedMorphism {
     pub v_pre: u128,
     pub v_post: u128,
     pub spend: u128,
     pub defect: u128,
+    pub authority: u128,
 }
 
 impl CertifiedMorphism {
-    pub fn new(v_pre: u128, v_post: u128, spend: u128, defect: u128) -> Self {
+    pub fn new(v_pre: u128, v_post: u128, spend: u128, defect: u128, authority: u128) -> Self {
         Self {
             v_pre,
             v_post,
             spend,
             defect,
+            authority,
         }
     }
 
     /// The fundamental inequality: V_post + spend <= V_pre + defect
     pub fn is_certified(&self) -> bool {
         let lhs = self.v_post.saturating_add(self.spend);
-        let rhs = self.v_pre.saturating_add(self.defect);
+        let rhs = self
+            .v_pre
+            .saturating_add(self.defect)
+            .saturating_add(self.authority);
         lhs <= rhs
     }
 
@@ -146,12 +173,14 @@ impl CertifiedMorphism {
 
         let total_spend = self.spend.checked_add(other.spend)?;
         let total_defect = self.defect.checked_add(other.defect)?;
+        let total_authority = self.authority.checked_add(other.authority)?;
 
         Some(Self {
             v_pre: self.v_pre,
             v_post: other.v_post,
             spend: total_spend,
             defect: total_defect,
+            authority: total_authority,
         })
     }
 }
@@ -177,6 +206,7 @@ pub struct SlabSummary {
     pub total_defect: u128,
     pub v_pre_first: u128,
     pub v_post_last: u128,
+    pub authority: u128,
 }
 
 pub struct SlabReceipt {
@@ -198,6 +228,7 @@ pub struct SlabReceipt {
 
 #[derive(Serialize)]
 pub struct MetricsPrehash {
+    pub authority: String,
     pub defect: String,
     pub spend: String,
     pub v_post: String,
@@ -294,6 +325,7 @@ impl TryFrom<MetricsWire> for Metrics {
             v_post: parse_u128(&w.v_post)?,
             spend: parse_u128(&w.spend)?,
             defect: parse_u128(&w.defect)?,
+            authority: parse_u128(&w.authority)?,
         })
     }
 }
@@ -327,6 +359,7 @@ impl TryFrom<SlabSummaryWire> for SlabSummary {
             total_defect: parse_u128(&w.total_defect)?,
             v_pre_first: parse_u128(&w.v_pre_first)?,
             v_post_last: parse_u128(&w.v_post_last)?,
+            authority: parse_u128(&w.authority)?,
         })
     }
 }

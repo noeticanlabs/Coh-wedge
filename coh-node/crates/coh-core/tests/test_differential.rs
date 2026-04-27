@@ -34,7 +34,7 @@ fn build_v1_wire(
             v_pre: v_pre.to_string(),
             v_post: v_post.to_string(),
             spend: spend.to_string(),
-            defect: defect.to_string(),
+            defect: defect.to_string(), authority: "0".to_string(),
         },
     };
 
@@ -79,7 +79,7 @@ fn build_v3_wire(v_pre: &str, v_post: &str, spend: &str, defect: &str) -> MicroR
             v_pre: v_pre.to_string(),
             v_post: v_post.to_string(),
             spend: spend.to_string(),
-            defect: defect.to_string(),
+            defect: defect.to_string(), authority: "0".to_string(),
         },
         // V3-specific fields
         objective_result: None,

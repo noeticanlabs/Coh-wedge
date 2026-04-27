@@ -36,7 +36,7 @@ fn run_cmd(args: &[String]) -> (i32, String) {
     )
 }
 
-#[ignore] // Fixtures use placeholder signatures - needs regeneration with real Ed25519 signatures
+#[ignore] // Fixtures need real Ed25519 signatures
 #[test]
 fn test_fixture_oracle_sweep() {
     let dir = examples_dir();

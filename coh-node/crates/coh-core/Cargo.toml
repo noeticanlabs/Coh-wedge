@@ -21,6 +21,8 @@ proptest = "1.5"
 quickcheck = "1"
 # Fuzzing dependencies
 # libafl = "0.9"  # Uncomment when ready to use LibAFL
+coh-time = { path = "../coh-time" }
+coh-gccp = { path = "../coh-gccp" }
 
 [[example]]
 name = "verify_single"

@@ -38,6 +38,7 @@ fn bench_execution(c: &mut Criterion) {
             v_post: "88".to_string(),
             spend: "12".to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     };
 
@@ -121,6 +122,7 @@ fn bench_verify_before_execute(c: &mut Criterion) {
             v_post: "88".to_string(),
             spend: "12".to_string(),
             defect: "0".to_string(),
+            authority: "0".to_string(),
         },
     };
 

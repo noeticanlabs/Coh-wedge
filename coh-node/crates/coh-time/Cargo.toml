@@ -1,0 +1,12 @@
+[package]
+name = "coh-time"
+version = "0.1.0"
+edition = "2021"
+license = "LicenseRef-NoeticanLabs-Proprietary"
+
+[dependencies]
+coh-core = { path = "../coh-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+hex = { workspace = true }

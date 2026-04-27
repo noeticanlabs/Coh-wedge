@@ -248,6 +248,7 @@ fn create_receipt(
             v_post: v_post.to_string(),
             spend: spend.to_string(),
             defect: defect.to_string(),
+            authority: "0".to_string(),
         },
     }
 }
@@ -260,17 +261,48 @@ fn compute_digest(receipt: &MicroReceiptWire) -> String {
 }
 
 fn signature_for(step_index: u64) -> SignatureWire {
-    // Return a placeholder signature - these fixtures are for testing/development
-    // The verifier code correctly validates trusted signers even with placeholder sigs
-    // when using fixture-default context
-    SignatureWire {
-        signature: format!("sig-{:016x}", step_index),
-        signer: format!("fixture-signer-{}", step_index % 3),
-        timestamp: 1_700_000_000 + step_index,
-        authority_id: Some(format!("fixture-signer-{}", step_index % 3)),
-        scope: Some("*".to_string()),
-        expires_at: None,
-    }
+    // Generate real Ed25519 signature for the receipt
+    // First create a mock receipt to sign, then extract signature
+    let authority_id = format!("fixture-signer-{}", step_index % 3);
+    let signing_key = fixture_signing_key(&authority_id);
+
+    // Create minimal receipt for signing
+    let mock_receipt = MicroReceiptWire {
+        schema_id: "coh.receipt.micro.v1".to_string(),
+        version: "1.0.0".to_string(),
+        object_id: "agent.workflow.demo".to_string(),
+        canon_profile_hash: VALID_PROFILE.to_string(),
+        policy_hash: ZERO_HASH.to_string(),
+        step_index,
+        step_type: Some("workflow".to_string()),
+        signatures: None,
+        state_hash_prev: "0".repeat(64),
+        state_hash_next: "0".repeat(64),
+        chain_digest_prev: ZERO_HASH.to_string(),
+        chain_digest_next: "0".repeat(64),
+        metrics: MetricsWire {
+            v_pre: "0".to_string(),
+            v_post: "0".to_string(),
+            spend: "0".to_string(),
+            defect: "0".to_string(),
+            authority: "0".to_string(),
+        },
+    };
+
+    // Sign the receipt
+    let signed = sign_micro_receipt(
+        mock_receipt,
+        &signing_key,
+        &authority_id,
+        "*",
+        1_700_000_000 + step_index,
+        None,
+        "MICRO_RECEIPT_V1",
+    )
+    .expect("Failed to sign receipt");
+
+    // Extract the signature
+    signed.signatures.unwrap().remove(0)
 }
 
 fn to_jsonl(receipts: &[MicroReceiptWire]) -> String {
@@ -325,6 +357,7 @@ fn build_valid_chain(object_id: &str, len: usize) -> Vec<MicroReceiptWire> {
                 v_post: "99".to_string(),
                 spend: "1".to_string(),
                 defect: defect_for_step(step).to_string(),
+                authority: "0".to_string(),
             },
         };
         receipt.chain_digest_next = compute_digest(&receipt);
@@ -365,6 +398,7 @@ fn build_semi_realistic_chain(object_id: &str, len: usize) -> Vec<MicroReceiptWi
                 v_post: posts[idx].to_string(),
                 spend: spends[idx].to_string(),
                 defect: defect_for_step(step).to_string(),
+                authority: "0".to_string(),
             },
         };
         receipt.chain_digest_next = compute_digest(&receipt);

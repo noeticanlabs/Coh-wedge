@@ -140,7 +140,19 @@ pub fn verify_micro_with_context(
         }
     };
     let rhs = match r.metrics.v_pre.safe_add(r.metrics.defect) {
-        Ok(val) => val,
+        Ok(val) => match val.safe_add(r.metrics.authority) {
+            Ok(v) => v,
+            Err(e) => {
+                return VerifyMicroResult {
+                    decision: Decision::Reject,
+                    code: Some(e),
+                    message: "Policy arithmetic overflow (v_pre + defect + authority)".to_string(),
+                    step_index: Some(r.step_index),
+                    object_id: Some(r.object_id),
+                    chain_digest_next: None,
+                }
+            }
+        },
         Err(e) => {
             return VerifyMicroResult {
                 decision: Decision::Reject,
@@ -158,7 +170,7 @@ pub fn verify_micro_with_context(
             decision: Decision::Reject,
             code: Some(RejectCode::RejectPolicyViolation),
             message: format!(
-                "Policy violation: v_post + spend ({}) exceeds v_pre + defect ({})",
+                "Policy violation: v_post + spend ({}) exceeds v_pre + defect + authority ({})",
                 lhs, rhs
             ),
             step_index: Some(r.step_index),

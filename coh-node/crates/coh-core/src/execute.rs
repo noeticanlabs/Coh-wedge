@@ -245,7 +245,7 @@ mod tests {
                 v_pre: "100".to_string(),
                 v_post: "88".to_string(),
                 spend: "12".to_string(),
-                defect: "0".to_string(),
+                defect: "0".to_string(), authority: "0".to_string(),
             },
         };
 
@@ -314,7 +314,7 @@ mod tests {
                 v_pre: "100".to_string(),
                 v_post: "99".to_string(),
                 spend: "1".to_string(),
-                defect: "0".to_string(),
+                defect: "0".to_string(), authority: "0".to_string(),
             },
         };
 
