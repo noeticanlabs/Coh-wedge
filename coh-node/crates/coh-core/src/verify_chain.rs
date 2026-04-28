@@ -202,31 +202,35 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
         // 3b. Progress check (NoProgressLoop) - defect must decrease or terminal
         total_defect = match total_defect.checked_add(r.metrics.defect) {
             Some(v) => v,
-            None => return VerifyChainResult {
-                decision: Decision::Reject,
-                code: Some(RejectCode::TrajectoryCostExceeded),
-                message: "Total defect overflow".to_string(),
-                steps_verified: i as u64,
-                first_step_index: first_index,
-                last_step_index: last_good_index,
-                final_chain_digest: current_digest,
-                failing_step_index: Some(step_idx),
-                steps_verified_before_failure: Some(i as u64),
-            },
+            None => {
+                return VerifyChainResult {
+                    decision: Decision::Reject,
+                    code: Some(RejectCode::TrajectoryCostExceeded),
+                    message: "Total defect overflow".to_string(),
+                    steps_verified: i as u64,
+                    first_step_index: first_index,
+                    last_step_index: last_good_index,
+                    final_chain_digest: current_digest,
+                    failing_step_index: Some(step_idx),
+                    steps_verified_before_failure: Some(i as u64),
+                }
+            }
         };
         total_authority = match total_authority.checked_add(r.metrics.authority) {
             Some(v) => v,
-            None => return VerifyChainResult {
-                decision: Decision::Reject,
-                code: Some(RejectCode::TrajectoryCostExceeded),
-                message: "Total authority overflow".to_string(),
-                steps_verified: i as u64,
-                first_step_index: first_index,
-                last_step_index: last_good_index,
-                final_chain_digest: current_digest,
-                failing_step_index: Some(step_idx),
-                steps_verified_before_failure: Some(i as u64),
-            },
+            None => {
+                return VerifyChainResult {
+                    decision: Decision::Reject,
+                    code: Some(RejectCode::TrajectoryCostExceeded),
+                    message: "Total authority overflow".to_string(),
+                    steps_verified: i as u64,
+                    first_step_index: first_index,
+                    last_step_index: last_good_index,
+                    final_chain_digest: current_digest,
+                    failing_step_index: Some(step_idx),
+                    steps_verified_before_failure: Some(i as u64),
+                }
+            }
         };
         if let Some(prev) = prev_defect {
             if r.metrics.defect > 0 && r.metrics.defect >= prev {
@@ -306,7 +310,9 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
     // The Accounting Law telescopes: v_post_last + cumulative_spend <= v_pre_first + total_defect
     if let Some(v_pre_0) = first_v_pre {
         let lhs = last_v_post.checked_add(cumulative_spend);
-        let rhs = v_pre_0.checked_add(total_defect).and_then(|v| v.checked_add(total_authority));
+        let rhs = v_pre_0
+            .checked_add(total_defect)
+            .and_then(|v| v.checked_add(total_authority));
         match (lhs, rhs) {
             (Some(l), Some(r)) if l > r => {
                 return VerifyChainResult {

@@ -1,6 +1,6 @@
 use crate::types::{AttemptLogEntry, LedgerTimeEntry, TimeIndexState};
-use coh_core::types::{Decision, Hash32};
 use coh_core::reject::RejectCode;
+use coh_core::types::{Decision, Hash32};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 pub struct CohTimeEngine {
@@ -35,7 +35,7 @@ impl CohTimeEngine {
             .as_secs();
 
         let current_attempt = self.state.attempt_index;
-        
+
         // Log the attempt
         self.attempt_log.push(AttemptLogEntry {
             attempt_index: current_attempt,
@@ -91,21 +91,28 @@ mod tests {
         let state_hash = Hash32([1; 32]);
 
         // First attempt - ACCEPT
-        let (att1, acc1) = engine.apply_decision(dummy_digest, Decision::Accept, None, Some(state_hash));
+        let (att1, acc1) =
+            engine.apply_decision(dummy_digest, Decision::Accept, None, Some(state_hash));
         assert_eq!(att1, 0);
         assert_eq!(acc1, 1);
         assert_eq!(engine.state().attempt_index, 1);
         assert_eq!(engine.state().accepted_index, 1);
 
         // Second attempt - REJECT
-        let (att2, acc2) = engine.apply_decision(dummy_digest, Decision::Reject, Some(RejectCode::RejectSchema), None);
+        let (att2, acc2) = engine.apply_decision(
+            dummy_digest,
+            Decision::Reject,
+            Some(RejectCode::RejectSchema),
+            None,
+        );
         assert_eq!(att2, 1);
         assert_eq!(acc2, 1); // accepted index stays at 1
         assert_eq!(engine.state().attempt_index, 2);
         assert_eq!(engine.state().accepted_index, 1);
 
         // Third attempt - ACCEPT
-        let (att3, acc3) = engine.apply_decision(dummy_digest, Decision::Accept, None, Some(state_hash));
+        let (att3, acc3) =
+            engine.apply_decision(dummy_digest, Decision::Accept, None, Some(state_hash));
         assert_eq!(att3, 2);
         assert_eq!(acc3, 2);
         assert_eq!(engine.state().attempt_index, 3);

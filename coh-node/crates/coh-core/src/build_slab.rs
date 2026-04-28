@@ -158,7 +158,8 @@ pub fn build_slab(receipts: Vec<MicroReceiptWire>) -> BuildSlabResult {
 
     let summary = SlabSummaryWire {
         total_spend: total_spend.to_string(),
-        total_defect: total_defect.to_string(), authority: "0".to_string(),
+        total_defect: total_defect.to_string(),
+        authority: "0".to_string(),
         v_pre_first: first_wire.metrics.v_pre.clone(),
         v_post_last: last_wire.metrics.v_post.clone(),
     };

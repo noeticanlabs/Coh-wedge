@@ -8,7 +8,9 @@
 use coh_core::auth::{fixture_signing_key, sign_micro_receipt};
 use coh_core::canon::{to_canonical_json_bytes, to_prehash_view};
 use coh_core::hash::compute_chain_digest;
-use coh_core::types::{MetricsWire, MicroReceipt, MicroReceiptWire, SignatureWire, AdmissionProfile};
+use coh_core::types::{
+    AdmissionProfile, MetricsWire, MicroReceipt, MicroReceiptWire, SignatureWire,
+};
 use std::convert::TryFrom;
 use std::fs;
 use std::io::Write;
@@ -62,7 +64,7 @@ fn main() {
         serde_json::to_string_pretty(&receipt0).unwrap(),
     )
     .unwrap();
-    
+
     write_jsonl_file(
         "vectors/semi_realistic/ai_workflow_valid.jsonl",
         &[
@@ -129,7 +131,7 @@ fn create_receipt(
         profile: AdmissionProfile::CoherenceOnlyV1,
         ..Default::default()
     };
-    
+
     wire.signatures = Some(vec![signature_for(step_index)]);
     wire
 }
@@ -213,7 +215,7 @@ fn build_valid_chain(object_id: &str, len: usize) -> Vec<MicroReceiptWire> {
         receipt.object_id = object_id.to_string();
         receipt.chain_digest_prev = prev_digest.clone();
         receipt.chain_digest_next = compute_digest(&receipt);
-        
+
         prev_digest = receipt.chain_digest_next.clone();
         prev_state = receipt.state_hash_next.clone();
         out.push(receipt);
@@ -246,7 +248,7 @@ fn build_semi_realistic_chain(object_id: &str, len: usize) -> Vec<MicroReceiptWi
         receipt.step_type = Some(step_types[idx].to_string());
         receipt.chain_digest_prev = prev_digest.clone();
         receipt.chain_digest_next = compute_digest(&receipt);
-        
+
         prev_digest = receipt.chain_digest_next.clone();
         prev_state = receipt.state_hash_next.clone();
         out.push(receipt);

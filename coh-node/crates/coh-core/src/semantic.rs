@@ -20,10 +20,12 @@ pub struct SemanticRegistry;
 impl SemanticRegistry {
     /// Get the conservative minimum cost envelope (delta_hat) for a given step type.
     /// The kernel obligation is: delta_hat >= delta (the true hidden cost).
-    pub fn delta_hat(step_type: &Option<String>) -> Result<(u128, SemanticEnvelopeSource), RejectCode> {
+    pub fn delta_hat(
+        step_type: &Option<String>,
+    ) -> Result<(u128, SemanticEnvelopeSource), RejectCode> {
         match step_type.as_deref() {
             Some("coh.step.identity") => Ok((0, SemanticEnvelopeSource::StaticTable)),
-            Some("coh.step.transfer") => Ok((5, SemanticEnvelopeSource::RegistryLookup)), 
+            Some("coh.step.transfer") => Ok((5, SemanticEnvelopeSource::RegistryLookup)),
             Some("coh.step.mint") => Ok((0, SemanticEnvelopeSource::StaticTable)),
             Some("coh.step.burn") => Ok((0, SemanticEnvelopeSource::StaticTable)),
             Some(_) | None => Err(RejectCode::SemanticEnvelopeMissing),

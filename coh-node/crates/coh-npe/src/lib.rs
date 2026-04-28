@@ -72,10 +72,7 @@ pub struct FormationResult {
 }
 
 impl FormationResult {
-    pub fn compute(
-        chaos_admissible: bool,
-        coherence_admissible: bool,
-    ) -> Self {
+    pub fn compute(chaos_admissible: bool, coherence_admissible: bool) -> Self {
         Self {
             is_chaos_admissible: chaos_admissible,
             is_coherence_admissible: coherence_admissible,
@@ -109,7 +106,7 @@ mod tests {
     #[test]
     fn test_chaos_admissible_with_slack() {
         let prev_disorder = 1000;
-        let next_disorder = 1100; 
+        let next_disorder = 1100;
         let cost = 150;
         let slack = 300; // 1100 + 150 = 1250 <= 1000 + 300 = 1300
 
@@ -129,7 +126,7 @@ mod tests {
         let _next_disorder = 900;
         let _cost = 50;
         let _slack = -50i128; // Wait, slack is u128. Let's use 0.
-        
+
         // 900 + 100 = 1000
         assert!(ChaosMetrics::is_chaos_admissible(1000, 900, 100, 0));
     }

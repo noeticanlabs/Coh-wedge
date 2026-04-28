@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
-use coh_core::types::{Decision, Hash32};
 use coh_core::reject::RejectCode;
+use coh_core::types::{Decision, Hash32};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct AttemptLogEntry {

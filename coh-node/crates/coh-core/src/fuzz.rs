@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use crate::verify_chain::verify_chain;
     use crate::types::{Decision, MicroReceiptWire};
+    use crate::verify_chain::verify_chain;
     use std::fs::File;
     use std::io::{BufRead, BufReader};
     use std::path::PathBuf;
@@ -16,7 +16,8 @@ mod tests {
     fn load_chain(path: PathBuf) -> Vec<MicroReceiptWire> {
         let file = File::open(path).expect("Failed to open adversarial vector");
         let reader = BufReader::new(file);
-        reader.lines()
+        reader
+            .lines()
             .map(|l| serde_json::from_str(&l.unwrap()).expect("Failed to parse JSON line"))
             .collect()
     }
@@ -36,14 +37,18 @@ mod tests {
             let path = get_adversarial_path(file);
             let chain = load_chain(path);
             let res = verify_chain(chain);
-            
+
             assert_eq!(
-                res.decision, 
-                Decision::Reject, 
-                "Adversarial file {} should have been REJECTED but was {:?}", 
-                file, res.decision
+                res.decision,
+                Decision::Reject,
+                "Adversarial file {} should have been REJECTED but was {:?}",
+                file,
+                res.decision
             );
-            println!("SUCCESS: {} rejected as expected with code {:?}", file, res.code);
+            println!(
+                "SUCCESS: {} rejected as expected with code {:?}",
+                file, res.code
+            );
         }
     }
 
@@ -51,10 +56,14 @@ mod tests {
     fn test_edge_cases_rejections() {
         let path = get_adversarial_path("reject_edge_cases.jsonl");
         let chain = load_chain(path);
-        
+
         // Some edge cases might be per-receipt or per-chain
         // If it's a large file, we might want to check individual receipts too
         let res = verify_chain(chain);
-        assert_eq!(res.decision, Decision::Reject, "Edge cases chain should be REJECTED");
+        assert_eq!(
+            res.decision,
+            Decision::Reject,
+            "Edge cases chain should be REJECTED"
+        );
     }
 }

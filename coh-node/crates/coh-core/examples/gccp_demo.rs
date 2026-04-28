@@ -1,7 +1,7 @@
-use coh_core::types::{MicroReceiptWire, Decision, MicroReceipt};
+use coh_core::types::{Decision, MicroReceipt, MicroReceiptWire};
 use coh_core::verify_micro::verify_micro;
-use coh_time::CohTimeEngine;
 use coh_gccp::{GccpState, GccpVerifier};
+use coh_time::CohTimeEngine;
 use std::convert::TryFrom;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -14,32 +14,50 @@ fn main() {
     let gccp_verifier = GccpVerifier::default();
     let mut gccp_state = GccpState::default();
 
-    println!("Initial State: Attempt={}, Accepted={}", 
-        time_engine.state().attempt_index, 
+    println!(
+        "Initial State: Attempt={}, Accepted={}",
+        time_engine.state().attempt_index,
         time_engine.state().accepted_index
     );
 
     // 2. Load Valid GCCP Vectors
     let valid_path = "vectors/gccp/valid_gccp_power.jsonl";
     println!("\n--- Processing Valid Transitions from {} ---", valid_path);
-    process_vector_file(valid_path, &mut time_engine, &gccp_verifier, &mut gccp_state);
+    process_vector_file(
+        valid_path,
+        &mut time_engine,
+        &gccp_verifier,
+        &mut gccp_state,
+    );
 
     // 3. Load Reject GCCP Vectors
     let reject_path = "vectors/gccp/reject_gccp_power_breach.jsonl";
-    println!("\n--- Processing Reject Transitions from {} ---", reject_path);
-    
+    println!(
+        "\n--- Processing Reject Transitions from {} ---",
+        reject_path
+    );
+
     // Simulate a thermal breach for the reject demo
-    gccp_state.thermal.die_temp = 95.0; 
-    process_vector_file(reject_path, &mut time_engine, &gccp_verifier, &mut gccp_state);
+    gccp_state.thermal.die_temp = 95.0;
+    process_vector_file(
+        reject_path,
+        &mut time_engine,
+        &gccp_verifier,
+        &mut gccp_state,
+    );
 
     // 4. Final Summary
     println!("\n=== Demo Summary ===");
-    println!("Final Indices: Attempt={}, Accepted={}", 
-        time_engine.state().attempt_index, 
+    println!(
+        "Final Indices: Attempt={}, Accepted={}",
+        time_engine.state().attempt_index,
         time_engine.state().accepted_index
     );
     println!("Ledger Entries: {}", time_engine.get_ledger().len());
-    println!("Attempt Log Entries: {}", time_engine.get_attempt_log().len());
+    println!(
+        "Attempt Log Entries: {}",
+        time_engine.get_attempt_log().len()
+    );
 }
 
 fn fix_hash(h: String) -> String {
@@ -53,20 +71,20 @@ fn fix_hash(h: String) -> String {
 }
 
 fn process_vector_file(
-    path: &str, 
-    time_engine: &mut CohTimeEngine, 
+    path: &str,
+    time_engine: &mut CohTimeEngine,
     gccp_verifier: &GccpVerifier,
-    gccp_state: &mut GccpState
+    gccp_state: &mut GccpState,
 ) {
     // Try multiple relative paths depending on where it's run from
     let attempts = vec![
         path.to_string(),
         format!("../../../{}", path), // From coh-core/examples
         format!("../../{}", path),    // From coh-node
-        format!("./{}", path),         // From root
-        format!("coh-node/{}", path),  // From root
+        format!("./{}", path),        // From root
+        format!("coh-node/{}", path), // From root
     ];
-    
+
     let mut opened_file = None;
     for attempt in attempts {
         if let Ok(f) = File::open(&attempt) {
@@ -74,7 +92,7 @@ fn process_vector_file(
             break;
         }
     }
-    
+
     let file = match opened_file {
         Some(f) => f,
         None => {
@@ -88,7 +106,7 @@ fn process_vector_file(
     for line in reader.lines() {
         let line = line.unwrap();
         let mut wire: MicroReceiptWire = serde_json::from_str(&line).unwrap();
-        
+
         // Fix short hashes in vectors
         wire.state_hash_prev = fix_hash(wire.state_hash_prev);
         wire.state_hash_next = fix_hash(wire.state_hash_next);
@@ -104,7 +122,7 @@ fn process_vector_file(
         // Note: verify_micro will likely reject due to digest mismatch because we modified the hashes,
         // but for this demo we are interested in the integration flow.
         let core_res = verify_micro(wire);
-        
+
         // Step B: GCCP Verification
         let gccp_res = gccp_verifier.verify_transition(gccp_state, &receipt);
 
@@ -124,13 +142,18 @@ fn process_vector_file(
 
         // Step C: Apply to Time Engine
         let (att, acc) = time_engine.apply_decision(
-            digest, 
-            final_decision, 
-            error_code, 
-            if final_decision == Decision::Accept { Some(receipt.state_hash_next) } else { None }
+            digest,
+            final_decision,
+            error_code,
+            if final_decision == Decision::Accept {
+                Some(receipt.state_hash_next)
+            } else {
+                None
+            },
         );
 
-        println!("Step {}: Core={:?}, GCCP={:?} -> Decision={:?} [Att={}, Acc={}]", 
+        println!(
+            "Step {}: Core={:?}, GCCP={:?} -> Decision={:?} [Att={}, Acc={}]",
             receipt.step_index,
             core_res.decision,
             if gccp_res.is_ok() { "OK" } else { "BREACH" },

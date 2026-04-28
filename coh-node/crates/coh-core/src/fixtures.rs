@@ -17,7 +17,7 @@ pub fn finalize_micro_receipt(mut wire: MicroReceiptWire) -> Result<MicroReceipt
         let projection = crate::verify_micro::compute_projection_hash(&runtime);
         wire.metrics.projection_hash = projection.to_hex();
     }
-    
+
     wire.chain_digest_next = compute_micro_digest_hex(&wire)?;
     Ok(wire)
 }

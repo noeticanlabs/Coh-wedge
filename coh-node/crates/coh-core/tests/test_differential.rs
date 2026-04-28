@@ -44,7 +44,6 @@ fn build_v1_wire(
 
     // Sign with a trusted fixture key for tests
     let signing_key = coh_core::auth::fixture_signing_key("test_signer");
-    
 
     coh_core::auth::sign_micro_receipt(
         wire,

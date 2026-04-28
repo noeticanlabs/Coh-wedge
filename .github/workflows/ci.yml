@@ -86,13 +86,18 @@ jobs:
   ape-build:
     name: APE Build & Test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ape
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Skip if ape/ folder is missing
+        shell: bash
+        run: |
+          if [ ! -d "ape" ]; then
+            echo "Directory 'ape' not found — skipping APE Build & Test job."
+            exit 0
+          fi
 
       - name: Install Rust stable toolchain
         uses: actions-rs/toolchain@v1
@@ -107,22 +112,26 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
+            ape/target
           key: ${{ runner.os }}-ape-cargo-${{ hashFiles('ape/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-ape-cargo-
 
       - name: Check formatting
         run: cargo fmt --check
+        working-directory: ape
 
       - name: Clippy deny warnings
         run: cargo clippy -- -D warnings
+        working-directory: ape
 
       - name: Build
         run: cargo build
+        working-directory: ape
 
       - name: Run tests
         run: cargo test
+        working-directory: ape
 
   compliance-audit:
     name: Compliance Vector Audit
@@ -251,6 +260,11 @@ jobs:
         uses: leanprover/lean-action@v1
         with:
           working-directory: coh-t-stack
+
+      - name: Configure Lean default toolchain
+        run: |
+          elan default stable
+        working-directory: coh-t-stack
 
       - name: Build Lean library
         run: lake build

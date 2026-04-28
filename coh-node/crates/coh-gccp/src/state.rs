@@ -72,18 +72,46 @@ pub struct GccpState {
 impl Default for GccpState {
     fn default() -> Self {
         Self {
-            thermal: ThermalState { die_temp: 45.0, hotspot_temp: 50.0, thermal_slope: 0.0 },
-            power: PowerState { draw_watts: 100.0, cap_watts: 300.0, margin_watts: 200.0 },
-            queue: QueueState { depth: 0, age_pressure: 0.0, class_mix: "default".to_string() },
-            utilization: UtilizationState { compute_percent: 0.0, memory_bw_percent: 0.0, interconnect_percent: 0.0 },
-            memory: MemoryState { used_bytes: 0, total_bytes: 32 * 1024 * 1024 * 1024, fragmentation: 0.0 },
-            risk: RiskState { retry_count: 0, timeout_ms: 100, is_throttled: false },
-            budget: BudgetState { energy_joules: 1000.0, latency_ms: 10.0, stability_score: 1.0 },
-            context: ControlContext { 
-                policy_hash: "0000".to_string(), 
-                profile: "default".to_string(), 
-                mode: "normal".to_string(), 
-                class: "standard".to_string() 
+            thermal: ThermalState {
+                die_temp: 45.0,
+                hotspot_temp: 50.0,
+                thermal_slope: 0.0,
+            },
+            power: PowerState {
+                draw_watts: 100.0,
+                cap_watts: 300.0,
+                margin_watts: 200.0,
+            },
+            queue: QueueState {
+                depth: 0,
+                age_pressure: 0.0,
+                class_mix: "default".to_string(),
+            },
+            utilization: UtilizationState {
+                compute_percent: 0.0,
+                memory_bw_percent: 0.0,
+                interconnect_percent: 0.0,
+            },
+            memory: MemoryState {
+                used_bytes: 0,
+                total_bytes: 32 * 1024 * 1024 * 1024,
+                fragmentation: 0.0,
+            },
+            risk: RiskState {
+                retry_count: 0,
+                timeout_ms: 100,
+                is_throttled: false,
+            },
+            budget: BudgetState {
+                energy_joules: 1000.0,
+                latency_ms: 10.0,
+                stability_score: 1.0,
+            },
+            context: ControlContext {
+                policy_hash: "0000".to_string(),
+                profile: "default".to_string(),
+                mode: "normal".to_string(),
+                class: "standard".to_string(),
             },
         }
     }

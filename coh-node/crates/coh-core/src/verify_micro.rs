@@ -183,7 +183,11 @@ pub fn verify_micro_with_context(
 
     // 5. Semantic integrity checks (TypeConfusion defense)
     // C1: No vacuous zero receipts
-    if r.metrics.v_pre == 0 && r.metrics.v_post == 0 && r.metrics.spend == 0 && r.metrics.defect == 0 {
+    if r.metrics.v_pre == 0
+        && r.metrics.v_post == 0
+        && r.metrics.spend == 0
+        && r.metrics.defect == 0
+    {
         return VerifyMicroResult {
             decision: Decision::Reject,
             code: Some(RejectCode::VacuousZeroReceipt),
@@ -259,7 +263,10 @@ pub fn verify_micro_with_context(
                     return VerifyMicroResult {
                         decision: Decision::Reject,
                         code: Some(RejectCode::ChaosViolation),
-                        message: format!("Chaos violation: M(g') + C(p) ({}) > M(g) + D(p) ({})", lhs, rhs),
+                        message: format!(
+                            "Chaos violation: M(g') + C(p) ({}) > M(g) + D(p) ({})",
+                            lhs, rhs
+                        ),
                         step_index: Some(r.step_index),
                         object_id: Some(r.object_id),
                         chain_digest_next: None,
@@ -299,14 +306,13 @@ pub fn verify_micro_with_context(
                 let delta_hat_str = SemanticRegistry::delta_hat(&r.step_type)
                     .map(|(d, _)| d.to_string())
                     .unwrap_or_else(|_| "UNKNOWN".to_string());
-                
+
                 return VerifyMicroResult {
                     decision: Decision::Reject,
                     code: Some(e),
                     message: format!(
                         "Semantic envelope violation: defect ({}) < delta_hat ({})",
-                        r.metrics.defect,
-                        delta_hat_str
+                        r.metrics.defect, delta_hat_str
                     ),
                     step_index: Some(r.step_index),
                     object_id: Some(r.object_id),

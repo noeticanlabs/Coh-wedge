@@ -177,7 +177,16 @@ fn test_unknown_step_type_rejection() {
 
     let wire = finalize_micro_receipt(wire).expect("should finalize");
     let signing_key = fixture_signing_key("test_signer");
-    let wire = sign_micro_receipt(wire, &signing_key, "test_signer", "*", 0, None, "MICRO_RECEIPT_V1").unwrap();
+    let wire = sign_micro_receipt(
+        wire,
+        &signing_key,
+        "test_signer",
+        "*",
+        0,
+        None,
+        "MICRO_RECEIPT_V1",
+    )
+    .unwrap();
 
     let res = verify_micro(wire);
     assert_eq!(res.decision, Decision::Reject);
