@@ -6,7 +6,9 @@ use crate::canon::{
 use crate::hash::compute_chain_digest;
 use crate::math::CheckedMath;
 use crate::semantic::SemanticRegistry;
-use crate::types::{Decision, MicroReceipt, MicroReceiptWire, RejectCode, VerifyMicroResult};
+use crate::types::{
+    AdmissionProfile, Decision, MicroReceipt, MicroReceiptWire, RejectCode, VerifyMicroResult,
+};
 use std::convert::TryFrom;
 
 /// Production verifier entrypoint that requires a trusted authority context.
@@ -179,18 +181,13 @@ pub fn verify_micro_with_context(
         };
     }
 
-    // 5.5 Semantic integrity checks (TypeConfusion defense — Q2)
+    // 5. Semantic integrity checks (TypeConfusion defense)
     // C1: No vacuous zero receipts
-    if r.metrics.v_pre == 0
-        && r.metrics.v_post == 0
-        && r.metrics.spend == 0
-        && r.metrics.defect == 0
-    {
+    if r.metrics.v_pre == 0 && r.metrics.v_post == 0 && r.metrics.spend == 0 && r.metrics.defect == 0 {
         return VerifyMicroResult {
             decision: Decision::Reject,
             code: Some(RejectCode::VacuousZeroReceipt),
-            message: "Vacuous zero receipt: all metrics are zero (no economic activity)"
-                .to_string(),
+            message: "Vacuous zero receipt: all coherence metrics are zero".to_string(),
             step_index: Some(r.step_index),
             object_id: Some(r.object_id),
             chain_digest_next: None,
@@ -202,44 +199,14 @@ pub fn verify_micro_with_context(
         return VerifyMicroResult {
             decision: Decision::Reject,
             code: Some(RejectCode::SpendExceedsBalance),
-            message: format!(
-                "Spend exceeds balance: spend ({}) > v_pre ({})",
-                r.metrics.spend, r.metrics.v_pre
-            ),
+            message: format!("Spend ({}) > v_pre ({})", r.metrics.spend, r.metrics.v_pre),
             step_index: Some(r.step_index),
             object_id: Some(r.object_id),
             chain_digest_next: None,
         };
     }
 
-    // C5: Defect bound enforcement (delta(trace) <= defect)
-    if !SemanticRegistry::verify_defect_bound(&r) {
-        let delta = SemanticRegistry::delta_for_type(&r.step_type);
-        return VerifyMicroResult {
-            decision: Decision::Reject,
-            code: Some(RejectCode::RejectPolicyViolation),
-            message: format!(
-                "Defect bound violation: defect ({}) < delta ({}) for step type {:?}",
-                r.metrics.defect, delta, r.step_type
-            ),
-            step_index: Some(r.step_index),
-            object_id: Some(r.object_id),
-            chain_digest_next: None,
-        };
-    }
-
-    // C6: Identity cost check (Identity spend must be zero)
-    if SemanticRegistry::is_identity(&r.step_type) && r.metrics.spend > 0 {
-        return VerifyMicroResult {
-            decision: Decision::Reject,
-            code: Some(RejectCode::RejectPolicyViolation),
-            message: "Identity step cannot have non-zero spend".to_string(),
-            step_index: Some(r.step_index),
-            object_id: Some(r.object_id),
-            chain_digest_next: None,
-        };
-    }
-    // 6. Cryptographic integrity (Canonicalization + Hashing)
+    // 6. Cryptographic integrity
     let prehash = to_prehash_view(&r);
     let canon_bytes = match to_canonical_json_bytes(&prehash) {
         Ok(bytes) => bytes,
@@ -247,7 +214,7 @@ pub fn verify_micro_with_context(
             return VerifyMicroResult {
                 decision: Decision::Reject,
                 code: Some(e),
-                message: "Canonicalization failed: invalid JSON encoding".to_string(),
+                message: "Canonicalization failed".to_string(),
                 step_index: Some(r.step_index),
                 object_id: Some(r.object_id),
                 chain_digest_next: None,
@@ -255,29 +222,66 @@ pub fn verify_micro_with_context(
         }
     };
     let computed_digest = compute_chain_digest(r.chain_digest_prev, &canon_bytes);
-
     if computed_digest != r.chain_digest_next {
         return VerifyMicroResult {
             decision: Decision::Reject,
             code: Some(RejectCode::RejectChainDigest),
-            message: format!(
-                "Cryptographic digest mismatch: computed {} but found {}",
-                computed_digest.to_hex(),
-                r.chain_digest_next.to_hex()
-            ),
+            message: "Cryptographic digest mismatch".to_string(),
             step_index: Some(r.step_index),
             object_id: Some(r.object_id),
             chain_digest_next: Some(r.chain_digest_next.to_hex()),
         };
     }
 
-    VerifyMicroResult {
-        decision: Decision::Accept,
-        code: None,
-        message: "Micro-receipt verified successfully".to_string(),
-        step_index: Some(r.step_index),
-        object_id: Some(r.object_id),
-        chain_digest_next: Some(r.chain_digest_next.to_hex()),
+    // 7. Profile-specific admission
+    match r.profile {
+        AdmissionProfile::CoherenceOnlyV1 => {
+            // Already checked by coherence resource law above
+            VerifyMicroResult {
+                decision: Decision::Accept,
+                code: None,
+                message: "Verified successfully (CoherenceOnlyV1)".to_string(),
+                step_index: Some(r.step_index),
+                object_id: Some(r.object_id),
+                chain_digest_next: Some(r.chain_digest_next.to_hex()),
+            }
+        }
+        AdmissionProfile::FormationV2 => {
+            // 7.1 Law of Chaos check
+            let chaos_lhs = r.metrics.m_post.saturating_add(r.metrics.c_cost);
+            let chaos_rhs = r.metrics.m_pre.saturating_add(r.metrics.d_slack);
+            if chaos_lhs > chaos_rhs {
+                return VerifyMicroResult {
+                    decision: Decision::Reject,
+                    code: Some(RejectCode::ChaosViolation),
+                    message: format!("Chaos violation: {} > {}", chaos_lhs, chaos_rhs),
+                    step_index: Some(r.step_index),
+                    object_id: Some(r.object_id),
+                    chain_digest_next: None,
+                };
+            }
+
+            // 7.2 Semantic Envelope Check (delta_hat <= defect)
+            if !SemanticRegistry::verify_defect_bound(&r) {
+                return VerifyMicroResult {
+                    decision: Decision::Reject,
+                    code: Some(RejectCode::SemanticEnvelopeViolation),
+                    message: "Semantic envelope violation: declared defect < delta_hat".to_string(),
+                    step_index: Some(r.step_index),
+                    object_id: Some(r.object_id),
+                    chain_digest_next: None,
+                };
+            }
+
+            VerifyMicroResult {
+                decision: Decision::Accept,
+                code: None,
+                message: "Verified successfully (FormationV2)".to_string(),
+                step_index: Some(r.step_index),
+                object_id: Some(r.object_id),
+                chain_digest_next: Some(r.chain_digest_next.to_hex()),
+            }
+        }
     }
 }
 

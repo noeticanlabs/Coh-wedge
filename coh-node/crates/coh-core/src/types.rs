@@ -33,6 +33,19 @@ pub enum Decision {
     AbortBudget,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum AdmissionProfile {
+    CoherenceOnlyV1,
+    FormationV2,
+}
+
+impl Default for AdmissionProfile {
+    fn default() -> Self {
+        Self::CoherenceOnlyV1
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct MetricsWire {
@@ -42,6 +55,18 @@ pub struct MetricsWire {
     pub defect: String,
     #[serde(default = "default_authority")]
     pub authority: String,
+    // Chaos Metrics (Forward Generation)
+    #[serde(default)]
+    pub m_pre: String,
+    #[serde(default)]
+    pub m_post: String,
+    #[serde(default)]
+    pub c_cost: String,
+    #[serde(default)]
+    pub d_slack: String,
+    // Projection Integrity
+    #[serde(default)]
+    pub projection_hash: String,
 }
 
 impl Default for MetricsWire {
@@ -52,6 +77,11 @@ impl Default for MetricsWire {
             spend: "0".to_string(),
             defect: "0".to_string(),
             authority: "0".to_string(),
+            m_pre: "0".to_string(),
+            m_post: "0".to_string(),
+            c_cost: "0".to_string(),
+            d_slack: "0".to_string(),
+            projection_hash: "0000000000000000000000000000000000000000000000000000000000000000".to_string(),
         }
     }
 }
@@ -89,6 +119,8 @@ pub struct MicroReceiptWire {
     pub state_hash_next: String,
     pub chain_digest_prev: String,
     pub chain_digest_next: String,
+    #[serde(default)]
+    pub profile: AdmissionProfile,
     pub metrics: MetricsWire,
 }
 
@@ -122,13 +154,37 @@ pub struct SlabReceiptWire {
     pub summary: SlabSummaryWire,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Default)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Metrics {
     pub v_pre: u128,
     pub v_post: u128,
     pub spend: u128,
     pub defect: u128,
     pub authority: u128,
+    // Chaos Metrics (Forward Generation)
+    pub m_pre: u128,
+    pub m_post: u128,
+    pub c_cost: u128,
+    pub d_slack: u128,
+    // Projection
+    pub projection_hash: Hash32,
+}
+
+impl Default for Metrics {
+    fn default() -> Self {
+        Self {
+            v_pre: 0,
+            v_post: 0,
+            spend: 0,
+            defect: 0,
+            authority: 0,
+            m_pre: 0,
+            m_post: 0,
+            c_cost: 0,
+            d_slack: 0,
+            projection_hash: Hash32([0; 32]),
+        }
+    }
 }
 
 /// A Certified Morphism in the Coh Category.
@@ -140,20 +196,39 @@ pub struct CertifiedMorphism {
     pub spend: u128,
     pub defect: u128,
     pub authority: u128,
+    // Chaos Metrics
+    pub m_pre: u128,
+    pub m_post: u128,
+    pub c_cost: u128,
+    pub d_slack: u128,
 }
 
 impl CertifiedMorphism {
-    pub fn new(v_pre: u128, v_post: u128, spend: u128, defect: u128, authority: u128) -> Self {
+    pub fn new(
+        v_pre: u128,
+        v_post: u128,
+        spend: u128,
+        defect: u128,
+        authority: u128,
+        m_pre: u128,
+        m_post: u128,
+        c_cost: u128,
+        d_slack: u128,
+    ) -> Self {
         Self {
             v_pre,
             v_post,
             spend,
             defect,
             authority,
+            m_pre,
+            m_post,
+            c_cost,
+            d_slack,
         }
     }
 
-    /// The fundamental inequality: V_post + spend <= V_pre + defect
+    /// The fundamental Coherence inequality: V_post + spend <= V_pre + defect + authority
     pub fn is_certified(&self) -> bool {
         let lhs = self.v_post.saturating_add(self.spend);
         let rhs = self
@@ -161,6 +236,18 @@ impl CertifiedMorphism {
             .saturating_add(self.defect)
             .saturating_add(self.authority);
         lhs <= rhs
+    }
+
+    /// The Law of Chaos: M(g') + C(p) <= M(g) + D(p)
+    pub fn is_chaos_admissible(&self) -> bool {
+        let lhs = self.m_post.saturating_add(self.c_cost);
+        let rhs = self.m_pre.saturating_add(self.d_slack);
+        lhs <= rhs
+    }
+
+    /// Intersection of Chaos and Coherence
+    pub fn is_formation_admissible(&self) -> bool {
+        self.is_certified() && self.is_chaos_admissible()
     }
 
     /// Compose with another certified morphism (f ; g)
@@ -175,12 +262,20 @@ impl CertifiedMorphism {
         let total_defect = self.defect.checked_add(other.defect)?;
         let total_authority = self.authority.checked_add(other.authority)?;
 
+        // Chaos composition (Additivity assumption for V1)
+        let total_cost = self.c_cost.checked_add(other.c_cost)?;
+        let total_slack = self.d_slack.checked_add(other.d_slack)?;
+
         Some(Self {
             v_pre: self.v_pre,
             v_post: other.v_post,
             spend: total_spend,
             defect: total_defect,
             authority: total_authority,
+            m_pre: self.m_pre,
+            m_post: other.m_post,
+            c_cost: total_cost,
+            d_slack: total_slack,
         })
     }
 }
@@ -198,6 +293,7 @@ pub struct MicroReceipt {
     pub state_hash_next: Hash32,
     pub chain_digest_prev: Hash32,
     pub chain_digest_next: Hash32,
+    pub profile: AdmissionProfile,
     pub metrics: Metrics,
 }
 
@@ -231,8 +327,13 @@ pub struct MetricsPrehash {
     pub authority: String,
     pub defect: String,
     pub spend: String,
+    pub m_pre: String,
+    pub m_post: String,
     pub v_post: String,
     pub v_pre: String,
+    pub c_cost: String,
+    pub d_slack: String,
+    pub projection_hash: String,
 }
 
 #[derive(Serialize)]
@@ -326,6 +427,11 @@ impl TryFrom<MetricsWire> for Metrics {
             spend: parse_u128(&w.spend)?,
             defect: parse_u128(&w.defect)?,
             authority: parse_u128(&w.authority)?,
+            m_pre: parse_u128(&w.m_pre)?,
+            m_post: parse_u128(&w.m_post)?,
+            c_cost: parse_u128(&w.c_cost)?,
+            d_slack: parse_u128(&w.d_slack)?,
+            projection_hash: Hash32::from_hex(&w.projection_hash).unwrap_or_default(),
         })
     }
 }
@@ -346,6 +452,7 @@ impl TryFrom<MicroReceiptWire> for MicroReceipt {
             state_hash_next: Hash32::from_hex(&w.state_hash_next)?,
             chain_digest_prev: Hash32::from_hex(&w.chain_digest_prev)?,
             chain_digest_next: Hash32::from_hex(&w.chain_digest_next)?,
+            profile: w.profile,
             metrics: Metrics::try_from(w.metrics)?,
         })
     }

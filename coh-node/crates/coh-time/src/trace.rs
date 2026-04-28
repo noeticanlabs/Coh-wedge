@@ -49,11 +49,15 @@ impl Trace {
         let mut total_spend: u128 = 0;
         let mut total_defect: u128 = 0;
         let mut total_authority: u128 = 0;
+        let mut total_cost: u128 = 0;
+        let mut total_slack: u128 = 0;
 
         for m in &self.morphisms {
             total_spend = total_spend.checked_add(m.spend).ok_or(TraceError::Overflow)?;
             total_defect = total_defect.checked_add(m.defect).ok_or(TraceError::Overflow)?;
             total_authority = total_authority.checked_add(m.authority).ok_or(TraceError::Overflow)?;
+            total_cost = total_cost.checked_add(m.c_cost).ok_or(TraceError::Overflow)?;
+            total_slack = total_slack.checked_add(m.d_slack).ok_or(TraceError::Overflow)?;
         }
 
         Ok(CertifiedMorphism {
@@ -62,6 +66,10 @@ impl Trace {
             spend: total_spend,
             defect: total_defect,
             authority: total_authority,
+            m_pre: first.m_pre,
+            m_post: last.m_post,
+            c_cost: total_cost,
+            d_slack: total_slack,
         })
     }
 
@@ -101,8 +109,8 @@ mod tests {
 
     #[test]
     fn test_valid_trace_composition() {
-        let m1 = CertifiedMorphism::new(100, 80, 20, 0, 0);
-        let m2 = CertifiedMorphism::new(80, 50, 30, 0, 0);
+        let m1 = CertifiedMorphism::new(100, 80, 20, 0, 0, 0, 0, 0, 0);
+        let m2 = CertifiedMorphism::new(80, 50, 30, 0, 0, 0, 0, 0, 0);
         let trace = Trace::try_from_morphisms(vec![m1, m2]).unwrap();
         
         let collapsed = trace.collapse().unwrap();
@@ -114,16 +122,16 @@ mod tests {
 
     #[test]
     fn test_invalid_trace_mismatch() {
-        let m1 = CertifiedMorphism::new(100, 80, 20, 0, 0);
-        let m2 = CertifiedMorphism::new(70, 50, 20, 0, 0); // 80 != 70
+        let m1 = CertifiedMorphism::new(100, 80, 20, 0, 0, 0, 0, 0, 0);
+        let m2 = CertifiedMorphism::new(70, 50, 20, 0, 0, 0, 0, 0, 0); // 80 != 70
         let result = Trace::try_from_morphisms(vec![m1, m2]);
         assert!(matches!(result, Err(TraceError::CompositionMismatch(0, 80, 70))));
     }
 
     #[test]
     fn test_trace_with_authority() {
-        let m1 = CertifiedMorphism::new(100, 110, 0, 0, 10); // Auth used to increase V
-        let m2 = CertifiedMorphism::new(110, 50, 60, 0, 0);
+        let m1 = CertifiedMorphism::new(100, 110, 0, 0, 10, 0, 0, 0, 0); // Auth used to increase V
+        let m2 = CertifiedMorphism::new(110, 50, 60, 0, 0, 0, 0, 0, 0);
         let trace = Trace::try_from_morphisms(vec![m1, m2]).unwrap();
         
         let collapsed = trace.collapse().unwrap();
@@ -133,9 +141,9 @@ mod tests {
 
     #[test]
     fn test_slab_segmentation() {
-        let m1 = CertifiedMorphism::new(100, 90, 10, 0, 0);
-        let m2 = CertifiedMorphism::new(90, 80, 10, 0, 0);
-        let m3 = CertifiedMorphism::new(80, 70, 10, 0, 0);
+        let m1 = CertifiedMorphism::new(100, 90, 10, 0, 0, 0, 0, 0, 0);
+        let m2 = CertifiedMorphism::new(90, 80, 10, 0, 0, 0, 0, 0, 0);
+        let m3 = CertifiedMorphism::new(80, 70, 10, 0, 0, 0, 0, 0, 0);
         let trace = Trace::try_from_morphisms(vec![m1, m2, m3]).unwrap();
         
         let slab = trace.segment(1, 3).unwrap(); // m2, m3

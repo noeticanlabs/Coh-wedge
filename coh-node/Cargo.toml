@@ -7,6 +7,7 @@ members = [
     "crates/coh-fuzz",
     "crates/coh-time",
     "crates/coh-gccp",
+    "crates/coh-npe",
 ]
 resolver = "2"
 

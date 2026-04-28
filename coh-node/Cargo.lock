@@ -438,6 +438,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "coh-npe"
+version = "0.1.0"
+dependencies = [
+ "coh-core",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
 name = "coh-sidecar"
 version = "0.1.0"
 dependencies = [

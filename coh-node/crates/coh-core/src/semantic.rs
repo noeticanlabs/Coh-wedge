@@ -5,29 +5,38 @@
 
 use crate::types::MicroReceipt;
 
-/// Registry for semantic delta values (minimum costs)
+/// Source of a semantic envelope bound
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SemanticEnvelopeSource {
+    StaticTable,
+    RegistryLookup,
+    TrajectoryEngine,
+    ExternalCertificate,
+}
+
+/// Registry for semantic delta_hat values (conservative cost envelopes)
 pub struct SemanticRegistry;
 
 impl SemanticRegistry {
-    /// Get the minimum cost (delta) for a given step type.
-    /// Based on Lean's `delta S trace`.
-    pub fn delta_for_type(step_type: &Option<String>) -> u128 {
+    /// Get the conservative minimum cost envelope (delta_hat) for a given step type.
+    /// The kernel obligation is: delta_hat >= delta (the true hidden cost).
+    pub fn delta_hat(step_type: &Option<String>) -> (u128, SemanticEnvelopeSource) {
         match step_type {
             Some(t) => match t.as_str() {
-                "coh.step.identity" => 0,
-                "coh.step.transfer" => 5, // Example: minimum cost of a transfer
-                "coh.step.mint" => 0,
-                "coh.step.burn" => 0,
-                _ => 0, // Default to 0 for unknown types (permissive)
+                "coh.step.identity" => (0, SemanticEnvelopeSource::StaticTable),
+                "coh.step.transfer" => (5, SemanticEnvelopeSource::RegistryLookup), 
+                "coh.step.mint" => (0, SemanticEnvelopeSource::StaticTable),
+                "coh.step.burn" => (0, SemanticEnvelopeSource::StaticTable),
+                _ => (0, SemanticEnvelopeSource::RegistryLookup),
             },
-            None => 0,
+            None => (0, SemanticEnvelopeSource::StaticTable),
         }
     }
 
-    /// Check if the receipt's defect bound is satisfied: delta(trace) <= defect
+    /// Check if the receipt's defect dominates the conservative envelope: defect >= delta_hat
     pub fn verify_defect_bound(receipt: &MicroReceipt) -> bool {
-        let delta = Self::delta_for_type(&receipt.step_type);
-        receipt.metrics.defect >= delta
+        let (delta_hat, _source) = Self::delta_hat(&receipt.step_type);
+        receipt.metrics.defect >= delta_hat
     }
 
     /// Check if a step is an identity transition.

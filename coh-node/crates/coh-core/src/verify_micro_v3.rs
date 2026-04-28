@@ -246,6 +246,7 @@ pub fn verify_micro_v3(
         state_hash_next: r.state_hash_next,
         chain_digest_prev: r.chain_digest_prev,
         chain_digest_next: r.chain_digest_next,
+        profile: crate::types::AdmissionProfile::CoherenceOnlyV1,
         metrics: r.metrics.clone(),
     };
 

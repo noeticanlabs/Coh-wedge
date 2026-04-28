@@ -100,9 +100,9 @@ pub fn build_slab(receipts: Vec<MicroReceiptWire>) -> BuildSlabResult {
             }
         };
 
-        total_delta = match total_delta.safe_add(crate::semantic::SemanticRegistry::delta_for_type(
+        total_delta = match total_delta.safe_add(crate::semantic::SemanticRegistry::delta_hat(
             &r.step_type,
-        )) {
+        ).0) {
             Ok(val) => val,
             Err(e) => {
                 return BuildSlabResult {

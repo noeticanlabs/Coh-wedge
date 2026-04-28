@@ -12,6 +12,11 @@ pub enum CohErrorCode {
     E002, // Cryptographic Failure (Digest/Merkle)
     E003, // Policy Violation (Accounting Law)
     E004, // Chain Discontinuity (State linkage)
+    E007,
+    E008,
+    E009,
+    E010,
+    E011,
 }
 
 impl From<RejectCode> for CohErrorCode {
@@ -59,6 +64,11 @@ impl From<RejectCode> for CohErrorCode {
 
             // State link -> E004
             RejectCode::RejectStateHashLink => CohErrorCode::E004,
+            RejectCode::ChaosMissing => CohErrorCode::E007,
+            RejectCode::ChaosViolation => CohErrorCode::E008,
+            RejectCode::ProjectionMismatch => CohErrorCode::E009,
+            RejectCode::SemanticEnvelopeMissing => CohErrorCode::E010,
+            RejectCode::SemanticEnvelopeViolation => CohErrorCode::E011,
         }
     }
 }
