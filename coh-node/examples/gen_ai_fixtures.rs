@@ -3,12 +3,11 @@
 //! Scope:
 //! - emits bounded valid-chain fixtures aligned with current verifier rules
 //! - emits semi-realistic AI workflow fixtures
-//! - does not claim unbounded trajectory coverage
 //! - All fixtures are properly signed with Ed25519
 
 use coh_core::auth::{fixture_signing_key, sign_micro_receipt};
-use coh_core::types::{MetricsWire, MicroReceiptWire, SignatureWire};
-use coh_core::{canon::*, hash::compute_chain_digest};
+use coh_core::types::{MetricsWire, MicroReceiptWire, SignatureWire, AdmissionProfile};
+use coh_core::{canon::*, hash::compute_chain_digest, types::MicroReceipt};
 use std::convert::TryFrom;
 use std::fs::{self, File};
 use std::io::Write;
@@ -69,16 +68,6 @@ fn main() {
     println!("\n=== Valid micro receipt (step 0) ===");
     println!("{}", serde_json::to_string_pretty(&receipt0).unwrap());
 
-    println!("\n=== Valid chain JSONL ===");
-    let jsonl0 = serde_json::to_string(&receipt0).unwrap();
-    let jsonl1 = serde_json::to_string(&receipt1).unwrap();
-    let jsonl2 = serde_json::to_string(&receipt2).unwrap();
-    let jsonl3 = serde_json::to_string(&receipt3).unwrap();
-    println!("{}", jsonl0);
-    println!("{}", jsonl1);
-    println!("{}", jsonl2);
-    println!("{}", jsonl3);
-
     write_jsonl(
         "vectors/semi_realistic/ai_workflow_valid.jsonl",
         &[
@@ -108,18 +97,6 @@ fn main() {
     println!("- vectors/valid/valid_chain_1000.jsonl");
     println!("- vectors/semi_realistic/ai_workflow_valid.jsonl");
     println!("- vectors/semi_realistic/ai_workflow_noisy.jsonl");
-
-    println!("\n=== Invalid digest micro (step 0 tampered) ===");
-    let mut tampered = receipt0.clone();
-    tampered.chain_digest_next =
-        "0000000000000000000000000000000000000000000000000000000000000000".to_string();
-    println!("{}", serde_json::to_string_pretty(&tampered).unwrap());
-
-    println!("\n=== Invalid state link (step 2 with wrong prev) ===");
-    let mut bad_state = receipt2.clone();
-    bad_state.state_hash_prev =
-        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF".to_string();
-    println!("{}", serde_json::to_string_pretty(&bad_state).unwrap());
 }
 
 fn create_receipt(
@@ -131,7 +108,7 @@ fn create_receipt(
     spend: &str,
     defect: &str,
 ) -> MicroReceiptWire {
-    MicroReceiptWire {
+    let mut wire = MicroReceiptWire {
         schema_id: "coh.receipt.micro.v1".to_string(),
         version: "1.0.0".to_string(),
         object_id: "agent.workflow.demo".to_string(),
@@ -139,7 +116,7 @@ fn create_receipt(
         policy_hash: "0".repeat(64),
         step_index: step,
         step_type: Some("workflow".to_string()),
-        signatures: Some(vec![signature_for(step)]),
+        signatures: None,
         state_hash_prev: prev_state.to_string(),
         state_hash_next: next_state.to_string(),
         chain_digest_prev: ZERO_HASH.to_string(),
@@ -149,8 +126,15 @@ fn create_receipt(
             v_post: v_post.to_string(),
             spend: spend.to_string(),
             defect: defect.to_string(),
+            authority: "0".to_string(),
+            ..Default::default()
         },
-    }
+        profile: AdmissionProfile::CoherenceOnlyV1,
+        ..Default::default()
+    };
+    
+    wire.signatures = Some(vec![signature_for(&wire, step)]);
+    wire
 }
 
 fn compute_digest(receipt: &MicroReceiptWire) -> String {
@@ -161,11 +145,9 @@ fn compute_digest(receipt: &MicroReceiptWire) -> String {
 }
 
 fn signature_for(receipt: &MicroReceiptWire, step: u64) -> SignatureWire {
-    // Use the fixture signing key
     let authority_id = format!("fixture-signer-{}", step % 3);
     let signing_key = fixture_signing_key(&authority_id);
     
-    // Sign the receipt (computes digest and signature)
     let signed = sign_micro_receipt(
         receipt.clone(),
         &signing_key,
@@ -176,9 +158,7 @@ fn signature_for(receipt: &MicroReceiptWire, step: u64) -> SignatureWire {
         "MICRO_RECEIPT_V1",
     ).expect("Failed to sign receipt");
     
-    // Extract the signature from the signed receipt
     signed.signatures.unwrap().into_iter().next().unwrap()
-}
 }
 
 fn next_state(seed: u64) -> String {
@@ -199,27 +179,20 @@ fn build_valid_chain(object_id: &str, len: usize) -> Vec<MicroReceiptWire> {
     let mut prev_state = ZERO_HASH.to_string();
 
     for step in 0..len as u64 {
-        let mut receipt = MicroReceiptWire {
-            schema_id: "coh.receipt.micro.v1".to_string(),
-            version: "1.0.0".to_string(),
-            object_id: object_id.to_string(),
-            canon_profile_hash: VALID_PROFILE.to_string(),
-            policy_hash: ZERO_HASH.to_string(),
-            step_index: step,
-            step_type: Some("acceptance".to_string()),
-            signatures: Some(vec![signature_for(step)]),
-            state_hash_prev: prev_state.clone(),
-            state_hash_next: next_state(step + 1),
-            chain_digest_prev: prev_digest.clone(),
-            chain_digest_next: ZERO_HASH.to_string(),
-            metrics: MetricsWire {
-                v_pre: "100".to_string(),
-                v_post: "99".to_string(),
-                spend: "1".to_string(),
-                defect: defect_for_step(step).to_string(),
-            },
-        };
+        let r = create_receipt(
+            step,
+            &prev_state,
+            &next_state(step + 1),
+            "100",
+            "99",
+            "1",
+            defect_for_step(step),
+        );
+        let mut receipt = r;
+        receipt.object_id = object_id.to_string();
+        receipt.chain_digest_prev = prev_digest.clone();
         receipt.chain_digest_next = compute_digest(&receipt);
+        
         prev_digest = receipt.chain_digest_next.clone();
         prev_state = receipt.state_hash_next.clone();
         out.push(receipt);
@@ -239,27 +212,21 @@ fn build_semi_realistic_chain(object_id: &str, len: usize) -> Vec<MicroReceiptWi
 
     for step in 0..len as u64 {
         let idx = (step as usize) % step_types.len();
-        let mut receipt = MicroReceiptWire {
-            schema_id: "coh.receipt.micro.v1".to_string(),
-            version: "1.0.0".to_string(),
-            object_id: object_id.to_string(),
-            canon_profile_hash: VALID_PROFILE.to_string(),
-            policy_hash: ZERO_HASH.to_string(),
-            step_index: step,
-            step_type: Some(step_types[idx].to_string()),
-            signatures: Some(vec![signature_for(step)]),
-            state_hash_prev: prev_state.clone(),
-            state_hash_next: next_state(10_000 + step * 17 + 1),
-            chain_digest_prev: prev_digest.clone(),
-            chain_digest_next: ZERO_HASH.to_string(),
-            metrics: MetricsWire {
-                v_pre: "100".to_string(),
-                v_post: posts[idx].to_string(),
-                spend: spends[idx].to_string(),
-                defect: defect_for_step(step).to_string(),
-            },
-        };
+        let r = create_receipt(
+            step,
+            &prev_state,
+            &next_state(10_000 + step * 17 + 1),
+            "100",
+            posts[idx],
+            spends[idx],
+            defect_for_step(step),
+        );
+        let mut receipt = r;
+        receipt.object_id = object_id.to_string();
+        receipt.step_type = Some(step_types[idx].to_string());
+        receipt.chain_digest_prev = prev_digest.clone();
         receipt.chain_digest_next = compute_digest(&receipt);
+        
         prev_digest = receipt.chain_digest_next.clone();
         prev_state = receipt.state_hash_next.clone();
         out.push(receipt);

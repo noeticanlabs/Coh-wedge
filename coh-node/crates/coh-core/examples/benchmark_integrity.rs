@@ -126,8 +126,12 @@ fn generate_demo_chain(steps: usize, breach_at: Option<usize>) -> Vec<MicroRecei
                 v_pre: v_pre.to_string(),
                 v_post: v_post.to_string(),
                 spend: spend.to_string(),
-                defect: defect.to_string(), authority: "0".to_string(),
+                defect: defect.to_string(),
+                authority: "0".to_string(),
+                ..Default::default()
             },
+            profile: coh_core::types::AdmissionProfile::CoherenceOnlyV1,
+            ..Default::default()
         };
 
         // If this is the breach step, we force a policy violation

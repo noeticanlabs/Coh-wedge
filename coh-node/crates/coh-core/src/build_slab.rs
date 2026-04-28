@@ -100,9 +100,24 @@ pub fn build_slab(receipts: Vec<MicroReceiptWire>) -> BuildSlabResult {
             }
         };
 
-        total_delta = match total_delta.safe_add(crate::semantic::SemanticRegistry::delta_hat(
-            &r.step_type,
-        ).0) {
+        let delta = match crate::semantic::SemanticRegistry::delta_hat(&r.step_type) {
+            Ok((d, _)) => d,
+            Err(e) => {
+                return BuildSlabResult {
+                    decision: Decision::Reject,
+                    code: Some(e),
+                    message: format!("Semantic lookup failed during slab build: {:?}", e),
+                    range_start: None,
+                    range_end: None,
+                    micro_count: None,
+                    merkle_root: None,
+                    output: None,
+                    slab: None,
+                }
+            }
+        };
+
+        total_delta = match total_delta.safe_add(delta) {
             Ok(val) => val,
             Err(e) => {
                 return BuildSlabResult {

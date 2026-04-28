@@ -17,7 +17,7 @@ fn build_v1_wire(
     defect: &str,
 ) -> coh_core::types::MicroReceiptWire {
     // Create wire without signature first
-    let mut wire = coh_core::types::MicroReceiptWire {
+    let wire = coh_core::types::MicroReceiptWire {
         schema_id: EXPECTED_MICRO_SCHEMA_ID.to_string(),
         version: EXPECTED_MICRO_VERSION.to_string(),
         object_id: "test_obj_001".to_string(),
@@ -34,13 +34,19 @@ fn build_v1_wire(
             v_pre: v_pre.to_string(),
             v_post: v_post.to_string(),
             spend: spend.to_string(),
-            defect: defect.to_string(), authority: "0".to_string(),
+            defect: defect.to_string(),
+            authority: "0".to_string(),
+            ..Default::default()
         },
+        profile: coh_core::types::AdmissionProfile::CoherenceOnlyV1,
+        ..Default::default()
     };
 
     // Sign with a trusted fixture key for tests
     let signing_key = coh_core::auth::fixture_signing_key("test_signer");
-    let signed = coh_core::auth::sign_micro_receipt(
+    
+
+    coh_core::auth::sign_micro_receipt(
         wire,
         &signing_key,
         "test_signer",
@@ -49,9 +55,7 @@ fn build_v1_wire(
         None,
         "MICRO_RECEIPT_V1",
     )
-    .expect("Failed to sign test receipt");
-
-    signed
+    .expect("Failed to sign test receipt")
 }
 
 fn build_v3_wire(v_pre: &str, v_post: &str, spend: &str, defect: &str) -> MicroReceiptV3Wire {
@@ -79,7 +83,9 @@ fn build_v3_wire(v_pre: &str, v_post: &str, spend: &str, defect: &str) -> MicroR
             v_pre: v_pre.to_string(),
             v_post: v_post.to_string(),
             spend: spend.to_string(),
-            defect: defect.to_string(), authority: "0".to_string(),
+            defect: defect.to_string(),
+            authority: "0".to_string(),
+            ..Default::default()
         },
         // V3-specific fields
         objective_result: None,
@@ -102,6 +108,8 @@ fn build_v3_wire(v_pre: &str, v_post: &str, spend: &str, defect: &str) -> MicroR
         chain_digest_prev: wire.chain_digest_prev.clone(),
         chain_digest_next: wire.chain_digest_next.clone(),
         metrics: wire.metrics.clone(),
+        profile: coh_core::types::AdmissionProfile::CoherenceOnlyV1,
+        ..Default::default()
     };
 
     let hashed_v1 = finalize_micro_receipt(v1_wire).expect("fixture should finalize");

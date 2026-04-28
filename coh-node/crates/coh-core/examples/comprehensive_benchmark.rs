@@ -195,7 +195,10 @@ fn build_signed_test_receipt() -> MicroReceiptWire {
             spend: "100".to_string(),
             defect: "0".to_string(),
             authority: "0".to_string(),
+            ..Default::default()
         },
+        profile: coh_core::types::AdmissionProfile::CoherenceOnlyV1,
+        ..Default::default()
     };
 
     // Sign with test key
@@ -237,7 +240,10 @@ fn build_test_chain(length: u64) -> Vec<MicroReceiptWire> {
                     spend: "100".to_string(),
                     defect: "0".to_string(),
                     authority: "0".to_string(),
+                    ..Default::default()
                 },
+                profile: coh_core::types::AdmissionProfile::CoherenceOnlyV1,
+                ..Default::default()
             };
 
             let signing_key = fixture_signing_key("test_signer");

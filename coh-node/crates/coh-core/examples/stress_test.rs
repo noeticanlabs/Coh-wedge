@@ -28,9 +28,12 @@ fn create_valid_receipt(step_index: u64, prev_digest: &str, prev_state: &str) ->
             v_pre: "100".to_string(),
             v_post: "80".to_string(),
             spend: "1".to_string(),
-            defect: "0".to_string(), authority: "0".to_string(),
-
+            defect: "0".to_string(),
+            authority: "0".to_string(),
+            ..Default::default()
         },
+        profile: coh_core::types::AdmissionProfile::CoherenceOnlyV1,
+        ..Default::default()
     };
     let r = MicroReceipt::try_from(wire.clone()).unwrap();
     let prehash = to_prehash_view(&r);

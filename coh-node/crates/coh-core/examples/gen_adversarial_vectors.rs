@@ -125,8 +125,12 @@ where
                 v_pre: "100".to_string(),
                 v_post: "50".to_string(),
                 spend: "50".to_string(),
-                defect: "0".to_string(), authority: "0".to_string(),
+                defect: "0".to_string(),
+                authority: "0".to_string(),
+                ..Default::default()
             },
+            profile: coh_core::types::AdmissionProfile::CoherenceOnlyV1,
+            ..Default::default()
         };
 
         // Apply tampering *conditionally* on whether we need a valid digest first

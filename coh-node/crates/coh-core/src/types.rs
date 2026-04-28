@@ -33,17 +33,12 @@ pub enum Decision {
     AbortBudget,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum AdmissionProfile {
+    #[default]
     CoherenceOnlyV1,
     FormationV2,
-}
-
-impl Default for AdmissionProfile {
-    fn default() -> Self {
-        Self::CoherenceOnlyV1
-    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -81,7 +76,8 @@ impl Default for MetricsWire {
             m_post: "0".to_string(),
             c_cost: "0".to_string(),
             d_slack: "0".to_string(),
-            projection_hash: "0000000000000000000000000000000000000000000000000000000000000000".to_string(),
+            projection_hash: "0000000000000000000000000000000000000000000000000000000000000000"
+                .to_string(),
         }
     }
 }
@@ -240,9 +236,12 @@ impl CertifiedMorphism {
 
     /// The Law of Chaos: M(g') + C(p) <= M(g) + D(p)
     pub fn is_chaos_admissible(&self) -> bool {
-        let lhs = self.m_post.saturating_add(self.c_cost);
-        let rhs = self.m_pre.saturating_add(self.d_slack);
-        lhs <= rhs
+        let lhs = self.m_post.checked_add(self.c_cost);
+        let rhs = self.m_pre.checked_add(self.d_slack);
+        match (lhs, rhs) {
+            (Some(l), Some(r)) => l <= r,
+            _ => false, // Overflow rejects
+        }
     }
 
     /// Intersection of Chaos and Coherence
@@ -343,8 +342,8 @@ pub struct MicroReceiptPrehash {
     pub metrics: MetricsPrehash,
     pub object_id: String,
     pub policy_hash: String,
+    pub profile: String,
     pub schema_id: String,
-    pub signatures: Option<Vec<SignatureWire>>,
     pub state_hash_next: String,
     pub state_hash_prev: String,
     pub step_index: u64,
@@ -352,7 +351,7 @@ pub struct MicroReceiptPrehash {
     pub version: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct VerifyMicroResult {
     pub decision: Decision,
     pub code: Option<RejectCode>,
@@ -365,7 +364,7 @@ pub struct VerifyMicroResult {
     pub chain_digest_next: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct VerifyChainResult {
     pub decision: Decision,
     pub code: Option<RejectCode>,
@@ -381,7 +380,7 @@ pub struct VerifyChainResult {
     pub steps_verified_before_failure: Option<u64>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct BuildSlabResult {
     pub decision: Decision,
     pub code: Option<RejectCode>,
@@ -400,7 +399,7 @@ pub struct BuildSlabResult {
     pub slab: Option<SlabReceiptWire>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct VerifySlabResult {
     pub decision: Decision,
     pub code: Option<RejectCode>,
@@ -431,7 +430,7 @@ impl TryFrom<MetricsWire> for Metrics {
             m_post: parse_u128(&w.m_post)?,
             c_cost: parse_u128(&w.c_cost)?,
             d_slack: parse_u128(&w.d_slack)?,
-            projection_hash: Hash32::from_hex(&w.projection_hash).unwrap_or_default(),
+            projection_hash: Hash32::from_hex(&w.projection_hash)?,
         })
     }
 }

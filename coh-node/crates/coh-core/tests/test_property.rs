@@ -6,7 +6,7 @@ use coh_core::canon::{
     EXPECTED_CANON_PROFILE_HASH, EXPECTED_MICRO_SCHEMA_ID, EXPECTED_MICRO_VERSION,
 };
 use coh_core::finalize_micro_receipt;
-use coh_core::types::{Decision, MetricsWire, RejectCode, SignatureWire};
+use coh_core::types::{Decision, MetricsWire, RejectCode};
 use coh_core::verify_micro::verify_micro;
 
 // Test constants
@@ -48,7 +48,10 @@ fn build_test_wire_with_metrics(
             spend: spend.to_string(),
             defect: defect.to_string(),
             authority: "0".to_string(),
+            ..Default::default()
         },
+        profile: coh_core::types::AdmissionProfile::CoherenceOnlyV1,
+        ..Default::default()
     };
 
     // Finalize first to compute correct digest, then sign

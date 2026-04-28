@@ -34,7 +34,9 @@ fn main() {
             v_pre: v_pre.to_string(),
             v_post: v_post.to_string(),
             spend: spend.to_string(),
-            defect: defect.to_string(), authority: "0".to_string(),
+            defect: defect.to_string(),
+            authority: "0".to_string(),
+            ..Default::default()
         };
 
         let mut receipt = create_receipt(
@@ -56,7 +58,9 @@ fn main() {
                 v_pre: v_pre.to_string(),
                 v_post: corrupt_v_post.to_string(),
                 spend: spend.to_string(),
-                defect: defect.to_string(), authority: "0".to_string(),
+                defect: defect.to_string(),
+                authority: "0".to_string(),
+                ..Default::default()
             };
             let mut r = create_receipt(
                 i as u64,
@@ -75,7 +79,9 @@ fn main() {
                 v_pre: v_pre_corrupt.to_string(),
                 v_post: v_post_corrupt.to_string(),
                 spend: spend.to_string(),
-                defect: defect.to_string(), authority: "0".to_string(),
+                defect: defect.to_string(),
+                authority: "0".to_string(),
+                ..Default::default()
             };
             let mut r = create_receipt(
                 i as u64,
@@ -124,6 +130,8 @@ fn create_receipt(
         chain_digest_prev: prev_digest.to_string(),
         chain_digest_next: "0".repeat(64),
         metrics,
+        profile: coh_core::types::AdmissionProfile::CoherenceOnlyV1,
+        ..Default::default()
     }
 }
 

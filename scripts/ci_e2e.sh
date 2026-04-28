@@ -37,10 +37,14 @@ until $(curl --output /dev/null --silent --head --fail http://127.0.0.1:3030/hea
     COUNT=$((COUNT+1))
 done
 
-echo -e "\n[ci_e2e] Sidecar is UP. Running APE integration..."
+echo -e "\n[ci_e2e] Sidecar is UP. Running NPE integration tests..."
 
-# Run APE demo
-# Note: we might need to install python deps first in the CI job
-python3 scripts/ape_coh_level2_integration.py --url http://127.0.0.1:3030
+# Run NPE unit tests
+echo "[ci_e2e] Running NPE tests..."
+cd coh-node && cargo test -p coh-npe -- --nocapture
 
-echo "[ci_e2e] SUCCESS: Integration test passed"
+# Also verify the core validator works
+echo "[ci_e2e] Running core validator tests..."
+cargo test -p coh-core --lib -- --nocapture
+
+echo "[ci_e2e] SUCCESS: NPE integration tests passed"

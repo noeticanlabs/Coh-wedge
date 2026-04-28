@@ -178,8 +178,12 @@ fn run_with_coh() {
                 v_pre: v_pre.to_string(),
                 v_post: v_post.to_string(),
                 spend: spend.to_string(),
-                defect: defect.to_string(), authority: "0".to_string(),
+                defect: defect.to_string(),
+                authority: "0".to_string(),
+                ..Default::default()
             },
+            profile: coh_core::types::AdmissionProfile::CoherenceOnlyV1,
+            ..Default::default()
         };
         receipt.chain_digest_next = seal(&receipt);
 

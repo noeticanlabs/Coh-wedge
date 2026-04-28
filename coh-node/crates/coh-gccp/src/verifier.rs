@@ -1,6 +1,6 @@
 use crate::state::GccpState;
-use coh_core::types::MicroReceipt;
 use coh_core::reject::RejectCode;
+use coh_core::types::MicroReceipt;
 
 pub struct GccpVerifier {
     pub temp_limit: f64,
@@ -34,19 +34,17 @@ impl GccpVerifier {
 
         // 3. Accounting law check (passed through from coh-core if already verified)
         // In a real system, we might check GCCP-specific budget consumption here.
-        
+
         Ok(())
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::state::{GccpState, ThermalState, PowerState};
+    use crate::state::GccpState;
 
     #[test]
     fn test_gccp_thermal_breach() {
-        let verifier = GccpVerifier::default();
         let mut state = GccpState::default();
         state.thermal.die_temp = 90.0; // Above 85.0 limit
 

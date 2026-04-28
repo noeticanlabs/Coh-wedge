@@ -88,7 +88,12 @@ fn main() {
         let mut loaded = false;
         for path in &candidates {
             if path.exists() {
-                match state.load_initial_inputs(&mut fuzzer, &mut executor, &mut mgr, &[path.clone()]) {
+                match state.load_initial_inputs(
+                    &mut fuzzer,
+                    &mut executor,
+                    &mut mgr,
+                    std::slice::from_ref(path),
+                ) {
                     Ok(_) => {
                         println!("Loaded initial corpus from {}", path.display());
                         loaded = true;

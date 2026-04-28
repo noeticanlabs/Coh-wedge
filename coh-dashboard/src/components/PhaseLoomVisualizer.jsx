@@ -9,9 +9,10 @@ const PhaseLoomVisualizer = () => {
   // Colors matching the cinematic theme
   const THEME = {
     BG: '#05080d',
-    GOLD: '#d9a233',
-    CYAN: '#8ed8ff',
-    RED: '#ff4e3f',
+    GOLD: '#d9a233',   // Coherence Margin
+    CYAN: '#8ed8ff',   // Chaos Margin
+    MAGENTA: '#ff00ff', // Semantic Envelope
+    RED: '#ff4e3f',    // Violation
     WHITE: '#eaf2ff',
     MUTED: '#6b7280'
   };
@@ -31,16 +32,6 @@ const PhaseLoomVisualizer = () => {
     const interval = setInterval(fetchData, 5000); // Poll every 5s
     return () => clearInterval(interval);
   }, []);
-
-  const THEME = {
-    BG: '#05080d',
-    GOLD: '#d9a233',   // Coherence Margin
-    CYAN: '#8ed8ff',   // Chaos Margin
-    MAGENTA: '#ff00ff', // Semantic Envelope
-    RED: '#ff4e3f',    // Violation
-    WHITE: '#eaf2ff',
-    MUTED: '#6b7280'
-  };
 
   useEffect(() => {
     if (!simulationData || !canvasRef.current) return;

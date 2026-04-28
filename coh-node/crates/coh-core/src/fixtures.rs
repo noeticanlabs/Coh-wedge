@@ -11,6 +11,13 @@ pub fn compute_micro_digest_hex(wire: &MicroReceiptWire) -> Result<String, Rejec
 }
 
 pub fn finalize_micro_receipt(mut wire: MicroReceiptWire) -> Result<MicroReceiptWire, RejectCode> {
+    // For FormationV2, we must ensure the projection link is valid
+    if wire.profile == crate::types::AdmissionProfile::FormationV2 {
+        let runtime = MicroReceipt::try_from(wire.clone())?;
+        let projection = crate::verify_micro::compute_projection_hash(&runtime);
+        wire.metrics.projection_hash = projection.to_hex();
+    }
+    
     wire.chain_digest_next = compute_micro_digest_hex(&wire)?;
     Ok(wire)
 }

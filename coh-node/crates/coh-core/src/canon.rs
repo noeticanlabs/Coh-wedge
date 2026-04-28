@@ -26,8 +26,11 @@ pub fn to_prehash_view(r: &MicroReceipt) -> MicroReceiptPrehash {
         },
         object_id: r.object_id.clone(),
         policy_hash: r.policy_hash.to_hex(),
+        profile: match r.profile {
+            crate::types::AdmissionProfile::CoherenceOnlyV1 => "COHERENCE_ONLY_V1".to_string(),
+            crate::types::AdmissionProfile::FormationV2 => "FORMATION_V2".to_string(),
+        },
         schema_id: r.schema_id.clone(),
-        signatures: r.signatures.clone(),
         state_hash_next: r.state_hash_next.to_hex(),
         state_hash_prev: r.state_hash_prev.to_hex(),
         step_index: r.step_index,
