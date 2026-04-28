@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master", "GMI" ]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master", "GMI" ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -239,3 +239,19 @@ jobs:
       - name: Run UI tests
         run: npm run test:run
         working-directory: coh-dashboard
+
+  formal-verification:
+    name: Lean 4 Formal Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Lean 4
+        uses: leanprover/lean-action@v1
+        with:
+          working-directory: coh-t-stack
+
+      - name: Build Lean library
+        run: lake build
+        working-directory: coh-t-stack
