@@ -167,7 +167,7 @@ jobs:
             ${{ runner.os }}-genesis-cargo-
 
       - name: Test Genesis metrics
-        run: cargo test -p coh-npe --lib
+        run: cargo test -p coh-genesis --lib
         working-directory: coh-node
 
       - name: Test Formation admissibility
@@ -305,11 +305,6 @@ jobs:
         uses: leanprover/lean-action@v1
         with:
           working-directory: coh-t-stack
-
-      - name: Configure Lean default toolchain
-        run: |
-          elan default stable
-        working-directory: coh-t-stack
 
       - name: Build Lean library
         run: |

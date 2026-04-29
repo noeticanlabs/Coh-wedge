@@ -4,6 +4,13 @@
 //! "Genesis is forward admissible generation."
 //!
 //! Law of Genesis: M(g') + C(p) <= M(g) + D(p)
+//!
+//! ## Modules
+//!
+//! - [`candidate`]: Genesis candidate structures and core functions
+//! - [`generator`]: Synthetic NPE generator for wildness testing
+//! - [`sweep`]: Wildness sweep algorithm
+//! - [`report`]: Report generation and exports
 
 use serde::{Deserialize, Serialize};
 
@@ -80,6 +87,24 @@ impl FormationResult {
         }
     }
 }
+
+// Re-export modules for NPE Wildness Boundary Test
+pub mod candidate;
+pub mod generator;
+pub mod report;
+pub mod sweep;
+
+// Re-export key types for convenience
+// Note: GenesisCandidate is already defined in this module, so use a prefix
+pub use candidate::{
+    GenesisCandidate as NpeGenesisCandidate, ProjectedCohClaim, WildnessLevel, WildnessResult,
+};
+pub use generator::SyntheticNpeGenerator;
+pub use report::{
+    export_csv, export_json, print_boundary_margin_stats, print_first_failure_table,
+    print_rejection_breakdown, print_reproducibility_info, print_results_table, print_summary,
+};
+pub use sweep::{find_optimal_wildness, run_wildness_sweep, SweepConfig};
 
 #[cfg(test)]
 mod tests {

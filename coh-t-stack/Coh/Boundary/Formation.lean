@@ -1,4 +1,4 @@
-import Coh.Boundary.LawOfChaos
+import Coh.Boundary.LawOfGenesis
 
 namespace Coh.Boundary
 
@@ -16,11 +16,11 @@ def CohAdmissible {X Q S : Type} [OrderedAddCommMonoid S]
   obj.RV x R y ∧ obj.V y + obj.Spend R ≤ obj.V x + obj.Defect R
 
 /--
-Formation is the intersection of forward Chaos generation and backward Coherence justification.
+Formation is the intersection of forward Genesis generation and backward Coherence justification.
 -/
-structure ChaosCoherenceSystem (G P R X Q S : Type) 
+structure GenesisCoherenceSystem (G P R X Q S : Type) 
   [OrderedAddCommMonoid R] [OrderedAddCommMonoid S] where
-  Chaos : ChaosObject G P R
+  Genesis : GenesisObject G P R
   Coh : CoherenceObject X Q S
   Pi : (G × P × G) → (X × Q × X)
   Rho : R → S
@@ -28,9 +28,9 @@ structure ChaosCoherenceSystem (G P R X Q S : Type)
 
 def FormationAdmissible {G P R X Q S : Type} 
   [OrderedAddCommMonoid R] [OrderedAddCommMonoid S]
-  (sys : ChaosCoherenceSystem G P R X Q S) (z : G × P × G) : Prop :=
+  (sys : GenesisCoherenceSystem G P R X Q S) (z : G × P × G) : Prop :=
   let (g, p, g') := z
-  ChaosAdmissible sys.Chaos g p g' ∧ 
+  GenesisAdmissible sys.Genesis g p g' ∧ 
   let (x, R, y) := sys.Pi z
   CohAdmissible sys.Coh x R y
 
@@ -40,7 +40,7 @@ This proves that the Formation mode is a conservative strengthening of the verif
 -/
 theorem formation_implies_coherence {G P R X Q S : Type} 
   [OrderedAddCommMonoid R] [OrderedAddCommMonoid S]
-  (sys : ChaosCoherenceSystem G P R X Q S) (z : G × P × G) :
+  (sys : GenesisCoherenceSystem G P R X Q S) (z : G × P × G) :
   FormationAdmissible sys z → CohAdmissible sys.Coh (sys.Pi z).1 (sys.Pi z).2.1 (sys.Pi z).2.2 := by
   intro h
   exact h.right
