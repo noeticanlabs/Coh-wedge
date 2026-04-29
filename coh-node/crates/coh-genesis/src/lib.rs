@@ -90,6 +90,7 @@ impl FormationResult {
 
 // Re-export modules for NPE Wildness Boundary Test
 pub mod candidate;
+pub mod code_patch;
 pub mod generator;
 pub mod report;
 pub mod sweep;
@@ -99,12 +100,22 @@ pub mod sweep;
 pub use candidate::{
     GenesisCandidate as NpeGenesisCandidate, ProjectedCohClaim, WildnessLevel, WildnessResult,
 };
+pub use code_patch::{
+    build_formation_result, check_hard_gates, compute_coherence_metrics, compute_genesis_metrics,
+    compute_patch_scores, is_formation_admissible, patch_type_for_wildness, CodePatchCandidate,
+    CodePatchFirstFailure, CodePatchFormationResult, CodePatchReport, PatchHardGate, PatchPolicy,
+    PatchSelectorMode, RejectPathImpact, RejectPolicyMode,
+};
 pub use generator::SyntheticNpeGenerator;
 pub use report::{
-    export_csv, export_json, print_boundary_margin_stats, print_first_failure_table,
-    print_rejection_breakdown, print_reproducibility_info, print_results_table, print_summary,
+    export_csv, export_json, print_boundary_margin_stats, print_boundary_seeker_result,
+    print_first_failure_table, print_rejection_breakdown, print_reproducibility_info,
+    print_results_table, print_summary,
 };
-pub use sweep::{find_optimal_wildness, run_wildness_sweep, SweepConfig};
+pub use sweep::{
+    find_boundary_seeker, find_edge_seeker, find_near_boundary_candidate, find_optimal_wildness,
+    run_wildness_sweep, standard_levels, SweepConfig,
+};
 
 #[cfg(test)]
 mod tests {

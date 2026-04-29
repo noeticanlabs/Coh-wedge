@@ -304,7 +304,9 @@ jobs:
       - name: Install Lean 4
         uses: leanprover/lean-action@v1
         with:
-          working-directory: coh-t-stack
+          lake-package-directory: coh-t-stack
+          use-mathlib-cache: true
+          build: false
 
       - name: Build Lean library
         run: |

@@ -172,3 +172,21 @@ pub fn print_boundary_margin_stats(results: &[WildnessResult]) {
     println!("--------------------------------------------------");
     println!();
 }
+
+use crate::sweep::BoundarySeekResult;
+
+pub fn print_boundary_seeker_result(result: &BoundarySeekResult) {
+    println!();
+    println!("==================================================");
+    println!("Boundary-Seeking Result");
+    println!("==================================================");
+    println!();
+    println!("  candidate_id: {}", result.candidate_id);
+    println!("  wildness: {:.1}", result.wildness);
+    println!("  novelty: {:.1}", result.novelty);
+    println!("  delta_gen: {}", result.genesis_margin);
+    println!("  delta_coh: {}", result.coh_margin);
+    println!("  boundary_margin: {}", result.boundary_margin);
+    println!("  score: {:.2}", result.score);
+    println!();
+}

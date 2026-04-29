@@ -1,7 +1,8 @@
 use coh_genesis::{
-    find_optimal_wildness, print_boundary_margin_stats, print_first_failure_table,
-    print_rejection_breakdown, print_reproducibility_info, print_results_table, print_summary,
-    run_wildness_sweep,
+    find_boundary_seeker, find_optimal_wildness, print_boundary_margin_stats,
+    print_boundary_seeker_result, print_first_failure_table, print_rejection_breakdown,
+    print_reproducibility_info, print_results_table, print_summary, run_wildness_sweep,
+    SyntheticNpeGenerator,
 };
 use std::env;
 
@@ -41,5 +42,14 @@ fn main() {
         println!("This is the sweet spot where the NPE produces");
         println!("the most creative yet admissible proposals.");
         println!("==================================================");
+    }
+
+    // Boundary-seeking mode
+    println!();
+    println!("Running boundary-seeking mode...");
+    let generator = SyntheticNpeGenerator::new(seed);
+    let alpha = 0.05;
+    if let Some(best) = find_boundary_seeker(&generator, 2.5, 100, alpha) {
+        print_boundary_seeker_result(&best);
     }
 }

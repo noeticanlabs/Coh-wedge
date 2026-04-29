@@ -167,6 +167,181 @@ pub fn standard_levels() -> Vec<f64> {
     vec![0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 5.0, 10.0]
 }
 
+/// Boundary-seeking result - the best accepted candidate near the boundary
+pub struct BoundarySeekResult {
+    pub candidate_id: String,
+    pub wildness: f64,
+    pub novelty: f64,
+    pub genesis_margin: i128,
+    pub coh_margin: i128,
+    pub boundary_margin: i128,
+    pub score: f64,
+}
+
+/// Find the boundary-seeking best candidate
+/// Maximizes: score = novelty + alpha * boundary_margin
+/// This is "safe-novel" mode - rewards candidates far from the boundary
+pub fn find_boundary_seeker(
+    generator: &SyntheticNpeGenerator,
+    wildness: f64,
+    count: usize,
+    alpha: f64,
+) -> Option<BoundarySeekResult> {
+    let candidates = generator.generate(wildness, count);
+
+    let mut best: Option<BoundarySeekResult> = None;
+
+    for c in &candidates {
+        if !c.is_formation_admissible() {
+            continue;
+        }
+
+        let gen_margin = c.genesis_margin();
+        let coh_margin = c.coherence_margin();
+        let boundary_margin = gen_margin.min(coh_margin);
+
+        let score = c.novelty as f64 + alpha * boundary_margin as f64;
+
+        match best {
+            None => {
+                best = Some(BoundarySeekResult {
+                    candidate_id: c.id.clone(),
+                    wildness: c.wildness,
+                    novelty: c.novelty,
+                    genesis_margin: gen_margin,
+                    coh_margin: coh_margin,
+                    boundary_margin,
+                    score,
+                });
+            }
+            Some(ref mut b) => {
+                if score > b.score {
+                    b.candidate_id = c.id.clone();
+                    b.wildness = c.wildness;
+                    b.novelty = c.novelty;
+                    b.genesis_margin = gen_margin;
+                    b.coh_margin = coh_margin;
+                    b.boundary_margin = boundary_margin;
+                    b.score = score;
+                }
+            }
+        }
+    }
+
+    best
+}
+
+/// Find the edge-seeking best candidate
+/// Maximizes: score = novelty - alpha * boundary_margin
+/// This finds candidates near the boundary (high novelty, small margin)
+pub fn find_edge_seeker(
+    generator: &SyntheticNpeGenerator,
+    wildness: f64,
+    count: usize,
+    alpha: f64,
+) -> Option<BoundarySeekResult> {
+    let candidates = generator.generate(wildness, count);
+
+    let mut best: Option<BoundarySeekResult> = None;
+
+    for c in &candidates {
+        if !c.is_formation_admissible() {
+            continue;
+        }
+
+        let gen_margin = c.genesis_margin();
+        let coh_margin = c.coherence_margin();
+        let boundary_margin = gen_margin.min(coh_margin);
+
+        // Edge-seeking: reward closeness to boundary (small margin)
+        let score = c.novelty as f64 - alpha * boundary_margin as f64;
+
+        match best {
+            None => {
+                best = Some(BoundarySeekResult {
+                    candidate_id: c.id.clone(),
+                    wildness: c.wildness,
+                    novelty: c.novelty,
+                    genesis_margin: gen_margin,
+                    coh_margin: coh_margin,
+                    boundary_margin,
+                    score,
+                });
+            }
+            Some(ref mut b) => {
+                if score > b.score {
+                    b.candidate_id = c.id.clone();
+                    b.wildness = c.wildness;
+                    b.novelty = c.novelty;
+                    b.genesis_margin = gen_margin;
+                    b.coh_margin = coh_margin;
+                    b.boundary_margin = boundary_margin;
+                    b.score = score;
+                }
+            }
+        }
+    }
+
+    best
+}
+
+/// Find the band-limited edge candidate
+/// Maximizes novelty subject to boundary_margin <= epsilon
+pub fn find_near_boundary_candidate(
+    generator: &SyntheticNpeGenerator,
+    wildness: f64,
+    count: usize,
+    epsilon: i128,
+) -> Option<BoundarySeekResult> {
+    let candidates = generator.generate(wildness, count);
+
+    let mut best: Option<BoundarySeekResult> = None;
+
+    for c in &candidates {
+        if !c.is_formation_admissible() {
+            continue;
+        }
+
+        let gen_margin = c.genesis_margin();
+        let coh_margin = c.coherence_margin();
+        let boundary_margin = gen_margin.min(coh_margin);
+
+        // Only consider candidates in the boundary band
+        if boundary_margin < 0 || boundary_margin > epsilon {
+            continue;
+        }
+
+        let score = c.novelty as f64;
+
+        match best {
+            None => {
+                best = Some(BoundarySeekResult {
+                    candidate_id: c.id.clone(),
+                    wildness: c.wildness,
+                    novelty: c.novelty,
+                    genesis_margin: gen_margin,
+                    coh_margin: coh_margin,
+                    boundary_margin,
+                    score,
+                });
+            }
+            Some(ref mut b) => {
+                if score > b.score {
+                    b.candidate_id = c.id.clone();
+                    b.wildness = c.wildness;
+                    b.novelty = c.novelty;
+                    b.genesis_margin = gen_margin;
+                    b.coh_margin = coh_margin;
+                    b.boundary_margin = boundary_margin;
+                    b.score = score;
+                }
+            }
+        }
+    }
+
+    best
+}
+
 /// Standard sweep parameters
 pub struct SweepConfig {
     pub levels: Vec<f64>,
