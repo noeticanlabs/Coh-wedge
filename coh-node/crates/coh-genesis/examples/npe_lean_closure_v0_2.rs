@@ -11,9 +11,13 @@
 //! The goal is to maximize the probability of full compilation (FullPairwiseAddCompiled)
 //! and emit the resulting proof graph and receipts to a dedicated directory.
 
+use coh_genesis::mathlib_advisor::{
+    assess_import_risk, check_policy, generate_report, MathlibAdvisorReport, MathlibPolicy,
+    MathlibStrategy,
+};
 use coh_genesis::phaseloom_lite::{
     phaseloom_circuit_broken, phaseloom_ingest, phaseloom_init, BoundaryReceiptSummary,
-    PhaseLoomConfig, PhaseLoomState,
+    MathlibEffect, PhaseLoomConfig, PhaseLoomState,
 };
 use std::env;
 use std::fs;
@@ -143,6 +147,7 @@ fn simulate_outcome(strategy: ClosureStrategy, rng: &mut SimpleRng) -> ClosureOu
 fn outcome_to_receipt(
     strategy: ClosureStrategy,
     outcome: ClosureOutcome,
+    mathlib_mode: &str,
 ) -> BoundaryReceiptSummary {
     let accepted = outcome.is_useful();
 
@@ -188,6 +193,35 @@ fn outcome_to_receipt(
         ClosureOutcome::ForbiddenRejected => 0.0,
     };
 
+    // Mathlib fields for PhaseLoom learning
+    let (mathlib_strategy, mathlib_confidence, mathlib_suggested, mathlib_risk, mathlib_used) =
+        if mathlib_mode == "closure" || mathlib_mode.is_empty() {
+            (None, None, None, None, false)
+        } else {
+            // In mathlib modes, use corresponding strategy
+            let strategy_name = match strategy {
+                ClosureStrategy::GLBGreatestReduction => "IsGLB",
+                ClosureStrategy::InfAddCompatibility => "SInf",
+                ClosureStrategy::ExistsLtUsed => "OrderTheory",
+                ClosureStrategy::ApproximationLemma => "Approximation",
+                _ => "Approximation",
+            };
+            let conf = match strategy {
+                ClosureStrategy::GLBGreatestReduction => 0.75,
+                ClosureStrategy::InfAddCompatibility => 0.70,
+                ClosureStrategy::ExistsLtUsed => 0.65,
+                ClosureStrategy::ApproximationLemma => 0.50,
+                _ => 0.50,
+            };
+            (
+                Some(strategy_name.to_string()),
+                Some(conf),
+                Some(vec!["add_le_add".to_string(), "IsGLB.add".to_string()]),
+                Some("Moderate".to_string()),
+                false, // imports not used in advisory mode
+            )
+        };
+
     BoundaryReceiptSummary {
         domain: "lean_proof".to_string(),
         target: "isRationalInf_pairwise_add".to_string(),
@@ -206,6 +240,19 @@ fn outcome_to_receipt(
                 .unwrap()
                 .as_nanos()
         ),
+        mathlib_strategy,
+        mathlib_confidence,
+        mathlib_suggested_lemmas: mathlib_suggested,
+        mathlib_import_risk: mathlib_risk,
+        mathlib_imports_used: mathlib_used,
+        mathlib_effect: if mathlib_mode == "closure" || mathlib_mode.is_empty() {
+            MathlibEffect::None
+        } else if mathlib_used {
+            MathlibEffect::ImportHelped
+        } else {
+            MathlibEffect::StrategyOnly
+        },
+        ..Default::default()
     }
 }
 
@@ -277,8 +324,49 @@ fn main() {
     println!("NPE-Lean Closure Attempt v0.2");
     println!("=============================");
     println!("Target: isRationalInf_pairwise_add");
-    println!("Mode: High Exploitation (Closure)");
+
+    // Parse mode from command line (default: closure)
+    let args: Vec<String> = env::args().collect();
+    let mode = args
+        .iter()
+        .position(|a| a == "--mode")
+        .map(|i| args[i + 1].clone())
+        .unwrap_or_else(|| "closure".to_string());
+
+    println!("Mode: {}", mode);
     println!();
+
+    // Initialize mathlib advisor report if in mathlib-assisted mode
+    let mathlib_report = if mode == "mathlib-assisted"
+        || mode == "mathlib-advisory"
+        || mode == "mathlib-import-tested"
+    {
+        println!("Initializing Mathlib Advisor...");
+        let report = generate_report("isRationalInf_pairwise_add");
+        println!("  Target: {}", report.target_theorem);
+        println!("  Strategy: {:?}", report.candidate_strategy.as_str());
+        println!("  Confidence: {:.2}", report.confidence);
+        println!("  Suggested lemmas: {:?}", report.suggested_lemmas);
+        println!();
+
+        // Check policy compliance
+        let policy = MathlibPolicy::default();
+        let compliant = check_policy(&report.suggested_imports, policy);
+
+        // Compute import risk tier
+        let risk = assess_import_risk(&report.suggested_imports);
+        println!("  Import risk tier: {:?}", risk);
+        println!("  Policy compliant: {}", compliant);
+
+        // Only use imports in import-tested mode
+        if mode == "mathlib-import-tested" && !compliant {
+            println!("  WARNING: Policy non-compliant, imports disabled");
+        }
+
+        Some(report)
+    } else {
+        None
+    };
 
     let config = PhaseLoomConfig {
         initial_budget: 20_000,
@@ -286,6 +374,7 @@ fn main() {
         curvature_penalty: 0.05,
         circuit_break_threshold: 2000,
         min_weight: 0.01,
+        ..Default::default()
     };
 
     let mut state = phaseloom_init(&config);
@@ -316,6 +405,27 @@ fn main() {
         .0
         .insert("ForbiddenShortcut".to_string(), 0.05);
     state.strategy_weights.normalize();
+
+    // In mathlib-assisted mode, boost weights based on advisor confidence
+    if let Some(ref report) = mathlib_report {
+        let boost = report.confidence * 0.15;
+        let strategy_name = match report.candidate_strategy {
+            MathlibStrategy::IsGLB => "GLBGreatestReduction",
+            MathlibStrategy::SInf => "InfAddCompatibility",
+            MathlibStrategy::OrderTheory => "ExistsLtUsed",
+            MathlibStrategy::Approximation => "ApproximationLemma",
+            MathlibStrategy::SetImage => "PairwiseLowerBound",
+            _ => "PairwiseLowerBound",
+        };
+        if let Some(w) = state.strategy_weights.0.get_mut(strategy_name) {
+            *w += boost;
+            println!(
+                "  Boosted {} by {:.3} based on mathlib confidence",
+                strategy_name, boost
+            );
+        }
+        state.strategy_weights.normalize();
+    }
 
     println!("Initial Biased Weights:");
     for (k, v) in &state.strategy_weights.0 {
@@ -357,7 +467,7 @@ fn main() {
             full_compiled_count += 1;
         }
 
-        let receipt = outcome_to_receipt(selected, outcome);
+        let receipt = outcome_to_receipt(selected, outcome, &mode);
         all_receipts.push(receipt.clone());
 
         phaseloom_ingest(&mut state, &receipt, &config);

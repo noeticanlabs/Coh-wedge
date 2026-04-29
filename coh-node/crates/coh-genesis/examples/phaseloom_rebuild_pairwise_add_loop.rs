@@ -264,6 +264,7 @@ fn outcome_to_receipt(
                 .unwrap()
                 .as_nanos()
         ),
+        ..Default::default()
     }
 }
 
@@ -292,6 +293,7 @@ fn main() {
         curvature_penalty: 0.04,
         circuit_break_threshold: 800,
         min_weight: 0.02,
+        ..Default::default()
     };
 
     // Previous learning

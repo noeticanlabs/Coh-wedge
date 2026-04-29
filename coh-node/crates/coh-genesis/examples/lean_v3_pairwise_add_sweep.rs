@@ -46,8 +46,8 @@ pub enum PairwiseAddOutcome {
     GLBGreatestHalfIsolated,
     /// Approximation lemma isolated
     ApproximationLemmaIsolated,
-    /// Inf-add compatibility compiles
-    InfAddCompatibilityReductionCompiled,
+    /// Inf-add compatibility isolated
+    CompatibilityIsolated,
     /// Mathlib bridge near miss
     MathlibBridgeNearMiss,
     /// Full theorem compiles
@@ -64,7 +64,7 @@ impl PairwiseAddOutcome {
             PairwiseAddOutcome::PairwiseLowerBoundCompiled => "LowerBound",
             PairwiseAddOutcome::GLBGreatestHalfIsolated => "GLBHalf",
             PairwiseAddOutcome::ApproximationLemmaIsolated => "ApproxLem",
-            PairwiseAddOutcome::InfAddCompatibilityReductionCompiled => "InfCompat",
+            PairwiseAddOutcome::CompatibilityIsolated => "InfCompat",
             PairwiseAddOutcome::MathlibBridgeNearMiss => "Mathlib",
             PairwiseAddOutcome::FullPairwiseAddCompiled => "Full",
             PairwiseAddOutcome::LeanNearMiss => "NearMiss",
@@ -130,8 +130,10 @@ struct PairwiseResult {
     forbidden_rejected: usize,
     lower_bound_compiled: usize,
     approx_lemma_compiled: usize,
+    glb_half_isolated: usize,
     full_compiled: usize,
     compatibility_isolated: usize,
+    mathlib_near_miss: usize,
     lean_near_miss: usize,
 
     // Breakdown
@@ -266,7 +268,7 @@ class InfAddCompatible (s1 s2 : Set ENNRat) where
 "#,
                     target
                 ),
-                PairwiseAddOutcome::InfAddCompatibilityReductionCompiled,
+                PairwiseAddOutcome::CompatibilityIsolated,
             )
         }
         PairwiseCandidateClass::LibrarySearch => {
@@ -420,7 +422,7 @@ fn run_pairwise_sweep_one_level(
             PairwiseAddOutcome::PairwiseLowerBoundCompiled => result.lower_bound_compiled += 1,
             PairwiseAddOutcome::GLBGreatestHalfIsolated => result.glb_half_isolated += 1,
             PairwiseAddOutcome::ApproximationLemmaIsolated => result.approx_lemma_compiled += 1,
-            PairwiseAddOutcome::InfAddCompatibilityReductionCompiled => {
+            PairwiseAddOutcome::CompatibilityIsolated => {
                 result.compatibility_isolated += 1
             }
             PairwiseAddOutcome::MathlibBridgeNearMiss => result.mathlib_near_miss += 1,

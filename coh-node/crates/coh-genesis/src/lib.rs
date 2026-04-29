@@ -92,7 +92,9 @@ impl FormationResult {
 pub mod candidate;
 pub mod code_patch;
 pub mod generator;
+pub mod lean_failure_taxonomy;
 pub mod lean_proof;
+pub mod mathlib_advisor;
 pub mod phaseloom_lite;
 pub mod report;
 pub mod sweep;
@@ -100,7 +102,14 @@ pub mod sweep;
 // Re-export PhaseLoomLite types and functions
 pub use phaseloom_lite::{
     phaseloom_circuit_broken, phaseloom_ingest, phaseloom_init, phaseloom_sample,
-    phaseloom_serialize, BoundaryReceiptSummary, PhaseLoomConfig, PhaseLoomState, StrategyWeights,
+    phaseloom_serialize, BoundaryReceiptSummary, MathlibEffect, PhaseLoomConfig, PhaseLoomState,
+    StrategyWeights,
+};
+
+// Re-export MathlibAdvisor types and functions
+pub use mathlib_advisor::{
+    assess_import_risk, check_policy, generate_report, ImportRisk, MathlibAdvisorReport,
+    MathlibPolicy, MathlibStrategy,
 };
 
 // Re-export key types for convenience

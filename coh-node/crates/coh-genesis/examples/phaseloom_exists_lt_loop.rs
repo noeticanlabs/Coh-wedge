@@ -305,6 +305,7 @@ fn outcome_to_receipt(
                 .unwrap()
                 .as_nanos()
         ),
+        ..Default::default()
     }
 }
 
@@ -334,6 +335,7 @@ fn main() {
         curvature_penalty: 0.05,
         circuit_break_threshold: 1000,
         min_weight: 0.02,
+        ..Default::default()
     };
 
     // Initial weights - uniform

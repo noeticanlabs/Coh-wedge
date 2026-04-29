@@ -280,6 +280,7 @@ fn outcome_to_receipt(
                 .unwrap()
                 .as_nanos()
         ),
+        ..Default::default()
     }
 }
 
@@ -308,7 +309,8 @@ fn main() {
         learning_rate: 0.1,
         curvature_penalty: 0.05,
         circuit_break_threshold: 1000,
-        min_weight: 0.02, // Higher floor to prevent tight convergence
+        min_weight: 0.02,
+        ..Default::default()
     };
 
     // Initial uniform strategy weights
