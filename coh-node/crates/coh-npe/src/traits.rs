@@ -4,20 +4,7 @@
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct ResourceCost {
-    pub cpu_ms: u128,
-    pub mem_bytes: u128,
-    pub token_count: u128,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum ToolAuthorityMode {
-    /// Exploratory mode: results are advisory, heuristics allowed.
-    Exploratory,
-    /// Certification mode: results are deterministic, must be auditable.
-    Certification,
-}
+pub use coh_core::types::{ResourceCost, ToolAuthorityMode};
 
 /// A tool report from an NPE-side exploratory run.
 #[derive(Clone, Debug, Serialize, Deserialize)]

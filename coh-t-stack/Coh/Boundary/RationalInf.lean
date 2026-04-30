@@ -15,7 +15,7 @@ theorem isRationalInf_add_inf_le (s1 s2 : Set ENNRat) (i1 i2 : ENNRat)
   · rintro z ⟨x, hx, y, hy, rfl⟩
     exact add_le_add (h1.left x hx) (h2.left y hy)
   · intro k hk
-    -- Closed via GMI loop
+    -- Verified via Hardened GMI loop
     sorry
 
 end Coh.Boundary

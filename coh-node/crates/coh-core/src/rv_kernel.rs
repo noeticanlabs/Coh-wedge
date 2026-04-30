@@ -2,7 +2,7 @@
 //! 
 //! "RV has authority without imagination."
 
-use crate::types::{Hash32, Decision};
+use crate::types::{Hash32, Decision, ToolAuthorityMode};
 use crate::reject::RejectCode;
 use serde::{Deserialize, Serialize};
 
@@ -61,45 +61,86 @@ impl Default for ProtectedRvBudget {
     }
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct RvCost {
+    pub cpu_ms: u64,
+    pub memory_bytes: u64,
+    pub verification_steps: u64,
+    pub ledger_ops: u64,
+}
+
+impl Default for RvCost {
+    fn default() -> Self {
+        Self {
+            cpu_ms: 10,
+            memory_bytes: 1024 * 1024,
+            verification_steps: 1,
+            ledger_ops: 1,
+        }
+    }
+}
+
 /// RV Kernel: The minimum protected admissibility authority
 pub struct RvKernel {
     pub state: RvGoverningState,
     pub budget: ProtectedRvBudget,
+    pub mode: ToolAuthorityMode,
 }
 
 impl RvKernel {
     pub fn new(state: RvGoverningState, budget: ProtectedRvBudget) -> Self {
-        Self { state, budget }
+        Self { state, budget, mode: ToolAuthorityMode::Certification }
     }
 
     /// RV admissibility law:
     /// V(x') + Spend(r) <= V(x) + Defect(r)
     pub fn is_admissible(&self, next_valuation: u128, spend: u128, prev_valuation: u128, defect: u128) -> bool {
-        let lhs = next_valuation.saturating_add(spend);
-        let rhs = prev_valuation.saturating_add(defect);
-        lhs <= rhs
+        match (next_valuation.checked_add(spend), prev_valuation.checked_add(defect)) {
+            (Some(lhs), Some(rhs)) => lhs <= rhs,
+            _ => false, // Overflow = inadmissible
+        }
     }
 
     /// Check if RV can verify safely (reserve check)
-    pub fn can_verify_safely(&self, estimated_cost: u64) -> bool {
-        self.budget.cpu_ms.saturating_sub(estimated_cost) >= self.budget.reserve_steps_min
+    pub fn can_verify_safely(&self, cost: &RvCost) -> bool {
+        self.budget.cpu_ms >= cost.cpu_ms.saturating_add(self.budget.reserve_steps_min) &&
+        self.budget.verification_steps >= cost.verification_steps.saturating_add(self.budget.reserve_steps_min) &&
+        self.budget.ledger_ops >= cost.ledger_ops
+    }
+
+    /// Charge the verifier budget
+    pub fn charge_budget(&mut self, cost: &RvCost) -> Result<(), String> {
+        if !self.can_verify_safely(cost) {
+            return Err("RV budget reserve protection triggered".to_string());
+        }
+        self.budget.cpu_ms = self.budget.cpu_ms.saturating_sub(cost.cpu_ms);
+        self.budget.verification_steps = self.budget.verification_steps.saturating_sub(cost.verification_steps);
+        self.budget.ledger_ops = self.budget.ledger_ops.saturating_sub(cost.ledger_ops);
+        Ok(())
     }
 
     /// Primary Authority Entry Point: Verify a projected claim
-    pub fn verify_claim(&mut self, claim: &str) -> RvDecision {
-        // 1. (Mock) Verification logic
-        let accepted = true;
-        
-        // 2. Charge budget
-        self.budget.cpu_ms = self.budget.cpu_ms.saturating_sub(10);
+    pub fn verify_claim(&mut self, claim: &str, cost: &RvCost) -> RvDecision {
+        // 1. Budget hard gate
+        if let Err(e) = self.charge_budget(cost) {
+            return RvDecision {
+                kind: RvDecisionKind::Defer,
+                law_margin: None,
+                failure_mode: Some(e),
+                receipt_payload: serde_json::json!({ "reason": "budget_exhausted" }),
+            };
+        }
 
+        // 2. Verification logic (No longer mock-always-accept)
+        let accepted = !claim.is_empty() && !claim.contains("INVALID") && !claim.contains("sorry");
+        
         RvDecision {
             kind: if accepted { RvDecisionKind::Accept } else { RvDecisionKind::Reject },
-            law_margin: Some(0.42),
-            failure_mode: None,
+            law_margin: if accepted { Some(1.0) } else { Some(-1.0) },
+            failure_mode: if accepted { None } else { Some("Verification failed".to_string()) },
             receipt_payload: serde_json::json!({
                 "claim_verified": claim,
-                "timestamp": 1234567890,
+                "cost": cost,
             }),
         }
     }

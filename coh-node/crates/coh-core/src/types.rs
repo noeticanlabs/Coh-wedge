@@ -20,6 +20,30 @@ impl Hash32 {
     pub fn to_hex(&self) -> String {
         hex::encode(self.0)
     }
+    pub fn as_bytes(&self) -> &[u8] {
+        &self.0
+    }
+    pub fn from_slice(slice: &[u8]) -> Self {
+        let mut arr = [0u8; 32];
+        arr.copy_from_slice(&slice[..32]);
+        Hash32(arr)
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceCost {
+    pub cpu_ms: u128,
+    pub mem_bytes: u128,
+    pub token_count: u128,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub enum ToolAuthorityMode {
+    /// Exploratory mode: results are advisory, heuristics allowed.
+    #[default]
+    Exploratory,
+    /// Certification mode: results are deterministic, must be auditable.
+    Certification,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]

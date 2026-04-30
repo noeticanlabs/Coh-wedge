@@ -74,9 +74,13 @@ impl NpeKernel {
         gen_defect: u128,
         authority: u128,
     ) -> bool {
-        let lhs = next_disorder.saturating_add(gen_cost).saturating_add(res_cost);
-        let rhs = prev_disorder.saturating_add(gen_defect).saturating_add(authority);
-        lhs <= rhs
+        let lhs = next_disorder.checked_add(gen_cost).and_then(|v| v.checked_add(res_cost));
+        let rhs = prev_disorder.checked_add(gen_defect).and_then(|v| v.checked_add(authority));
+        
+        match (lhs, rhs) {
+            (Some(l), Some(r)) => l <= r,
+            _ => false, // Overflow = inadmissible
+        }
     }
 
     /// Check if a proposal action is NPE-affordable
@@ -84,5 +88,18 @@ impl NpeKernel {
         self.budget.cpu_ms >= cpu_cost && 
         self.budget.memory_bytes >= mem_cost && 
         self.budget.token_budget.map_or(true, |limit| limit >= (token_cost as u64))
+    }
+
+    /// Charge the NPE budget
+    pub fn charge_budget(&mut self, cpu_cost: u64, mem_cost: u64, token_cost: u64) -> Result<(), String> {
+        if !self.is_affordable(cpu_cost, mem_cost, token_cost) {
+            return Err("NPE budget exhausted".to_string());
+        }
+        self.budget.cpu_ms = self.budget.cpu_ms.saturating_sub(cpu_cost);
+        self.budget.memory_bytes = self.budget.memory_bytes.saturating_sub(mem_cost);
+        if let Some(ref mut limit) = self.budget.token_budget {
+            *limit = limit.saturating_sub(token_cost);
+        }
+        Ok(())
     }
 }

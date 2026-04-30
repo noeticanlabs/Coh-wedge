@@ -98,6 +98,8 @@ pub mod sweep;
 pub mod governor_tests;
 pub mod lean_json_export;
 pub mod causal_cone;
+pub mod ledger;
+pub mod verifier_tools;
 
 // Re-export PhaseLoomLite types and functions
 pub use fusion_wedge::verify_governed_step;
@@ -190,6 +192,7 @@ pub struct GmiGovernor {
     pub phaseloom: PhaseLoomKernel,
     pub env: EnvironmentalEnvelope,
     pub system: SystemReserve,
+    pub ledger: ledger::SimpleLedger,
 }
 
 impl GmiGovernor {
@@ -200,14 +203,15 @@ impl GmiGovernor {
         env: EnvironmentalEnvelope,
         system: SystemReserve,
     ) -> Self {
-        Self { npe, rv, phaseloom, env, system }
+        Self { npe, rv, phaseloom, env, system, ledger: ledger::SimpleLedger::default() }
     }
 
     /// Whole-System Admissibility Law
     pub fn is_globally_admissible(&self, prev_v: u128, next_v: u128, spend: u128, defect: u128) -> bool {
-        let lhs = next_v.saturating_add(spend);
-        let rhs = prev_v.saturating_add(defect);
-        lhs <= rhs
+        match (next_v.checked_add(spend), prev_v.checked_add(defect)) {
+            (Some(lhs), Some(rhs)) => lhs <= rhs,
+            _ => false, // Overflow = inadmissible
+        }
     }
 
     /// Execute a governed loop step (Hierarchical Budget Edition)
@@ -230,14 +234,22 @@ impl GmiGovernor {
             return (false, trace);
         }
 
-        // 3. Level 2: RV Reserve Check
-        if !self.rv.can_verify_safely(10) {
+        // 3. Level 2: RV Reserve Check (Pre-check)
+        let rv_cost = coh_core::rv_kernel::RvCost::default();
+        if !self.rv.can_verify_safely(&rv_cost) {
             trace.events.push("Governor REJECT: RV reserve protection breach".into());
             return (false, trace);
         }
 
         // 3.5. Causal Cone Check (Spacelike Rejection)
-        let cone_check = classify_gmi_interval(distance, c_g, dt_g);
+        let cone_check = match classify_gmi_interval(distance, c_g, dt_g) {
+            Ok(check) => check,
+            Err(e) => {
+                trace.events.push(format!("Governor REJECT: Invalid causal parameters: {:?}", e));
+                return (false, trace);
+            }
+        };
+        
         if cone_check.class == CausalClass::Spacelike {
             trace.events.push("Governor REJECT: Spacelike causal violation (d_G > c_G * dt_G)".into());
             return (false, trace);
@@ -257,7 +269,7 @@ impl GmiGovernor {
             }
         };
 
-        // 4. Pre-state valuation
+        // 4. Pre-state valuation (Freeze for law check)
         let prev_v = self.rv.state.valuation + self.npe.governing_state.disorder + (self.phaseloom.state.tension as u128);
 
         // 5. PhaseLoom Read (Bias)
@@ -272,7 +284,7 @@ impl GmiGovernor {
             }
         };
 
-        // 6. Level 3: NPE Propose
+        // 6. Level 3: NPE Propose (Dry Run / Budget Check)
         if !self.npe.is_affordable(100, 1000, 50) {
             trace.events.push("NPE REJECT: Budget exhausted".into());
             return (false, trace);
@@ -282,8 +294,8 @@ impl GmiGovernor {
         // 7. Projection Bridge
         let claim = format!("claim_{}", proposal_id);
 
-        // 8. RV Verify
-        let decision = self.rv.verify_claim(&claim);
+        // 8. RV Verify (Dry Run Verification)
+        let decision = self.rv.verify_claim(&claim, &rv_cost);
         trace.decision = Some(decision.kind);
         trace.events.push(format!("RV VERIFY: Decision {:?}", decision.kind));
 
@@ -291,11 +303,37 @@ impl GmiGovernor {
             return (false, trace);
         }
 
-        // 9. Receipt and Ledger
+        // 9. Ledger Check (Hard Gate)
+        if self.system.ledger_append_ops == 0 {
+            trace.events.push("Governor REJECT: Ledger capacity exhausted".into());
+            return (false, trace);
+        }
+
+        // 10. Post-state valuation (Projected)
+        // Note: In a real system, we'd use a more complex projection of disorder change.
+        let next_v = self.rv.state.valuation + self.npe.governing_state.disorder + (self.phaseloom.state.tension as u128);
+
+        // 11. Governor Global Admissibility Check (TWO-PHASE COMMIT)
+        // We allow a defect budget of 100 to account for process cost and tension injection
+        if !self.is_globally_admissible(prev_v, next_v, 10, 100) {
+            trace.events.push("Governor REJECT: Global admissibility violation".into());
+            return (false, trace);
+        }
+
+        // --- COMMIT PHASE ---
+        
+        // A. Ledger Append
+        if let Err(e) = self.ledger.append(proposal_id, decision) {
+            trace.events.push(format!("Governor ROLLBACK: Ledger append failed: {}", e));
+            return (false, trace);
+        }
         self.system.ledger_append_ops = self.system.ledger_append_ops.saturating_sub(1);
         trace.events.push("Ledger APPEND: Receipt emitted".into());
 
-        // 10. PhaseLoom Write
+        // B. Budget Charging
+        let _ = self.npe.charge_budget(100, 1000, 50);
+
+        // C. PhaseLoom Write
         let receipt = BoundaryReceiptSummary {
             target: proposal_id.to_string(),
             domain: "system".into(),
@@ -304,17 +342,9 @@ impl GmiGovernor {
             gamma,
             ..Default::default()
         };
-        let _ = self.phaseloom.update(&receipt, &PhaseLoomConfig::default());
-        trace.events.push("PhaseLoom WRITE: Memory updated from receipt".into());
-
-        // 11. Post-state valuation
-        let next_v = self.rv.state.valuation + self.npe.governing_state.disorder + (self.phaseloom.state.tension as u128);
-
-        // 12. Governor post-check: Global Admissibility
-        // We allow a defect budget of 100 to account for process cost and tension injection
-        if !self.is_globally_admissible(prev_v, next_v, 10, 100) {
-            trace.events.push("Governor REJECT: Global admissibility violation".into());
-            return (false, trace);
+        match self.phaseloom.update(&receipt, &PhaseLoomConfig::default()) {
+            Ok(_) => trace.events.push("PhaseLoom WRITE: Memory updated from receipt".into()),
+            Err(e) => trace.events.push(format!("PhaseLoom WRITE SKIPPED: {}", e)),
         }
 
         trace.events.push("Governor COMMIT: Step completed successfully".into());

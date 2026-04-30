@@ -21,8 +21,25 @@ pub struct GmiConeCheck {
     pub class: CausalClass,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ConeError {
+    NegativeDistance,
+    NonPositiveSpeedLimit,
+    NonPositiveDeltaTime,
+}
+
 /// Classify the GMI interval using the causal cone approximation
-pub fn classify_gmi_interval(distance: Rational, c_g: Rational, dt_g: Rational) -> GmiConeCheck {
+pub fn classify_gmi_interval(distance: Rational, c_g: Rational, dt_g: Rational) -> Result<GmiConeCheck, ConeError> {
+    if distance < Rational::from_integer(0) {
+        return Err(ConeError::NegativeDistance);
+    }
+    if c_g <= Rational::from_integer(0) {
+        return Err(ConeError::NonPositiveSpeedLimit);
+    }
+    if dt_g <= Rational::from_integer(0) {
+        return Err(ConeError::NonPositiveDeltaTime);
+    }
+
     let max_distance = c_g * dt_g;
     let interval_sq = max_distance * max_distance - distance * distance;
 
@@ -34,10 +51,10 @@ pub fn classify_gmi_interval(distance: Rational, c_g: Rational, dt_g: Rational) 
         CausalClass::Spacelike
     };
 
-    GmiConeCheck {
+    Ok(GmiConeCheck {
         distance,
         max_distance,
         interval_sq,
         class,
-    }
+    })
 }

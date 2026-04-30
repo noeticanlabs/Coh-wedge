@@ -18,8 +18,9 @@ impl LawChecker {
 pub struct ResourceGate;
 
 impl ResourceGate {
-    pub fn check(&self, kernel: &RvKernel, estimated_cost: u64) -> bool {
-        kernel.can_verify_safely(estimated_cost)
+    pub fn check(&self, kernel: &RvKernel, _estimated_cost: u64) -> bool {
+        let cost = crate::rv_kernel::RvCost::default();
+        kernel.can_verify_safely(&cost)
     }
 }
 
