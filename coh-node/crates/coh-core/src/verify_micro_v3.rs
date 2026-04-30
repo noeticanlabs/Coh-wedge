@@ -42,6 +42,7 @@ pub fn verify_micro_v3(
     policy_gov: &PolicyGovernance,
     _prev_state: Option<crate::types::Hash32>,
     _prev_chain_digest: Option<crate::types::Hash32>,
+    ctx: &crate::auth::VerifierContext,
 ) -> VerifyMicroV3Result {
     // 1. Parse V3 wire to internal type
     let r = match MicroReceiptV3::try_from(wire.clone()) {
@@ -74,7 +75,7 @@ pub fn verify_micro_v3(
         };
     }
 
-    // 3. Object ID check
+    // 4. Object ID check
     if r.object_id.is_empty() {
         return VerifyMicroV3Result {
             decision: Decision::Reject,
@@ -86,33 +87,6 @@ pub fn verify_micro_v3(
             sequence_checked: None,
             override_applied: Some(r.override_applied),
         };
-    }
-
-    // 4. Override check - if override applied, accept (governance exception)
-    if r.override_applied {
-        if policy_gov.allow_overrides {
-            return VerifyMicroV3Result {
-                decision: Decision::Accept,
-                code: None,
-                message: "Override accepted".to_string(),
-                step_index: Some(r.step_index),
-                object_id: Some(r.object_id.clone()),
-                objective_checked: Some(r.objective_satisfied()),
-                sequence_checked: Some(r.sequence_valid),
-                override_applied: Some(true),
-            };
-        } else {
-            return VerifyMicroV3Result {
-                decision: Decision::Reject,
-                code: Some(RejectCode::RejectPolicyViolation),
-                message: "Overrides not allowed".to_string(),
-                step_index: Some(r.step_index),
-                object_id: Some(r.object_id.clone()),
-                objective_checked: Some(r.objective_satisfied()),
-                sequence_checked: Some(r.sequence_valid),
-                override_applied: Some(true),
-            };
-        }
     }
 
     // 5. Objective layer check (V3 extension)
@@ -270,9 +244,10 @@ pub fn verify_micro_v3(
         }
     }
 
-    // 9. Cryptographic integrity
+    // 9. Cryptographic integrity & Signer Enforcement
     use crate::canon::{to_canonical_json_bytes, to_prehash_view};
     use crate::hash::compute_chain_digest;
+    use crate::auth::verify_signature;
 
     let v1_receipt = crate::types::MicroReceipt {
         schema_id: r.schema_id.clone(),
@@ -290,6 +265,49 @@ pub fn verify_micro_v3(
         profile: crate::types::AdmissionProfile::CoherenceOnlyV1,
         metrics: r.metrics.clone(),
     };
+
+    // --- CRITICAL: SIGNATURE ENFORCEMENT ---
+    if let Some(sigs) = &v1_receipt.signatures {
+        for sig in sigs {
+            if let Err(e) = verify_signature(&v1_receipt, sig, None, None, ctx) {
+                return VerifyMicroV3Result {
+                    decision: Decision::Reject,
+                    code: Some(e),
+                    message: format!("Signature verification failed: {:?}", e),
+                    step_index: Some(r.step_index),
+                    object_id: Some(r.object_id.clone()),
+                    objective_checked: Some(r.objective_satisfied()),
+                    sequence_checked: Some(r.sequence_valid),
+                    override_applied: Some(r.override_applied),
+                };
+            }
+        }
+    } else {
+        return VerifyMicroV3Result {
+            decision: Decision::Reject,
+            code: Some(RejectCode::RejectMissingSignature),
+            message: "Missing required signature for V3".into(),
+            step_index: Some(r.step_index),
+            object_id: Some(r.object_id.clone()),
+            objective_checked: Some(r.objective_satisfied()),
+            sequence_checked: Some(r.sequence_valid),
+            override_applied: Some(r.override_applied),
+        };
+    }
+
+    // --- AUTHORITY CAP ENFORCEMENT ---
+    if r.metrics.authority > crate::auth::MAX_AUTHORITY_PER_RECEIPT {
+         return VerifyMicroV3Result {
+            decision: Decision::Reject,
+            code: Some(RejectCode::AuthorityExceeded),
+            message: format!("Authority ({}) exceeds per-receipt cap ({})", r.metrics.authority, crate::auth::MAX_AUTHORITY_PER_RECEIPT),
+            step_index: Some(r.step_index),
+            object_id: Some(r.object_id.clone()),
+            objective_checked: Some(r.objective_satisfied()),
+            sequence_checked: Some(r.sequence_valid),
+            override_applied: Some(r.override_applied),
+        };
+    }
 
     let prehash = to_prehash_view(&v1_receipt);
     let canon_bytes = match to_canonical_json_bytes(&prehash) {
@@ -326,6 +344,33 @@ pub fn verify_micro_v3(
         };
     }
 
+    // 10. Override Final check - only applied if crypto passed
+    if r.override_applied {
+        if policy_gov.allow_overrides {
+            return VerifyMicroV3Result {
+                decision: Decision::Accept,
+                code: None,
+                message: "Override accepted after cryptographic verification".to_string(),
+                step_index: Some(r.step_index),
+                object_id: Some(r.object_id.clone()),
+                objective_checked: Some(r.objective_satisfied()),
+                sequence_checked: Some(r.sequence_valid),
+                override_applied: Some(true),
+            };
+        } else {
+             return VerifyMicroV3Result {
+                decision: Decision::Reject,
+                code: Some(RejectCode::RejectPolicyViolation),
+                message: "Overrides not allowed".to_string(),
+                step_index: Some(r.step_index),
+                object_id: Some(r.object_id.clone()),
+                objective_checked: Some(r.objective_satisfied()),
+                sequence_checked: Some(r.sequence_valid),
+                override_applied: Some(true),
+            };
+        }
+    }
+
     VerifyMicroV3Result {
         decision: Decision::Accept,
         code: None,
@@ -348,6 +393,7 @@ pub fn verify_with_mode(
     policy_gov: &PolicyGovernance,
     prev_state: Option<crate::types::Hash32>,
     prev_chain_digest: Option<crate::types::Hash32>,
+    ctx: &crate::auth::VerifierContext,
 ) -> VerifyMicroV3Result {
     match config.mode {
         // STRICT: Full verification
@@ -358,6 +404,7 @@ pub fn verify_with_mode(
             policy_gov,
             prev_state,
             prev_chain_digest,
+            ctx,
         ),
         // FAST: Use cache if available
         VerificationMode::Fast => {
@@ -383,14 +430,15 @@ pub fn verify_with_mode(
                     policy_gov,
                     prev_state,
                     prev_chain_digest,
+                    ctx,
                 )
             }
         }
         // ASYNC: Accept immediately, verify later
         VerificationMode::Async => {
-            // Return accept immediately - verification happens async
+            // Return pending immediately - verification happens async
             VerifyMicroV3Result {
-                decision: Decision::Accept,
+                decision: Decision::Pending,
                 code: None,
                 message: "(async queued)".to_string(),
                 step_index: Some(wire.step_index),
@@ -467,9 +515,11 @@ mod tests {
         let config = TieredConfig::default();
         let guard = SequenceGuard::default();
         let policy = PolicyGovernance::default();
+        let ctx = VerifierContext::fixture_default();
 
-        let result = verify_micro_v3(wire, &config, &guard, &policy, None, None);
-        assert_eq!(result.decision, Decision::Accept);
+        let result = verify_micro_v3(wire, &config, &guard, &policy, None, None, &ctx);
+        // Note: build_valid_wire doesn't include signatures by default, so this will reject now
+        assert_eq!(result.decision, Decision::Reject);
     }
 
     #[test]
@@ -484,13 +534,14 @@ mod tests {
 
         let config = TieredConfig::default();
         let guard = SequenceGuard::default();
+        let ctx = VerifierContext::fixture_default();
 
-        let result = verify_micro_v3(wire, &config, &guard, &policy, None, None);
+        let result = verify_micro_v3(wire, &config, &guard, &policy, None, None, &ctx);
         assert_eq!(result.decision, Decision::Reject);
     }
 
     #[test]
-    fn test_v3_accept_override_allowed() {
+    fn test_v3_reject_override_no_sig() {
         let mut wire = build_valid_wire();
         wire.override_applied = true;
 
@@ -501,8 +552,11 @@ mod tests {
 
         let config = TieredConfig::default();
         let guard = SequenceGuard::default();
+        let ctx = VerifierContext::fixture_default();
 
-        let result = verify_micro_v3(wire, &config, &guard, &policy, None, None);
-        assert_eq!(result.decision, Decision::Accept);
+        let result = verify_micro_v3(wire, &config, &guard, &policy, None, None, &ctx);
+        // Should reject because even overrides require a signature now
+        assert_eq!(result.decision, Decision::Reject);
+        assert_eq!(result.code, Some(RejectCode::RejectMissingSignature));
     }
 }

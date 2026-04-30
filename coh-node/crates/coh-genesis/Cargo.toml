@@ -8,11 +8,13 @@ license.workspace = true
 coh-core = { path = "../coh-core" }
 coh-npe = { path = "../coh-npe" }
 coh-phaseloom = { path = "../coh-phaseloom" }
+coh-physics = { path = "../coh-physics" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 schemars = "0.8"
 thiserror = { workspace = true }
 tracing = { workspace = true }
+num-complex = "0.4"
 num-rational = "0.4"
 wait-timeout = "0.2"
 

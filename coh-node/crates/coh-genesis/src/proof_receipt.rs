@@ -275,6 +275,36 @@ impl ProofAttemptReceipt {
             lean_errors: self.lean_details.as_ref().map(|d| d.errors.join("; ")),
         }
     }
+
+    pub fn to_legacy_micro_receipt_wire(&self) -> coh_core::types::MicroReceiptWire {
+         coh_core::types::MicroReceiptWire {
+            schema_id: self.schema_id.clone(),
+            version: self.version.clone(),
+            object_id: self.attempt_id.clone(),
+            canon_profile_hash: "0".repeat(64),
+            policy_hash: "0".repeat(64),
+            step_index: self.search_budget.steps,
+            step_type: Some("NPE_PROOF_ATTEMPT".to_string()),
+            signatures: None,
+            state_hash_prev: "0".repeat(64),
+            state_hash_next: "0".repeat(64),
+            chain_digest_prev: self.parent_digest.clone().unwrap_or_else(|| "0".repeat(64)),
+            chain_digest_next: self.chain_digest.clone(),
+            profile: coh_core::types::AdmissionProfile::CoherenceOnlyV1,
+            metrics: coh_core::types::MetricsWire {
+                v_pre: self.coherence_metrics.v_pre.to_string(),
+                v_post: self.coherence_metrics.v_post.to_string(),
+                spend: self.search_budget.spent.to_string(),
+                defect: "0".to_string(),
+                authority: "0".to_string(),
+                m_pre: self.genesis_metrics.m_pre.to_string(),
+                m_post: self.genesis_metrics.m_post.to_string(),
+                c_cost: self.genesis_metrics.cost.to_string(),
+                d_slack: self.genesis_metrics.slack.to_string(),
+                ..Default::default()
+            },
+        }
+    }
 }
 
 /// Wire format for JSON serialization (matches coh-node format)

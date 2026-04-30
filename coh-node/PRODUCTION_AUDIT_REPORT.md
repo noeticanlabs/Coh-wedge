@@ -11,14 +11,14 @@
 
 | Area | Status | Critical Issues |
 |------|--------|-----------------|
-| Core Invariants | ✅ PASS | None |
+| Core Invariants | ⚠️ HARDENED | Formal proof debt exists in Lean |
 | Property Tests | ✅ PASS | None |
-| Differential Tests | ✅ PASS | Resolved (7/7 pass) |
-| CI/CD (fmt/clippy) | ✅ PASS | Resolved (31+ errors fixed across coh-node and ape) |
+| Differential Tests | ✅ PASS | Resolved |
+| CI/CD (fmt/clippy) | ✅ PASS | Resolved |
 | APE Hardening | ✅ PASS | Fixed clippy and pathing issues |
-| Security | ✅ PASS | Hardened |
+| Security | 🛡️ HARDENED | V3 signing & authority caps enforced |
 
-**Overall Production Readiness**: ✅ READY FOR PRODUCTION
+**Overall Production Readiness**: 🛠️ HARDENED PROTOTYPE / TRUSTED-BOUNDARY CANDIDATE
 
 ---
 
@@ -142,5 +142,5 @@ From PRODUCTION_AUDIT_RUNBOOK.md:
 
 ---
 
-**Report Status**: ✅ PASS - PRODUCTION READY
+**Report Status**: ⚠️ HARDENED PROTOTYPE
 **Next Steps**: Deploy to staging for final E2E verification.

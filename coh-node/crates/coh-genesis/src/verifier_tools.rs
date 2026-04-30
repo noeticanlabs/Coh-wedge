@@ -8,20 +8,32 @@ use coh_npe::closure::LeanClosureStatus;
 pub struct NoSorryScanner;
 
 impl NoSorryScanner {
-    /// Scan a Lean file for 'sorry', 'admit', or other proof gaps.
+    /// Scan a Lean file for 'sorry', 'admit', 'axiom', or 'unsafe' markers.
     pub fn scan_file(path: &Path) -> Result<LeanClosureStatus, std::io::Error> {
         let content = fs::read_to_string(path)?;
+        let content_lower = content.to_lowercase();
         
-        if content.contains("admit") {
+        if content_lower.contains("admit") {
             return Ok(LeanClosureStatus::BuildPassedWithAdmit);
         }
         
-        if content.contains("sorry") {
+        if content_lower.contains("sorry") {
             return Ok(LeanClosureStatus::BuildPassedWithSorry);
         }
+
+        if content_lower.contains("axiom") {
+            // Treat axioms as uncertified logic
+            return Ok(LeanClosureStatus::BuildPassedWithAdmit);
+        }
+
+        if content_lower.contains("unsafe") {
+            return Ok(LeanClosureStatus::BuildFailed);
+        }
+
+        if content_lower.contains("set_option autoimplicit true") {
+            return Ok(LeanClosureStatus::BuildFailed);
+        }
         
-        // In a more advanced version, we would also run 'lake build' and check for
-        // specific 'axiom' or 'untrusted' labels.
         Ok(LeanClosureStatus::ClosedNoSorry)
     }
 

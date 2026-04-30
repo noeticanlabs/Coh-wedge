@@ -46,6 +46,34 @@ pub enum ToolAuthorityMode {
     Certification,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub enum FormalStatus {
+    #[default]
+    Unknown,
+    BuildFailed,
+    BuildPassedWithSorry,
+    BuildPassedWithAdmit,
+    ClosedNoSorry,
+    ProofCertified,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum AuthorityTag {
+    System,
+    User,
+    NpeExploratory,
+    RvCertification,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct VerifierClaim {
+    pub claim_id: String,
+    pub payload_hash: Hash32,
+    pub formal_status: FormalStatus,
+    pub authority: AuthorityTag,
+    pub law_margin: Option<i128>,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum Decision {
@@ -55,6 +83,8 @@ pub enum Decision {
     TerminalSuccess,
     TerminalFailure,
     AbortBudget,
+    Pending,
+    Queued,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]

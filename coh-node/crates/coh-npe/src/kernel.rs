@@ -48,6 +48,7 @@ impl Default for NpeBudget {
 }
 
 /// NPE Kernel: The minimum governed generator
+#[derive(Clone, Debug)]
 pub struct NpeKernel {
     pub state: NpeState,
     pub governing_state: NpeGoverningState,

@@ -486,10 +486,12 @@ dependencies = [
  "coh-core",
  "coh-npe",
  "coh-phaseloom",
+ "coh-physics",
  "egg",
  "hex",
  "nalgebra",
  "ndarray",
+ "num-complex",
  "num-rational",
  "petgraph",
  "rand 0.8.6",
@@ -537,6 +539,16 @@ dependencies = [
  "rand 0.8.6",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "coh-physics"
+version = "0.1.0"
+dependencies = [
+ "coh-core",
+ "num-complex",
+ "num-rational",
+ "serde",
 ]
 
 [[package]]
@@ -1642,6 +1654,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73f88a1307638156682bada9d7604135552957b7818057dcef22705b4d509495"
 dependencies = [
  "num-traits",
+ "serde",
 ]
 
 [[package]]
@@ -1662,6 +1675,7 @@ dependencies = [
  "num-bigint",
  "num-integer",
  "num-traits",
+ "serde",
 ]
 
 [[package]]

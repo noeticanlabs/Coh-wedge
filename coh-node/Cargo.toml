@@ -9,7 +9,7 @@ members = [
     "crates/coh-gccp",
     "crates/coh-genesis",
     "crates/coh-npe",
-    "crates/coh-phaseloom",
+    "crates/coh-phaseloom", "crates/coh-physics",
 ]
 resolver = "2"
 

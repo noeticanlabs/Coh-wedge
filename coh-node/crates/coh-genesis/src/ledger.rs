@@ -1,18 +1,30 @@
-use coh_core::types::Hash32;
+use coh_core::types::{Hash32, VerifierClaim};
 use coh_core::rv_kernel::RvDecision;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Receipt {
+pub struct ReceiptPayload {
+    pub schema_version: String,
+    pub domain_tag: String,
     pub proposal_id: String,
     pub prev_tip: Hash32,
+    pub claim: VerifierClaim,
     pub decision: RvDecision,
     pub timestamp: u64,
+    pub sequence: u64,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Receipt {
+    pub payload: ReceiptPayload,
+    pub hash: Hash32,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SimpleLedger {
     pub tip: Hash32,
+    pub sequence: u64,
     pub history: Vec<Receipt>,
 }
 
@@ -20,30 +32,39 @@ impl SimpleLedger {
     pub fn new() -> Self {
         Self {
             tip: Hash32::default(),
+            sequence: 0,
             history: Vec::new(),
         }
     }
 
-    pub fn append(&mut self, proposal_id: &str, decision: RvDecision) -> Result<Hash32, String> {
-        let receipt = Receipt {
+    pub fn append(&mut self, proposal_id: &str, claim: VerifierClaim, decision: RvDecision) -> Result<Hash32, String> {
+        let payload = ReceiptPayload {
+            schema_version: "GMI_V1".into(),
+            domain_tag: "GMI_RECEIPT".into(),
             proposal_id: proposal_id.to_string(),
             prev_tip: self.tip.clone(),
+            claim,
             decision,
             timestamp: std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .map_err(|e| e.to_string())?
                 .as_secs(),
+            sequence: self.sequence,
         };
 
-        // Update tip by hashing the receipt
+        // Canonical hash of the payload
+        let payload_bytes = serde_json::to_vec(&payload).map_err(|e| e.to_string())?;
         let mut hasher = Sha256::new();
-        hasher.update(self.tip.as_bytes());
-        hasher.update(receipt.proposal_id.as_bytes());
-        hasher.update(serde_json::to_vec(&receipt.decision).map_err(|e| e.to_string())?);
+        hasher.update(&payload_bytes);
         
         let new_tip = Hash32::from_slice(&hasher.finalize());
         self.tip = new_tip.clone();
-        self.history.push(receipt);
+        self.sequence = self.sequence.saturating_add(1);
+        
+        self.history.push(Receipt {
+            payload,
+            hash: new_tip.clone(),
+        });
 
         Ok(new_tip)
     }

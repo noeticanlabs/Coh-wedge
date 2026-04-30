@@ -100,6 +100,8 @@ pub mod lean_json_export;
 pub mod causal_cone;
 pub mod ledger;
 pub mod verifier_tools;
+pub mod atom;
+pub use atom::GmiAtom;
 
 // Re-export PhaseLoomLite types and functions
 pub use fusion_wedge::verify_governed_step;
@@ -149,9 +151,11 @@ pub use sweep::{
 };
 
 use coh_core::rv_kernel::RvDecisionKind;
+use coh_core::types::{VerifierClaim, AuthorityTag, FormalStatus, Hash32};
 pub use causal_cone::*;
 
 /// Level 0: Environmental Envelope (Outer physical limits)
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct EnvironmentalEnvelope {
     pub power_mj: Option<u64>,
     pub thermal_headroom_c: Option<f64>,
@@ -161,6 +165,7 @@ pub struct EnvironmentalEnvelope {
 }
 
 /// Level 1: System Reserve (Protected operational limits)
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SystemReserve {
     pub halt_available: bool,
     pub logging_ops: u64,
@@ -170,6 +175,7 @@ pub struct SystemReserve {
 }
 
 /// Global Budgets (B_G): Priority-ordered hierarchy
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct GlobalBudgets {
     pub env: EnvironmentalEnvelope,
     pub system: SystemReserve,
@@ -178,22 +184,34 @@ pub struct GlobalBudgets {
     pub phaseloom: PhaseLoomBudget,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub enum GmiStepOutcome {
+    CommittedWithMemoryUpdate,
+    CommittedMemorySkipped(String),
+    Rejected(String),
+    Deferred(String),
+    SafeHalt(String),
+}
+
+use coh_core::cohbit::CohBitState;
+
 /// GMI Step Trace for observability
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GmiStepTrace {
     pub step_id: String,
     pub events: Vec<String>,
     pub decision: Option<RvDecisionKind>,
+    pub outcome: Option<GmiStepOutcome>,
+    pub cohbit_state: CohBitState,
 }
 
 /// Global GMI Governor (Gov_G)
+/// Now implemented as a wrapper around the GmiAtom.
 pub struct GmiGovernor {
-    pub npe: NpeKernel,
-    pub rv: RvKernel,
-    pub phaseloom: PhaseLoomKernel,
-    pub env: EnvironmentalEnvelope,
-    pub system: SystemReserve,
-    pub ledger: ledger::SimpleLedger,
+    pub atom: atom::GmiAtom,
 }
+
+use coh_physics::CohSpinor;
 
 impl GmiGovernor {
     pub fn new(
@@ -202,153 +220,36 @@ impl GmiGovernor {
         phaseloom: PhaseLoomKernel,
         env: EnvironmentalEnvelope,
         system: SystemReserve,
+        carrier: Option<CohSpinor>,
     ) -> Self {
-        Self { npe, rv, phaseloom, env, system, ledger: ledger::SimpleLedger::default() }
+        let budgets = GlobalBudgets {
+            env,
+            system,
+            rv: rv.budget.clone(),
+            npe: npe.budget.clone(),
+            phaseloom: phaseloom.budget.clone(),
+        };
+        Self { 
+            atom: atom::GmiAtom::new(npe, rv, phaseloom, budgets, carrier)
+        }
     }
 
     /// Whole-System Admissibility Law
     pub fn is_globally_admissible(&self, prev_v: u128, next_v: u128, spend: u128, defect: u128) -> bool {
-        match (next_v.checked_add(spend), prev_v.checked_add(defect)) {
-            (Some(lhs), Some(rhs)) => lhs <= rhs,
-            _ => false, // Overflow = inadmissible
-        }
+        self.atom.is_stable(prev_v, next_v, spend, defect)
     }
 
     /// Execute a governed loop step (Hierarchical Budget Edition)
-    pub fn step(&mut self, proposal_id: &str, _content: &str, distance: num_rational::Rational64, c_g: num_rational::Rational64, dt_g: num_rational::Rational64) -> (bool, GmiStepTrace) {
-        let mut trace = GmiStepTrace {
-            step_id: proposal_id.to_string(),
-            events: vec![],
-            decision: None,
-        };
-
-        // 1. Level 0: Environment Check
-        if !self.env.hardware_available || self.env.wallclock_ms == 0 {
-            trace.events.push("Governor HALT: Environmental envelope breach".into());
-            return (false, trace);
-        }
-
-        // 2. Level 1: System Reserve Check
-        if !self.system.halt_available || self.system.logging_ops < 10 {
-            trace.events.push("Governor HALT: System reserve threatened".into());
-            return (false, trace);
-        }
-
-        // 3. Level 2: RV Reserve Check (Pre-check)
-        let rv_cost = coh_core::rv_kernel::RvCost::default();
-        if !self.rv.can_verify_safely(&rv_cost) {
-            trace.events.push("Governor REJECT: RV reserve protection breach".into());
-            return (false, trace);
-        }
-
-        // 3.5. Causal Cone Check (Spacelike Rejection)
-        let cone_check = match classify_gmi_interval(distance, c_g, dt_g) {
-            Ok(check) => check,
-            Err(e) => {
-                trace.events.push(format!("Governor REJECT: Invalid causal parameters: {:?}", e));
-                return (false, trace);
-            }
-        };
-        
-        if cone_check.class == CausalClass::Spacelike {
-            trace.events.push("Governor REJECT: Spacelike causal violation (d_G > c_G * dt_G)".into());
-            return (false, trace);
-        }
-
-        // [LORENTZ] Calculate the Gamma factor (time dilation)
-        let gamma = if cone_check.class == CausalClass::Null {
-            100.0 // Cap at boundary
-        } else {
-            let cg_dt = c_g * dt_g;
-            let cg_dt_f = *cg_dt.numer() as f64 / *cg_dt.denom() as f64;
-            let ds2_f = *cone_check.interval_sq.numer() as f64 / *cone_check.interval_sq.denom() as f64;
-            if ds2_f <= 0.0 {
-                100.0
-            } else {
-                cg_dt_f / ds2_f.sqrt()
-            }
-        };
-
-        // 4. Pre-state valuation (Freeze for law check)
-        let prev_v = self.rv.state.valuation + self.npe.governing_state.disorder + (self.phaseloom.state.tension as u128);
-
-        // 5. PhaseLoom Read (Bias)
-        let _bias = match self.phaseloom.get_bias() {
-            Ok(b) => {
-                trace.events.push("PhaseLoom READ: StrategyBias emitted".into());
-                b
-            },
-            Err(e) => {
-                trace.events.push(format!("PhaseLoom REJECT: {}", e));
-                return (false, trace);
-            }
-        };
-
-        // 6. Level 3: NPE Propose (Dry Run / Budget Check)
-        if !self.npe.is_affordable(100, 1000, 50) {
-            trace.events.push("NPE REJECT: Budget exhausted".into());
-            return (false, trace);
-        }
-        trace.events.push("NPE PROPOSE: Candidate knowledge formed".into());
-
-        // 7. Projection Bridge
-        let claim = format!("claim_{}", proposal_id);
-
-        // 8. RV Verify (Dry Run Verification)
-        let decision = self.rv.verify_claim(&claim, &rv_cost);
-        trace.decision = Some(decision.kind);
-        trace.events.push(format!("RV VERIFY: Decision {:?}", decision.kind));
-
-        if decision.kind != RvDecisionKind::Accept {
-            return (false, trace);
-        }
-
-        // 9. Ledger Check (Hard Gate)
-        if self.system.ledger_append_ops == 0 {
-            trace.events.push("Governor REJECT: Ledger capacity exhausted".into());
-            return (false, trace);
-        }
-
-        // 10. Post-state valuation (Projected)
-        // Note: In a real system, we'd use a more complex projection of disorder change.
-        let next_v = self.rv.state.valuation + self.npe.governing_state.disorder + (self.phaseloom.state.tension as u128);
-
-        // 11. Governor Global Admissibility Check (TWO-PHASE COMMIT)
-        // We allow a defect budget of 100 to account for process cost and tension injection
-        if !self.is_globally_admissible(prev_v, next_v, 10, 100) {
-            trace.events.push("Governor REJECT: Global admissibility violation".into());
-            return (false, trace);
-        }
-
-        // --- COMMIT PHASE ---
-        
-        // A. Ledger Append
-        if let Err(e) = self.ledger.append(proposal_id, decision) {
-            trace.events.push(format!("Governor ROLLBACK: Ledger append failed: {}", e));
-            return (false, trace);
-        }
-        self.system.ledger_append_ops = self.system.ledger_append_ops.saturating_sub(1);
-        trace.events.push("Ledger APPEND: Receipt emitted".into());
-
-        // B. Budget Charging
-        let _ = self.npe.charge_budget(100, 1000, 50);
-
-        // C. PhaseLoom Write
-        let receipt = BoundaryReceiptSummary {
-            target: proposal_id.to_string(),
-            domain: "system".into(),
-            accepted: true,
-            outcome: "accepted".into(),
-            gamma,
-            ..Default::default()
-        };
-        match self.phaseloom.update(&receipt, &PhaseLoomConfig::default()) {
-            Ok(_) => trace.events.push("PhaseLoom WRITE: Memory updated from receipt".into()),
-            Err(e) => trace.events.push(format!("PhaseLoom WRITE SKIPPED: {}", e)),
-        }
-
-        trace.events.push("Governor COMMIT: Step completed successfully".into());
-        (true, trace)
+    pub fn step(
+        &mut self, 
+        proposal_id: &str, 
+        content: &str, 
+        distance: num_rational::Rational64, 
+        c_g: num_rational::Rational64, 
+        dt_g: num_rational::Rational64, 
+        formal_status: FormalStatus
+    ) -> (bool, GmiStepTrace) {
+        self.atom.emit_cohbit(proposal_id, content, distance, c_g, dt_g, formal_status)
     }
 }
 

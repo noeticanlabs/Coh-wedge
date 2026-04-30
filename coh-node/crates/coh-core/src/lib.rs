@@ -4,6 +4,7 @@
 pub mod auth;
 pub mod build_slab;
 pub mod canon;
+pub mod cohbit;
 pub mod execute;
 pub mod fixtures;
 pub mod hash;

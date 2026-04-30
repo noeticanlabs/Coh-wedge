@@ -2,7 +2,7 @@
 //! 
 //! "RV has authority without imagination."
 
-use crate::types::{Hash32, Decision, ToolAuthorityMode};
+use crate::types::{Hash32, Decision, ToolAuthorityMode, VerifierClaim, FormalStatus};
 use crate::reject::RejectCode;
 use serde::{Deserialize, Serialize};
 
@@ -81,6 +81,7 @@ impl Default for RvCost {
 }
 
 /// RV Kernel: The minimum protected admissibility authority
+#[derive(Clone, Debug)]
 pub struct RvKernel {
     pub state: RvGoverningState,
     pub budget: ProtectedRvBudget,
@@ -120,8 +121,8 @@ impl RvKernel {
     }
 
     /// Primary Authority Entry Point: Verify a projected claim
-    pub fn verify_claim(&mut self, claim: &str, cost: &RvCost) -> RvDecision {
-        // 1. Budget hard gate
+    pub fn verify_claim(&mut self, claim: &VerifierClaim, cost: &RvCost) -> RvDecision {
+        // 1. Budget hard gate (Evaluation Spend)
         if let Err(e) = self.charge_budget(cost) {
             return RvDecision {
                 kind: RvDecisionKind::Defer,
@@ -131,15 +132,38 @@ impl RvKernel {
             };
         }
 
-        // 2. Verification logic (No longer mock-always-accept)
-        let accepted = !claim.is_empty() && !claim.contains("INVALID") && !claim.contains("sorry");
+        // 2. Formal Status Gate
+        match claim.formal_status {
+            FormalStatus::ProofCertified | FormalStatus::ClosedNoSorry => {
+                // Proceed
+            }
+            _ => {
+                return RvDecision {
+                    kind: RvDecisionKind::Reject,
+                    law_margin: Some(-1.0),
+                    failure_mode: Some(format!("RV REJECT: Incomplete formal status {:?}", claim.formal_status)),
+                    receipt_payload: serde_json::json!({ "status": claim.formal_status }),
+                };
+            }
+        }
+
+        // 3. Logic Gate
+        if claim.claim_id.is_empty() {
+             return RvDecision {
+                kind: RvDecisionKind::Reject,
+                law_margin: Some(-1.0),
+                failure_mode: Some("RV REJECT: Empty claim ID".into()),
+                receipt_payload: serde_json::json!({}),
+            };
+        }
         
         RvDecision {
-            kind: if accepted { RvDecisionKind::Accept } else { RvDecisionKind::Reject },
-            law_margin: if accepted { Some(1.0) } else { Some(-1.0) },
-            failure_mode: if accepted { None } else { Some("Verification failed".to_string()) },
+            kind: RvDecisionKind::Accept,
+            law_margin: Some(1.0),
+            failure_mode: None,
             receipt_payload: serde_json::json!({
-                "claim_verified": claim,
+                "claim_id": claim.claim_id,
+                "status": claim.formal_status,
                 "cost": cost,
             }),
         }

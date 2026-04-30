@@ -288,7 +288,7 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
         current_m_state = Some(r.metrics.m_post);
     }
 
-    // Final trajectory check - total defect should be bounded
+    // Final trajectory check - total defect and authority should be bounded
     if total_defect > u64::MAX as u128 {
         return VerifyChainResult {
             decision: Decision::Reject,
@@ -296,6 +296,24 @@ pub fn verify_chain(receipts: Vec<MicroReceiptWire>) -> VerifyChainResult {
             message: format!(
                 "Trajectory cost exceeded: total defect mass {}",
                 total_defect
+            ),
+            steps_verified: (last_good_index - first_index + 1),
+            first_step_index: first_index,
+            last_step_index: last_good_index,
+            final_chain_digest: current_digest,
+            failing_step_index: None,
+            steps_verified_before_failure: None,
+        };
+    }
+
+    if total_authority > crate::auth::MAX_AUTHORITY_CHAIN {
+        return VerifyChainResult {
+            decision: Decision::Reject,
+            code: Some(RejectCode::AuthorityExceeded),
+            message: format!(
+                "Cumulative authority {} exceeds chain cap {}",
+                total_authority,
+                crate::auth::MAX_AUTHORITY_CHAIN
             ),
             steps_verified: (last_good_index - first_index + 1),
             first_step_index: first_index,

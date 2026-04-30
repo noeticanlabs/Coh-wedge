@@ -20,6 +20,7 @@ pub fn verify_governed_step(
     policy_gov: &coh_core::types_v3::PolicyGovernance,
     prev_state: Option<coh_core::types::Hash32>,
     prev_chain_digest: Option<coh_core::types::Hash32>,
+    ctx: &coh_core::auth::VerifierContext,
 ) -> (VerifyMicroV3Result, Option<BoundaryReceiptSummary>) {
     // 1. Inject PhaseLoom state into the wire for the verifier to check
     wire.metrics.pl_tau = state.tau.to_string();
@@ -33,6 +34,7 @@ pub fn verify_governed_step(
         policy_gov,
         prev_state,
         prev_chain_digest,
+        ctx,
     );
 
     // 3. Map result to PhaseLoom receipt for ingestion
