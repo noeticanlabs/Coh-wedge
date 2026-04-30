@@ -139,5 +139,98 @@ fn bench_verify_before_execute(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, bench_execution, bench_verify_before_execute);
+/// Benchmark the Coh Physics Hierarchy (Bit -> Atom -> Spinor -> Yang-Mills)
+fn bench_physics_hierarchy(c: &mut Criterion) {
+    let mut group = c.benchmark_group("physics_hierarchy");
+    
+    use coh_core::cohbit::{CohBit, CohBitLaw, CohBitState};
+    use coh_core::atom::{CohAtom, AtomGeometry, AtomMetabolism};
+    use coh_physics::CohSpinor;
+    use coh_physics::current::CoherenceCurrent;
+    use coh_physics::gauge::YangMillsCurvature;
+    use coh_core::types::{Hash32, Decision};
+    use num_rational::Rational64;
+    use num_complex::Complex64;
+
+    let state_x = Hash32([0; 32]);
+    let bit = CohBit {
+        from_state: state_x,
+        to_state: Hash32([1; 32]),
+        transition_id: "bench".to_string(),
+        projection_hash: state_x,
+        valuation_pre: Rational64::new(100, 1),
+        valuation_post: Rational64::new(90, 1),
+        spend: Rational64::new(5, 1),
+        defect: Rational64::new(2, 1),
+        delta_hat: Rational64::new(2, 1),
+        utility: 10.0,
+        probability_soft: 0.0,
+        probability_exec: 0.0,
+        rv_status: Decision::Accept,
+        receipt_hash: Hash32([2; 32]),
+        state: CohBitState::Superposed,
+    };
+
+    // 1. Bit Admissibility (1,000 operations)
+    group.bench_function("bit_admissibility_x1000", |b| {
+        b.iter(|| {
+            for _ in 0..1000 {
+                let _ = bit.margin();
+                let _ = bit.is_executable();
+            }
+        });
+    });
+
+    // 2. Atom Optimal Selection (1,000 candidates)
+    let atom = CohAtom {
+        state_hash: state_x,
+        valuation: Rational64::new(100, 1),
+        admissible_bits: vec![bit.clone(); 1000],
+        geometry: AtomGeometry {
+            distance: Rational64::new(0, 1),
+            curvature: 0.0,
+            ricci_scalar: 0.5,
+        },
+        metabolism: AtomMetabolism {
+            budget: Rational64::new(1000, 1),
+            refresh: Rational64::new(5, 1),
+        },
+        receipt_chain: vec![],
+    };
+    group.bench_function("atom_selection_1000_candidates", |b| {
+        b.iter(|| {
+            let _ = atom.select_optimal_bit(1.0, 5.0);
+        });
+    });
+
+    // 3. Spinor Current Computation (1,000 operations)
+    let psi = CohSpinor::new(
+        Complex64::new(1.0, 0.0),
+        Complex64::new(0.5, 0.2),
+        Complex64::new(0.0, -0.1),
+        Complex64::new(0.1, 0.0),
+    );
+    group.bench_function("spinor_current_x1000", |b| {
+        b.iter(|| {
+            for _ in 0..1000 {
+                let _ = CoherenceCurrent::compute(&psi);
+            }
+        });
+    });
+
+    // 4. Effective Metric Coupling (1,000 operations)
+    let current = CoherenceCurrent::compute(&psi);
+    let g_base = [[1.0, 0.0, 0.0, 0.0], [0.0, -1.0, 0.0, 0.0], [0.0, 0.0, -1.0, 0.0], [0.0, 0.0, 0.0, -1.0]];
+    group.bench_function("metric_coupling_x1000", |b| {
+        b.iter(|| {
+            for _ in 0..1000 {
+                let _ = current.effective_metric_coupling(g_base, 0.1, 0.05, 0.02);
+            }
+        });
+    });
+
+    group.finish();
+}
+
+criterion_group!(benches, bench_execution, bench_verify_before_execute, bench_physics_hierarchy);
 criterion_main!(benches);

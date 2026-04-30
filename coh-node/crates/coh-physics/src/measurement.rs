@@ -39,7 +39,12 @@ impl SpinorProjector {
             }
             components[i] = sum;
         }
-        CohSpinor { components }
+        CohSpinor { 
+            components,
+            lambda: psi.lambda,
+            nabla_lambda: psi.nabla_lambda,
+            source_defect: psi.source_defect,
+        }
     }
 
     pub fn born_weight(&self, psi: &CohSpinor) -> f64 {

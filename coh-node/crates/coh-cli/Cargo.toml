@@ -6,7 +6,11 @@ license.workspace = true
 
 [dependencies]
 coh-core = { path = "../coh-core" }
+coh-genesis = { path = "../coh-genesis" }
+coh-npe = { path = "../coh-npe" }
+coh-phaseloom = { path = "../coh-phaseloom" }
 clap.workspace = true
 anyhow.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+num-rational = "0.4"

@@ -3,20 +3,20 @@
 //! Each function in this module is the **runtime enforcement point** of a
 //! formally proved Lean 4 theorem. The mapping is:
 //!
-//! ```
-//! Lean Theorem                          → Rust Kernel Gate
+//! ```text
+//! Lean Theorem                          -> Rust Kernel Gate
 //! ──────────────────────────────────────────────────────────────────────
-//! atomic_transition_stable              → GmiAtom::is_stable()
-//! atomic_transition_rv_certified        → RvKernel::verify_claim() (Accept)
-//! isRationalInf_add_inf_le              → budget_infimum_admissible()
-//! positive_density_theorem              → spinor_density_nonneg()
-//! cohspinor_density_eq_one              → normalized_spinor_density_is_one()
-//! gamma0_sq_eq_one                      → gamma0_sq_eq_identity()
-//! proj_density_nonneg                   → projection_weight_nonneg()
-//! coord_proj_idem                       → projector_is_idempotent()
-//! coord_proj_hermitian                  → projector_is_hermitian()
-//! coord_proj_weight_sum                 → projection_weights_sum_to_density()
-//! j0_eq_density                         → coherence_current_j0_eq_density()
+//! atomic_transition_stable              -> GmiAtom::is_stable()
+//! atomic_transition_rv_certified        -> RvKernel::verify_claim() (Accept)
+//! isRationalInf_add_inf_le              -> budget_infimum_admissible()
+//! positive_density_theorem              -> spinor_density_nonneg()
+//! cohspinor_density_eq_one              -> normalized_spinor_density_is_one()
+//! gamma0_sq_eq_one                      -> gamma0_sq_eq_identity()
+//! proj_density_nonneg                   -> projection_weight_nonneg()
+//! coord_proj_idem                       -> projector_is_idempotent()
+//! coord_proj_hermitian                  -> projector_is_hermitian()
+//! coord_proj_weight_sum                 -> projection_weights_sum_to_density()
+//! j0_eq_density                         -> coherence_current_j0_eq_density()
 //! ```
 
 use coh_core::rv_kernel::{RvDecision, RvDecisionKind};
@@ -232,6 +232,7 @@ pub struct SpinorInvariantReport {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use num_complex::Complex64;
 
     fn test_spinor() -> CohSpinor {
         CohSpinor::new(

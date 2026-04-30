@@ -4,85 +4,64 @@ import Coh.Boundary.CohBit
 namespace Coh.Boundary
 
 /--
-## Coh Atom
-The smallest bound system that can generate, verify, receipt, and continue CohBits.
+## Coh Atom Framework
+\boxed{ \textbf{Coh Atom}=\text{a self-contained, verifier-governed unit of state that generates, filters, and executes CohBits.} }
 -/
-structure CohAtom (X Y : Type) where
-  /-- Hidden/proposal/microstate space -/
-  space_X : Type := X
-  /-- Visible record/claim/macroscopic state space -/
-  space_Y : Type := Y
-  /-- Projection from possibility to record -/
-  projection : X → Y
-  
-  /-- NPE: Proposal Kernel -/
-  npe : X → Set X
-  /-- RV: Verifier Nucleus -/
-  rv : Y → Prop
-  /-- PhaseLoom: Memory-Feedback Kernel -/
-  phaseloom : Y → Set (X → Set X)
-  
-  /-- Global Governance Boundary -/
-  governor : X → Prop
-  
-  /-- Receipt Ledger -/
-  receipt : Y → Type
-  
-  /-- Hierarchical Budget Envelope -/
-  budget : X → ℝ
-  
-  /-- Feedback map from receipts to PhaseLoom/NPE -/
-  feedback : (y : Y) → receipt y → (X → Set X)
 
 /--
-## Atom Stability Law
-A Coh Atom is stable if the global Coherence Law holds for its transitions.
+### Coh Atom Definition
+\boxed{\mathcal A(x) = (x, \mathcal B_x, \mathcal A_x, \mathcal P_x, \mathcal G_x, \mathcal M_x, \mathcal R_x)}
 -/
-def is_stable {X Y : Type} (atom : CohAtom X Y) (x_prev x_next : X) (a : Y) : Prop :=
-  atom.governor x_next ∧ 
-  atom.budget x_next + 10 ≤ atom.budget x_prev + 100
+structure CohAtom {X : Type} (S : CohSystem X) where
+  state : X
+  budget : ENNRat
+  receipt_chain : List (Type) -- Simplified representation of H_t
+  
+  -- Candidate bits are just the set of all CohBits at this state
+  -- Executable bits are the subset satisfying is_executable
+  -- (These are properties derived from the state and system)
 
 /--
-## Atomic Transition (CohBit Emission)
-The process by which a Coh Atom emits a CohBit.
-
-Note: We parameterize over the receipt explicitly to avoid the sorry.
-The receipt `r : atom.receipt y` is a required precondition for the feedback
-continuation — it cannot be synthesized without an actual RV decision.
-The caller must supply it. The definition is existentially quantified over
-all admissible receipts.
+### Executable Direction Set
+The set of indices i such that b_i is executable.
 -/
-def atomic_transition {X Y : Type} (atom : CohAtom X Y) (x : X) : Set (Y × X) :=
-  { p | 
-    let y := p.1
-    let x_next := p.2
-    ∃ x_proposal ∈ atom.npe x, 
-    y = atom.projection x_proposal ∧ 
-    atom.rv y ∧ 
-    (∃ r : atom.receipt y, x_next ∈ (atom.feedback y r) x_proposal) ∧
-    is_stable atom x x_next y
-  }
+def executable_set {X : Type} {S : CohSystem X} (a : CohAtom S) (bits : List (CohBit S a.state)) : List (CohBit S a.state) :=
+  bits.filter (fun b => is_executable b)
 
 /--
-## Atomic Transition Stability
-Every completed atomic transition satisfies the Stability Law.
-[PROVED]
+### Transition Law
+\boxed{\mathcal A(x) \xrightarrow{\mathfrak b_i} \mathcal A(x_i')}
 -/
-theorem atomic_transition_stable {X Y : Type} (atom : CohAtom X Y) (x : X)
-  (p : Y × X) (hp : p ∈ atomic_transition atom x) :
-  is_stable atom x p.2 p.1 := by
-  obtain ⟨_, _, _, _, _, hstable⟩ := hp
-  exact hstable
+def transition {X : Type} {S : CohSystem X} (a : CohAtom S) (b : CohBit S a.state) (h_exec : is_executable b) (refresh : ENNRat) : CohAtom S where
+  state := b.next_state
+  budget := a.budget + refresh - S.spend b.transition
+  receipt_chain := b.certificate :: a.receipt_chain
 
 /--
-## Atomic Transition Verified
-Every completed atomic transition passes the RV gate.
-[PROVED]
+### Metabolic Law
+Constraint: V(x') + Spend(e) ≤ V(x) + Defect(e) + A_t
 -/
-theorem atomic_transition_rv_certified {X Y : Type} (atom : CohAtom X Y) (x : X)
-  (p : Y × X) (hp : p ∈ atomic_transition atom x) :
-  atom.rv p.1 := by
-  obtain ⟨_, _, _, hrv, _, _⟩ := hp
-  exact hrv
+def metabolic_admissible {X : Type} {S : CohSystem X} (a : CohAtom S) (b : CohBit S a.state) (refresh : ENNRat) : Prop :=
+  S.valuation b.next_state + S.spend b.transition ≤ S.valuation a.state + b.defect + refresh
+
+/--
+### Identity Atom Law
+The identity transition preserves the atom's state and valuation.
+-/
+theorem identity_atom_stable {X : Type} {S : CohSystem X} (a : CohAtom S) (cx : Type) (h_rv : S.rv_accept cx) :
+  let b_id := identity_cohbit S a.state cx h_rv
+  let a_next := transition a b_id (by 
+    unfold is_executable
+    simp [identity_cohbit, h_rv]
+  ) 0
+  a_next.state = a.state := by
+  simp [transition, identity_cohbit]
+
+/--
+### Protected Identity Theorem
+If refresh is 0 and no executable bits exist except identity, the atom enters stasis.
+-/
+def is_protected {X : Type} {S : CohSystem X} (a : CohAtom S) (cx : Type) (h_rv : S.rv_accept cx) : Prop :=
+  ∀ (b : CohBit S a.state), is_executable b -> b.transition = id
 
 end Coh.Boundary

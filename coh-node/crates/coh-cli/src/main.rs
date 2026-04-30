@@ -4,6 +4,8 @@ use coh_core::types::*;
 use coh_core::verify_chain::verify_chain;
 use coh_core::verify_micro::verify_micro;
 use coh_core::verify_slab_envelope;
+use coh_genesis::*;
+use num_rational::Rational64;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 use std::process;
@@ -39,6 +41,25 @@ enum Commands {
     },
     /// Verify a standalone slab-receipt
     VerifySlab { input: String },
+    /// Run a single GMI Governor step
+    GmiStep {
+        #[arg(long)]
+        proposal_id: String,
+        #[arg(long)]
+        content: String,
+        #[arg(long, default_value = "100/1")]
+        distance: String,
+    },
+    /// Run the Wildness Seeker sweep
+    WildnessSweep {
+        #[arg(long, default_value = "10")]
+        steps: usize,
+    },
+    /// Run the NPE Loop (PhaseLoom enabled)
+    NpeLoop {
+        #[arg(long, default_value = "5")]
+        iterations: usize,
+    },
 }
 
 fn main() {
@@ -118,7 +139,113 @@ fn main() {
             let res = verify_slab_envelope(wire);
             output_result(res, cli.format);
         }
+        Commands::GmiStep { proposal_id, content, distance } => {
+            let mut gov = setup_mock_governor();
+            let dist_rational = parse_rational(&distance);
+            
+            let (success, trace) = gov.step(
+                &proposal_id, 
+                &content, 
+                dist_rational,
+                Rational64::new(10, 1), 
+                Rational64::new(1, 1),
+                FormalStatus::ClosedNoSorry
+            );
+            
+            if cli.format == Format::Json {
+                println!("{}", serde_json::to_string_pretty(&trace).unwrap());
+            } else {
+                println!("GMI Step: {}", if success { "SUCCESS" } else { "REJECTED" });
+                println!("Step ID: {}", trace.step_id);
+                for event in trace.events {
+                    println!("  - {}", event);
+                }
+            }
+        }
+        Commands::WildnessSweep { steps } => {
+            println!("Running Wildness Sweep ({} steps per level)...", steps);
+            let results = run_wildness_sweep(&standard_levels(), steps, 42);
+            
+            if cli.format == Format::Json {
+                println!("{}", serde_json::to_string_pretty(&results).unwrap());
+            } else {
+                print_summary(&results);
+            }
+        }
+        Commands::NpeLoop { iterations } => {
+            println!("Running NPE Loop ({} iterations)...", iterations);
+            let mut gov = setup_mock_governor();
+            
+            for i in 0..iterations {
+                let pid = format!("prop-{}", i);
+                let (success, _) = gov.step(
+                    &pid,
+                    "npe-loop-content",
+                    Rational64::new(100, 1),
+                    Rational64::new(10, 1),
+                    Rational64::new(1, 1),
+                    FormalStatus::BuildPassedWithSorry
+                );
+                println!("  Iteration {}: {}", i, if success { "COMMITTED" } else { "REJECTED" });
+            }
+        }
     }
+}
+
+fn parse_rational(s: &str) -> Rational64 {
+    let parts: Vec<&str> = s.split('/').collect();
+    if parts.len() == 2 {
+        let n = parts[0].parse::<i64>().unwrap_or(0);
+        let d = parts[1].parse::<i64>().unwrap_or(1);
+        Rational64::new(n, d)
+    } else {
+        Rational64::new(s.parse::<i64>().unwrap_or(0), 1)
+    }
+}
+
+fn setup_mock_governor() -> GmiGovernor {
+    let npe = NpeKernel {
+        state: NpeState::new(NpeConfig::default()),
+        governing_state: NpeGoverningState { 
+            disorder: 1000,
+            accumulated_cost: 0,
+            wildness: 1.0,
+            queue_depth: 0,
+            memory_warmth: 0.5,
+        },
+        budget: NpeBudget::default(),
+    };
+    let rv = RvKernel {
+        state: RvGoverningState { 
+            valuation: 5000,
+            verified_spend: 0,
+            allowable_defect: 1000,
+            queue_depth: 0,
+            ledger_tip: Hash32([0; 32]),
+        },
+        budget: ProtectedRvBudget::default(),
+        mode: ToolAuthorityMode::Certification,
+    };
+    let phaseloom = PhaseLoomKernel {
+        state: PhaseLoomState::default(),
+        budget: PhaseLoomBudget::default(),
+    };
+    let env = EnvironmentalEnvelope {
+        power_mj: None,
+        thermal_headroom_c: None,
+        wallclock_ms: 1000,
+        hardware_available: true,
+        network_allowed: false,
+    };
+    let system = SystemReserve {
+        halt_available: true,
+        logging_ops: 100,
+        ledger_append_ops: 100,
+        recovery_ops: 10,
+        scheduler_ticks: 1000,
+    };
+    
+    GmiGovernor::new(npe, rv, phaseloom, env, system, None)
 }
 
 fn load_json<T: serde::de::DeserializeOwned>(path: &str) -> anyhow::Result<T> {

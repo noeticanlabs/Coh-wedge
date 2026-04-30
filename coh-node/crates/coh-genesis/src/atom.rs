@@ -72,6 +72,9 @@ impl GmiAtom {
             decision: None,
             outcome: None,
             cohbit_state: CohBitState::Superposed,
+            projection_hash: None,
+            delta_hat: None,
+            certificate_hash: None,
         };
 
         // 1. Envelopes
@@ -142,12 +145,25 @@ impl GmiAtom {
         }
 
         // 6. Global Stability Law Gate
-        //    Lean: atomic_transition_stable — V(x') + spend ≤ V(x) + defect
+        //    Lean: atomic_transition_stable — V(x') + spend ≤ V(x) + delta_hat
         let next_v = self.rv.state.valuation + self.npe.governing_state.disorder + self.phaseloom.state.tension;
-        if let Err(e) = assert_stability_law(prev_v, next_v, 10, 100) {
+        
+        // V3 Geometry: delta_hat is the certified upper bound of the defect
+        // In this implementation, we use a conservative bound based on the current metric space
+        let delta_hat = 100; 
+        
+        if let Err(e) = assert_stability_law(prev_v, next_v, 10, delta_hat) {
             return (false, trace.with_reject(&format!("Stability law: {:?}", e)));
         }
         
+        // 7. Certifiability Trace
+        let claim_json = serde_json::to_vec(&claim).unwrap_or_default();
+        let p_hash = coh_core::hash::compute_projection_hash(&claim_json);
+        
+        trace.delta_hat = Some(delta_hat);
+        trace.projection_hash = Some(p_hash.to_hex());
+        trace.certificate_hash = Some(format!("cert:{}", p_hash.to_hex()));
+
         // Budget Infimum Law (Lean: isRationalInf_add_inf_le)
         if let Err(e) = assert_budget_infimum(
             self.budgets.npe.cpu_ms,

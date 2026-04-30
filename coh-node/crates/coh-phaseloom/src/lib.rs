@@ -24,6 +24,8 @@ use std::collections::HashMap;
 use coh_npe::weights::StrategyWeights;
 use coh_npe::receipt::BoundaryReceiptSummary;
 use coh_npe::closure::LeanClosureStatus;
+#[cfg(test)]
+use coh_npe::{MathlibEffect, failure_taxonomy};
 
 pub mod kernel;
 pub mod knowledge;

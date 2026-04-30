@@ -21,15 +21,21 @@ Since gamma^0 is Hermitian and (gamma^0)^2 = 1, J^0 = psi† psi which is real a
 This is the physically meaningful statement: J^0 is the probability density.
 -/
 theorem j0_eq_density (psi : SpinorSpace) :
-  (coherence_current psi gamma0).re = density psi := by
-  -- gamma0_sq_eq_one (in Proofs.lean) establishes: gamma0_mat * gamma0_mat = I  [PROVED]
-  -- The adjoint is bar{psi} = psi† gamma0 (diagonal, entries: conj(c0),conj(c1),-conj(c2),-conj(c3))
-  -- J0 = bar{psi} gamma0 psi = sum_i (bar_psi_i * (gamma0 * psi)_i)
-  --    = c0*.c0 + c1*.c1 + c2*.c2 + c3*.c3  (using gamma0^2=I)
-  --    = density(psi)
-  -- The residual sorry is a type-bridge: SpinorSpace (Vector) ↔ SpinorVec (Fin 4 → ℂ).
-  -- These are definitionally isomorphic; full closure requires simp [Vector.get_ofFn].
-  sorry -- [STRUCTURAL-BRIDGE-ONLY: connects SpinorSpace to Fin 4 → Complex ℝ]
+  unfold coherence_current
+  unfold adjoint
+  rw [Matrix.mul_assoc]
+  rw [gamma0_sq_eq_one]
+  rw [Matrix.mul_one]
+  -- Now we have: ((Matrix.col (Fin 1) psi.get).conjTranspose * Matrix.col (Fin 4) psi.get) 0 0 = density psi
+  -- This is exactly the definition of density via dot product/sum of normSq.
+  unfold density
+  simp [Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.col_apply, Complex.normSq]
+  -- Bridge List.sum and Finset.sum
+  have h : (psi.toList.map fun c => c.re ^ 2 + c.im ^ 2).sum = 
+           Finset.univ.sum (fun i => (psi.get i).re ^ 2 + (psi.get i).im ^ 2) := by
+    rw [List.sum_eq_univ_sum]
+    simp
+  exact h
 
 /--
 ## Current Closure Statement (Conservation)

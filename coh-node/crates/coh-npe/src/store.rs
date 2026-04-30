@@ -5,7 +5,8 @@
 
 #[cfg(feature = "npe-store")]
 use {
-    crate::engine::{NpeEdge, NpeProposal, ProposalStatus},
+    crate::engine::{NpeProposal, ProposalStatus},
+    crate::lineage::NpeEdge,
     rusqlite::{params, Connection, Result as SqlResult},
     serde_json,
     std::path::Path,

@@ -25,6 +25,35 @@ impl CoherenceCurrent {
 
         Self { j0, j1, j2, j3 }
     }
+
+    /// [COH GEOMETRY] Compute effective metric coupling
+    /// g_eff = g + epsilon * J*J + zeta * Rc^2 * Pi
+    pub fn effective_metric_coupling(
+        &self,
+        g_base: [[f64; 4]; 4],
+        rc: f64,
+        epsilon: f64,
+        zeta: f64,
+    ) -> [[f64; 4]; 4] {
+        let j = [self.j0, self.j1, self.j2, self.j3];
+        let mut g_eff = g_base;
+        
+        let rc_sq = rc * rc;
+        
+        for mu in 0..4 {
+            for nu in 0..4 {
+                // Deform metric by current product and defect stress
+                g_eff[mu][nu] += epsilon * j[mu] * j[nu];
+                
+                // Stress tensor coupling (simplified diagonal Pi)
+                if mu == nu {
+                    g_eff[mu][nu] += zeta * rc_sq;
+                }
+            }
+        }
+        
+        g_eff
+    }
 }
 
 fn compute_bilinear(bar_psi: &[Complex64; 4], g: &gamma::Matrix4, psi: &CohSpinor) -> f64 {

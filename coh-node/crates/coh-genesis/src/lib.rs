@@ -209,6 +209,9 @@ pub struct GmiStepTrace {
     pub decision: Option<RvDecisionKind>,
     pub outcome: Option<GmiStepOutcome>,
     pub cohbit_state: CohBitState,
+    pub projection_hash: Option<String>,
+    pub delta_hat: Option<u128>,
+    pub certificate_hash: Option<String>,
 }
 
 /// Global GMI Governor (Gov_G)

@@ -2,6 +2,7 @@
 #![allow(clippy::too_many_arguments)]
 
 pub mod auth;
+pub mod atom;
 pub mod build_slab;
 pub mod canon;
 pub mod cohbit;
@@ -14,6 +15,7 @@ pub mod merkle;
 pub mod phaseloom;
 pub mod reject;
 pub mod semantic;
+pub mod trajectory;
 pub mod trajectory_probability;
 pub mod types;
 pub mod types_v3;
@@ -23,6 +25,8 @@ pub mod verify_chain;
 pub mod verify_micro;
 pub mod verify_micro_v3;
 pub mod verify_slab;
+pub mod gccp;
+pub mod external;
 
 pub mod rv_kernel;
 pub mod tools;
