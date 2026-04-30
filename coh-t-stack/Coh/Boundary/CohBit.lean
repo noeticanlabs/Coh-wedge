@@ -18,6 +18,7 @@ structure CohSystem (X : Type) where
   certified_defect : (X -> X) -> ENNRat -- \widehat{\delta}
   spend : (X -> X) -> ENNRat
   rv_accept : Type -> Prop -- Runtime Verifier
+  id_defect_zero : certified_defect id = 0
 
 /--
 ### CohBit Definition
@@ -86,6 +87,8 @@ def identity_cohbit {X : Type} (S : CohSystem X) (x : X) (cx : Type) (h_rv : S.r
   trace_eq := rfl
   next_eq := rfl
   defect := 0
-  v2_certified := sorry -- Assume id has 0 defect
+  v2_certified := by 
+    rw [S.id_defect_zero]
+    exact le_refl 0
 
 end Coh.Boundary

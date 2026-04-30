@@ -74,7 +74,7 @@ pub struct VerifierClaim {
     pub law_margin: Option<i128>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum Decision {
     Accept,
@@ -83,6 +83,7 @@ pub enum Decision {
     TerminalSuccess,
     TerminalFailure,
     AbortBudget,
+    #[default]
     Pending,
     Queued,
 }

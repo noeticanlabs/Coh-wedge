@@ -1,0 +1,399 @@
+﻿{
+  "benchmarks": [
+    {
+      "latency_us": 9,
+      "steps": 1000,
+      "type": "latency_bench"
+    },
+    {
+      "latency_us": 11,
+      "steps": 2000,
+      "type": "latency_bench"
+    },
+    {
+      "latency_us": 13,
+      "steps": 3000,
+      "type": "latency_bench"
+    },
+    {
+      "latency_us": 17,
+      "steps": 4000,
+      "type": "latency_bench"
+    },
+    {
+      "latency_us": 21,
+      "steps": 5000,
+      "type": "latency_bench"
+    },
+    {
+      "latency_us": 25,
+      "steps": 6000,
+      "type": "latency_bench"
+    },
+    {
+      "latency_us": 32,
+      "steps": 7000,
+      "type": "latency_bench"
+    },
+    {
+      "latency_us": 47,
+      "steps": 8000,
+      "type": "latency_bench"
+    },
+    {
+      "latency_us": 36,
+      "steps": 9000,
+      "type": "latency_bench"
+    },
+    {
+      "latency_us": 40,
+      "steps": 10000,
+      "type": "latency_bench"
+    }
+  ],
+  "dynamics": [
+    {
+      "enforcement_loss": 0.0004994208704672618,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.0004994208704672618,
+      "tau": 0.1,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.04067902398100978,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.04067902398100978,
+      "tau": 0.2,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.15963821601067807,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.15963821601067807,
+      "tau": 0.30000000000000004,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.30921462560131663,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.30921462560131663,
+      "tau": 0.4,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.45847520412371245,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.45847520412371245,
+      "tau": 0.5,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.5978139214910084,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.5978139214910084,
+      "tau": 0.6000000000000001,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.7266797420996721,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.7266797420996721,
+      "tau": 0.7000000000000001,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.8486421814095877,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.8486421814095877,
+      "tau": 0.8,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.9685999601200435,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.9685999601200435,
+      "tau": 0.9,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.0900675960415747,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.0900675960415747,
+      "tau": 1.0,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.21316485779772,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.21316485779772,
+      "tau": 1.1,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.3341499447977956,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.3341499447977956,
+      "tau": 1.2000000000000002,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.4465649459385117,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.4465649459385117,
+      "tau": 1.3,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.543332204298217,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.543332204298217,
+      "tau": 1.4000000000000001,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.618826121964711,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.618826121964711,
+      "tau": 1.5,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.6701380633540908,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.6701380633540908,
+      "tau": 1.6,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.697279742981587,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.697279742981587,
+      "tau": 1.7000000000000002,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.7025748505057137,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.7025748505057137,
+      "tau": 1.8,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.6897067637922762,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.6897067637922762,
+      "tau": 1.9000000000000001,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.662820146854578,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.662820146854578,
+      "tau": 2.0,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.625878678084457,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.625878678084457,
+      "tau": 2.1,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.582309245174802,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.582309245174802,
+      "tau": 2.2,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.5348716372850448,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.5348716372850448,
+      "tau": 2.3000000000000003,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.4856701022481476,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.4856701022481476,
+      "tau": 2.4000000000000004,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.4362363583492173,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.4362363583492173,
+      "tau": 2.5,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.387637035425156,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.387637035425156,
+      "tau": 2.6,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.3405792354714583,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.3405792354714583,
+      "tau": 2.7,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.2955022045625812,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.2955022045625812,
+      "tau": 2.8000000000000003,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.2526515170421777,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.2526515170421777,
+      "tau": 2.9000000000000004,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.2121364385085367,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.2121364385085367,
+      "tau": 3.0,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.1739728981502844,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.1739728981502844,
+      "tau": 3.1,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.1381149280657872,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.1381149280657872,
+      "tau": 3.2,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.1044772303932442,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.1044772303932442,
+      "tau": 3.3000000000000003,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.0729511047742193,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.0729511047742193,
+      "tau": 3.4000000000000004,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.043415503582133,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.043415503582133,
+      "tau": 3.5,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 1.01574456452129,
+      "exec_entropy": 0.0,
+      "soft_entropy": 1.01574456452129,
+      "tau": 3.6,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.9898126267832165,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.9898126267832165,
+      "tau": 3.7,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.9654974685595589,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.9654974685595589,
+      "tau": 3.8000000000000003,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.9426823004456174,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.9426823004456174,
+      "tau": 3.9000000000000004,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.9212568984740006,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.9212568984740006,
+      "tau": 4.0,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.9011181502173837,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.9011181502173837,
+      "tau": 4.1000000000000005,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.8821702075159712,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.8821702075159712,
+      "tau": 4.2,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.8643243819470152,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.8643243819470152,
+      "tau": 4.3,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.8474988780801259,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.8474988780801259,
+      "tau": 4.4,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.8316184303215596,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.8316184303215596,
+      "tau": 4.5,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.8166138884171319,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.8166138884171319,
+      "tau": 4.6000000000000005,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.8024217820404537,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.8024217820404537,
+      "tau": 4.7,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.7889838845973689,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.7889838845973689,
+      "tau": 4.800000000000001,
+      "type": "entropy_sweep"
+    },
+    {
+      "enforcement_loss": 0.7762467891767549,
+      "exec_entropy": 0.0,
+      "soft_entropy": 0.7762467891767549,
+      "tau": 4.9,
+      "type": "entropy_sweep"
+    }
+  ]
+}

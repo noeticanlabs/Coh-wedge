@@ -1,0 +1,367 @@
+﻿[
+  {
+    "g": 0.0,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.05,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.1,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.15000000000000002,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.2,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.25,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.30000000000000004,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.35000000000000003,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.4,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.45,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.5,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.55,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.6000000000000001,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.65,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.7000000000000001,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.75,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.8,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.8500000000000001,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.9,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "g": 0.9500000000000001,
+    "interaction_cost": -0.0,
+    "total_action": -10.0,
+    "type": "coupling_sweep"
+  },
+  {
+    "holonomy": 1.9975005207899326,
+    "steps": 1,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.9900083305560516,
+    "steps": 2,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.9775421558720845,
+    "steps": 3,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.9601331556824833,
+    "steps": 4,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.9378248434212895,
+    "steps": 5,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.910672978251212,
+    "steps": 6,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.8787454256947578,
+    "steps": 7,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.8421219880057702,
+    "steps": 8,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.800894204705354,
+    "steps": 9,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.7551651237807455,
+    "steps": 10,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.7050490441190116,
+    "steps": 11,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.6506712298193567,
+    "steps": 12,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.5921675970981117,
+    "steps": 13,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.5296843745689768,
+    "steps": 14,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.4633777377476416,
+    "steps": 15,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.3934134186943306,
+    "steps": 16,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.319966291769964,
+    "steps": 17,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.2432199365413286,
+    "steps": 18,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.1633661789277665,
+    "steps": 19,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 1.080604611736279,
+    "steps": 20,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 0.9951420957834535,
+    "steps": 21,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 0.9071922428511542,
+    "steps": 22,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 0.8169748817683139,
+    "steps": 23,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 0.7247155089533465,
+    "steps": 24,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 0.6306447247905365,
+    "steps": 25,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 0.5349976572491739,
+    "steps": 26,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 0.4380133741860821,
+    "steps": 27,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 0.33993428580048074,
+    "steps": 28,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 0.2410055387347319,
+    "steps": 29,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 0.14147440333540448,
+    "steps": 30,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": 0.04158965560618352,
+    "steps": 31,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -0.05839904460257896,
+    "steps": 32,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -0.1582417776134695,
+    "steps": 33,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -0.25768898859105105,
+    "steps": 34,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -0.35649211129898595,
+    "steps": 35,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -0.45440418938617594,
+    "steps": 36,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -0.5511804936490275,
+    "steps": 37,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -0.6465791337270088,
+    "steps": 38,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -0.7403616627025759,
+    "steps": 39,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -0.8322936730942864,
+    "steps": 40,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -0.9221453827534271,
+    "steps": 41,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -1.0096922091997158,
+    "steps": 42,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -1.0947153309605429,
+    "steps": 43,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -1.1770022345106916,
+    "steps": 44,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -1.2563472454454783,
+    "steps": 45,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -1.332552042559648,
+    "steps": 46,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -1.4054261535471073,
+    "steps": 47,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -1.4747874310824902,
+    "steps": 48,
+    "type": "holonomy_decay"
+  },
+  {
+    "holonomy": -1.5404625080946137,
+    "steps": 49,
+    "type": "holonomy_decay"
+  }
+]

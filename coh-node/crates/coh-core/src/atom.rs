@@ -5,7 +5,7 @@ use num_rational::Rational64;
 use num_traits::ToPrimitive;
 
 /// Coh Atom Geometry Metrics
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct AtomGeometry {
     pub distance: Rational64,
     pub curvature: f64,
@@ -13,7 +13,7 @@ pub struct AtomGeometry {
 }
 
 /// Coh Atom Metabolism
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct AtomMetabolism {
     pub budget: Rational64,
     pub refresh: Rational64,
@@ -22,7 +22,7 @@ pub struct AtomMetabolism {
 /// The Coh Atom: Verifier-governed unit of state evolution.
 /// 
 /// \boxed{\mathcal A(x) = (x, \mathcal B_x, \mathcal A_x, \mathcal P_x, \mathcal G_x, \mathcal M_x, \mathcal R_x)}
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct CohAtom {
     pub state_hash: Hash32,
     pub valuation: Rational64,
@@ -44,8 +44,9 @@ impl CohAtom {
         
         let r_coh = ricci + gauge_curvature;
         let u_refresh = self.metabolism.refresh.to_f64().unwrap_or(0.0);
+        let ym_energy = bit.ym_energy;
         
-        delta_hat - f_exec + (lambda * r_coh) - u_refresh
+        delta_hat - f_exec + (lambda * r_coh) + ym_energy - u_refresh
     }
 
     /// Optimal Executable CohBit: \pi^*(x) = arg min_{e \in A_x} J(e)

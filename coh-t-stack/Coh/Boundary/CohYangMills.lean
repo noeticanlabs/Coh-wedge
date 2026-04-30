@@ -29,10 +29,17 @@ structure CohGaugeField (dim : ℕ) where
 ### Covariant Admissibility Law
 \nabla_\mu J^\mu = S_C \in \mathfrak{g}
 -/
+/--
+### Current Admissibility
+Direct current-based constraint for field coupling.
+-/
+def current_satisfies_constraint {N : ℕ} (j : CohCurrent N) (sc : ENNRat) : Prop :=
+  j.j0 + (Finset.univ.sum j.j_spatial) = sc
+
 def satisfies_covariant_admissibility {N : ℕ} {dim : ℕ} 
   (j : Fin dim -> CohCurrent N) 
   (sc : Fin dim -> ENNRat) : Prop :=
-  ∀ a, satisfies_admissibility_constraint (j a |> sorry) (sc a)
+  ∀ a, current_satisfies_constraint (j a) (sc a)
 
 /--
 ### Wilson Loop Receipt

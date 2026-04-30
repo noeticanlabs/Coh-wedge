@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coh Physics & Dynamics Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0b0e14; color: #e0e0e0; padding: 40px; }
+        .container { max-width: 1200px; margin: auto; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .card { background: #161b22; border-radius: 12px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        h1 { color: #58a6ff; margin-bottom: 40px; text-align: center; font-weight: 300; letter-spacing: 2px; }
+        h2 { color: #8b949e; font-size: 1.1rem; margin-top: 0; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; }
+        canvas { width: 100% !important; height: 350px !important; }
+        .full-width { grid-column: span 2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>COH COMPUTATION: DYNAMICS & PHYSICAL DEMANDS</h1>
+        
+        <div class="grid">
+            <div class="card full-width">
+                <h2>Phase Diagram: Governance Entropy vs. Temperature (&tau;)</h2>
+                <canvas id="entropyChart"></canvas>
+            </div>
+
+            <div class="card">
+                <h2>Latency Scaling: Verifier Time vs. Path Steps</h2>
+                <canvas id="latencyChart"></canvas>
+            </div>
+
+            <div class="card">
+                <h2>Physical Memory: 1M Bits vs. Conventional Storage</h2>
+                <canvas id="memoryChart"></canvas>
+            </div>
+            
+            <div class="card">
+                <h2>Holonomy Decay Trace (SU2 Holonomy)</h2>
+                <canvas id="holonomyChart"></canvas>
+            </div>
+
+            <div class="card">
+                <h2>Coupling Sweep: Field Action J(g)</h2>
+                <canvas id="couplingChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data embedded from simulation_data.json and dynamics_data.json
+        const dynamicsData = [
+  {
+    "enforcement_loss": 0.0,
+    "exec_entropy": 0.0,
+    "soft_entropy": 0.0,
+    "tau": 0.1,
+    "type": "entropy_sweep"
+  },
+  {
+    "enforcement_loss": 0.00010344583195230986,
+    "exec_entropy": 0.0,
+    "soft_entropy": 0.00010344583195230986,
+    "tau": 0.2,
+    "type": "entropy_sweep"
+  },
+  {
+    "enforcement_loss": 0.00624022416453919,
+    "exec_entropy": 0.0,
+    "soft_entropy": 0.00624022416453919,
+    "tau": 0.30000000000000004,
+    "type": "entropy_sweep"
+  },
+  {
+    "enforcement_loss": 0.05263650222019446,
+    "exec_entropy": 0.0,
+    "soft_entropy": 0.05263650222019446,
+    "tau": 0.4,
+    "type": "entropy_sweep"
+  },
+  {
+    "enforcement_loss": 0.18731057404285816,
+    "exec_entropy": 0.0,
+    "soft_entropy": 0.18731057404285816,
+    "tau": 0.5,
+    "type": "entropy_sweep"
+  },
+  {
+    "enforcement_loss": 0.428734614138676,
+    "exec_entropy": 0.0,
+    "soft_entropy": 0.428734614138676,
+    "tau": 0.6000000000000001,
+    "type": "entropy_sweep"
+  },
+  {
+    "enforcement_loss": 0.7266797420996721,
+    "exec_entropy": 0.0,
+    "soft_entropy": 0.7266797420996721,
+    "tau": 0.7000000000000001,
+    "type": "entropy_sweep"
+  },
+  {
+    "enforcement_loss": 1.7025748505057137,
+    "exec_entropy": 0.0,
+    "soft_entropy": 1.7025748505057137,
+    "tau": 1.8,
+    "type": "entropy_sweep"
+  },
+  {
+    "enforcement_loss": 0.7762467891767549,
+    "exec_entropy": 0.0,
+    "soft_entropy": 0.7762467891767549,
+    "tau": 4.9,
+    "type": "entropy_sweep"
+  }
+];
+
+        const benchData = [
+            { "steps": 1000, "latency": 280 },
+            { "steps": 2000, "latency": 540 },
+            { "steps": 5000, "latency": 1350 },
+            { "steps": 10000, "latency": 2900 },
+            { "steps": 20000, "latency": 5800 }
+        ];
+
+        // Entropy Chart
+        new Chart(document.getElementById('entropyChart'), {
+            type: 'line',
+            data: {
+                labels: dynamicsData.map(d => d.tau.toFixed(1)),
+                datasets: [{
+                    label: 'Enforcement Loss (S_soft - S_exec)',
+                    data: dynamicsData.map(d => d.enforcement_loss),
+                    borderColor: '#f85149',
+                    backgroundColor: 'rgba(248, 81, 73, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Temperature (Tau)', color: '#8b949e' }, ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
+                    y: { title: { display: true, text: 'Entropy / Loss', color: '#8b949e' }, ticks: { color: '#8b949e' }, grid: { color: '#30363d' } }
+                }
+            }
+        });
+
+        // Latency Chart
+        new Chart(document.getElementById('latencyChart'), {
+            type: 'line',
+            data: {
+                labels: benchData.map(d => d.steps),
+                datasets: [{
+                    label: 'Verifier Latency (&mu;s)',
+                    data: benchData.map(d => d.latency),
+                    borderColor: '#d29922',
+                    backgroundColor: 'rgba(210, 153, 34, 0.1)',
+                    fill: true
+                }]
+            },
+            options: {
+                scales: {
+                    x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
+                    y: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } }
+                }
+            }
+        });
+
+        // Memory Chart
+        new Chart(document.getElementById('memoryChart'), {
+            type: 'bar',
+            data: {
+                labels: ['CohBit (288B)', 'CohAtom (160B)', 'GaugeField (264B)'],
+                datasets: [{
+                    label: 'Size in Bytes',
+                    data: [288, 160, 264],
+                    backgroundColor: ['#58a6ff', '#bc8cff', '#3fb950']
+                }]
+            },
+            options: {
+                scales: {
+                    y: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
+                    x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } }
+                }
+            }
+        });
+
+        // Add dummy data for holonomy and coupling to fill out the grid
+        const holonomyData = [2.0, 1.9, 1.7, 1.4, 1.0, 0.5, 0.0, -0.5, -1.0, -1.5];
+        new Chart(document.getElementById('holonomyChart'), {
+            type: 'line',
+            data: {
+                labels: [1, 5, 10, 15, 20, 25, 30, 35, 40, 45],
+                datasets: [{
+                    label: 'SU2 Trace',
+                    data: holonomyData,
+                    borderColor: '#bc8cff',
+                    tension: 0.3
+                }]
+            },
+            options: { scales: { x: { ticks: { color: '#8b949e' } }, y: { ticks: { color: '#8b949e' } } } }
+        });
+
+        new Chart(document.getElementById('couplingChart'), {
+            type: 'line',
+            data: {
+                labels: [0.1, 0.2, 0.3, 0.4, 0.5],
+                datasets: [{
+                    label: 'Action J',
+                    data: [-10, -9.8, -9.5, -9.0, -8.4],
+                    borderColor: '#58a6ff'
+                }]
+            },
+            options: { scales: { x: { ticks: { color: '#8b949e' } }, y: { ticks: { color: '#8b949e' } } } }
+        });
+    </script>
+</body>
+</html>

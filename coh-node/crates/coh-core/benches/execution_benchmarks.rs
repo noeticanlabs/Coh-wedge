@@ -168,6 +168,7 @@ fn bench_physics_hierarchy(c: &mut Criterion) {
         rv_status: Decision::Accept,
         receipt_hash: Hash32([2; 32]),
         state: CohBitState::Superposed,
+        ..Default::default()
     };
 
     // 1. Bit Admissibility (1,000 operations)
@@ -229,6 +230,41 @@ fn bench_physics_hierarchy(c: &mut Criterion) {
         b.iter(|| {
             for _ in 0..1000 {
                 let _ = criterion::black_box(current.effective_metric_coupling(g_base, 0.1, 0.05, 0.02));
+            }
+        });
+    });
+
+    // 5. Yang-Mills Curvature (1,000 operations)
+    use coh_physics::gauge::CohGaugeField;
+    let mut gauge = CohGaugeField::new(3);
+    gauge.connection[0][0] = 0.1;
+    gauge.connection[1][1] = 0.1;
+    group.bench_function("yang_mills_curvature_x1000", |b| {
+        let gauge = criterion::black_box(gauge.clone());
+        b.iter(|| {
+            for _ in 0..1000 {
+                let _ = criterion::black_box(gauge.compute_curvature(0, 1));
+            }
+        });
+    });
+
+    // 6. Wilson Loop Holonomy (100 steps, 100 iterations)
+    use coh_physics::gauge::WilsonLoopReceipt;
+    use coh_core::trajectory::path_integral::CohHistory;
+    let history = CohHistory {
+        steps: vec![CohBit {
+            from_state: state_x,
+            to_state: Hash32([1; 32]),
+            rv_status: Decision::Accept,
+            ..Default::default()
+        }; 100],
+    };
+    group.bench_function("wilson_loop_100_steps_x100", |b| {
+        let history = criterion::black_box(history.clone());
+        let gauge = criterion::black_box(gauge.clone());
+        b.iter(|| {
+            for _ in 0..100 {
+                let _ = criterion::black_box(WilsonLoopReceipt::compute_holonomy(&history, &gauge));
             }
         });
     });

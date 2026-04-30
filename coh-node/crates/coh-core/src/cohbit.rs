@@ -22,7 +22,7 @@ pub enum CohBitState {
 /// The CohBit: Minimal unit of governed information formation.
 /// 
 /// \boxed{ \mathfrak b_i(x) = (r_i, x_i', R_i, m_i, u_i, p_i, c_i) }
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct CohBit {
     pub from_state: Hash32,
     pub to_state: Hash32,
@@ -42,6 +42,11 @@ pub struct CohBit {
     pub rv_status: Decision,
     pub receipt_hash: Hash32,
     pub state: CohBitState,
+
+    // Yang-Mills Fields
+    pub ym_energy: f64,
+    pub constraint_residual: f64,
+    pub bianchi_residual: f64,
 }
 
 impl CohBit {
@@ -51,8 +56,17 @@ impl CohBit {
     }
 
     /// Executability Condition: m_i(x) >= 0 and RV(c_i) = ACCEPT
+    /// For Locked Yang-Mills, we also check residuals and energy bounds.
     pub fn is_executable(&self) -> bool {
-        self.margin() >= Rational64::from_integer(0) && self.rv_status == Decision::Accept
+        let eps_j = 1e-6;
+        let eps_b = 1e-6;
+        let b_field = 1000.0;
+
+        self.margin() >= Rational64::from_integer(0) 
+            && self.rv_status == Decision::Accept
+            && self.constraint_residual <= eps_j
+            && self.bianchi_residual <= eps_b
+            && self.ym_energy <= b_field
     }
 
     /// Identity CohBit: \mathbf 1_x = (id, x, Pi(id), 0, 0, 1, c_x)
@@ -73,6 +87,9 @@ impl CohBit {
             rv_status: Decision::Accept,
             receipt_hash: state_hash,
             state: CohBitState::Remembered,
+            ym_energy: 0.0,
+            constraint_residual: 0.0,
+            bianchi_residual: 0.0,
         }
     }
 
@@ -114,6 +131,9 @@ impl CohBit {
             },
             receipt_hash,
             state: CohBitState::Superposed,
+            ym_energy: self.ym_energy + other.ym_energy,
+            constraint_residual: self.constraint_residual + other.constraint_residual,
+            bianchi_residual: self.bianchi_residual + other.bianchi_residual,
         })
     }
 
@@ -150,6 +170,9 @@ impl CohBit {
             },
             receipt_hash: self.receipt_hash,
             state: CohBitState::Superposed,
+            ym_energy: self.ym_energy + other.ym_energy,
+            constraint_residual: self.constraint_residual + other.constraint_residual,
+            bianchi_residual: self.bianchi_residual + other.bianchi_residual,
         }
     }
 
