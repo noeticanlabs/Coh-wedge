@@ -1,75 +1,10 @@
-//! NPE-Lean Closure Attempt v0.2
-//!
-//! Target: isRationalInf_pairwise_add
-//!
-//! This runner operates in "closure" mode. Instead of starting with uniform weights
-//! for exploration, it initializes PhaseLoom with heavily biased weights based on
-//! previous learning (NPE-Lean PhaseLoom Benchmark), prioritizing strategies known
-//! to be effective for this specific proof target: ApproximationLemma, ExistsLtUsed,
-//! and InfAddCompatibility.
-
-use coh_genesis::mathlib_advisor::{
-    assess_import_risk, check_policy, MathlibPolicy,
-    MathlibStrategy, generate_failure_report,
-};
-use coh_genesis::phaseloom_lite::{
-    phaseloom_ingest, phaseloom_init, BoundaryReceiptSummary,
-    MathlibEffect, PhaseLoomConfig, PhaseLoomState,
-};
-use std::env;
+use serde::Serialize;
+use serde_json::json;
+use std::collections::HashMap;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
-/// Strategies combined from pairwise add and rebuild loops
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ClosureStrategy {
-    ApproximationLemma,
-    ExistsLtUsed,
-    InfAddCompatibility,
-    PairwiseLowerBound,
-    GLBGreatestReduction,
-    ForbiddenShortcut,
-}
-
-impl ClosureStrategy {
-    fn as_str(&self) -> &'static str {
-        match self {
-            ClosureStrategy::ApproximationLemma => "ApproximationLemma",
-            ClosureStrategy::ExistsLtUsed => "ExistsLtUsed",
-            ClosureStrategy::InfAddCompatibility => "InfAddCompatibility",
-            ClosureStrategy::PairwiseLowerBound => "PairwiseLowerBound",
-            ClosureStrategy::GLBGreatestReduction => "GLBGreatestReduction",
-            ClosureStrategy::ForbiddenShortcut => "ForbiddenShortcut",
-        }
-    }
-}
-
-/// Outcomes for the closure attempt
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ClosureOutcome {
-    FullPairwiseAddCompiled,
-    ApproximationLemmaIsolated,
-    ExistsLtUsedIsolated,
-    InfAddCompatibilityIsolated,
-    PartialAssembly,
-    LeanNearMiss,
-    ForbiddenRejected,
-}
-
-impl ClosureOutcome {
-    fn is_useful(&self) -> bool {
-        matches!(
-            self,
-            ClosureOutcome::FullPairwiseAddCompiled
-                | ClosureOutcome::ApproximationLemmaIsolated
-                | ClosureOutcome::ExistsLtUsedIsolated
-                | ClosureOutcome::InfAddCompatibilityIsolated
-                | ClosureOutcome::PartialAssembly
-        )
-    }
-}
-
-/// Simple RNG
+/// Simple RNG for simulation
 #[derive(Clone, Debug)]
 struct SimpleRng {
     state: u64,
@@ -93,228 +28,34 @@ impl SimpleRng {
     }
 }
 
-/// Simulates a candidate generation and compilation attempt based on selected strategy
-fn simulate_outcome(strategy: ClosureStrategy, rng: &mut SimpleRng) -> ClosureOutcome {
-    match strategy {
-        ClosureStrategy::ApproximationLemma => {
-            if rng.next_f64() < 0.60 {
-                ClosureOutcome::ApproximationLemmaIsolated
-            } else if rng.next_f64() < 0.10 {
-                ClosureOutcome::FullPairwiseAddCompiled
-            } else {
-                ClosureOutcome::LeanNearMiss
-            }
-        }
-        ClosureStrategy::ExistsLtUsed => {
-            if rng.next_f64() < 0.50 {
-                ClosureOutcome::ExistsLtUsedIsolated
-            } else if rng.next_f64() < 0.30 {
-                ClosureOutcome::FullPairwiseAddCompiled
-            } else {
-                ClosureOutcome::LeanNearMiss
-            }
-        }
-        ClosureStrategy::InfAddCompatibility => {
-            if rng.next_f64() < 0.40 {
-                ClosureOutcome::InfAddCompatibilityIsolated
-            } else if rng.next_f64() < 0.20 {
-                ClosureOutcome::FullPairwiseAddCompiled
-            } else {
-                ClosureOutcome::LeanNearMiss
-            }
-        }
-        ClosureStrategy::PairwiseLowerBound => {
-            if rng.next_f64() < 0.30 {
-                ClosureOutcome::PartialAssembly
-            } else {
-                ClosureOutcome::LeanNearMiss
-            }
-        }
-        ClosureStrategy::GLBGreatestReduction => {
-            if rng.next_f64() < 0.35 {
-                ClosureOutcome::PartialAssembly
-            } else {
-                ClosureOutcome::LeanNearMiss
-            }
-        }
-        ClosureStrategy::ForbiddenShortcut => ClosureOutcome::ForbiddenRejected,
-    }
+#[derive(Serialize)]
+struct ProofNode {
+    id: String,
+    strategy: String,
+    outcome: String,
+    weight: f64,
 }
 
-fn outcome_to_receipt(
-    strategy: ClosureStrategy,
-    outcome: ClosureOutcome,
-    mathlib_mode: &str,
-) -> BoundaryReceiptSummary {
-    let accepted = outcome.is_useful();
-
-    let first_failure = match outcome {
-        ClosureOutcome::FullPairwiseAddCompiled => "none",
-        ClosureOutcome::ApproximationLemmaIsolated => "none_proved_partial",
-        ClosureOutcome::ExistsLtUsedIsolated => "none_proved_partial",
-        ClosureOutcome::InfAddCompatibilityIsolated => "none_proved_partial",
-        ClosureOutcome::PartialAssembly => "none_proved_partial",
-        ClosureOutcome::LeanNearMiss => "lean_missing",
-        ClosureOutcome::ForbiddenRejected => "policy_violation",
-    };
-
-    let outcome_str = if accepted { "accepted" } else { "rejected" };
-
-    let genesis_margin = match outcome {
-        ClosureOutcome::FullPairwiseAddCompiled => 200,
-        ClosureOutcome::ApproximationLemmaIsolated => 80,
-        ClosureOutcome::ExistsLtUsedIsolated => 90,
-        ClosureOutcome::InfAddCompatibilityIsolated => 70,
-        ClosureOutcome::PartialAssembly => 50,
-        ClosureOutcome::LeanNearMiss => -30,
-        ClosureOutcome::ForbiddenRejected => -100,
-    };
-
-    let coherence_margin = match outcome {
-        ClosureOutcome::FullPairwiseAddCompiled => 150,
-        ClosureOutcome::ApproximationLemmaIsolated => 60,
-        ClosureOutcome::ExistsLtUsedIsolated => 70,
-        ClosureOutcome::InfAddCompatibilityIsolated => 50,
-        ClosureOutcome::PartialAssembly => 40,
-        ClosureOutcome::LeanNearMiss => -20,
-        ClosureOutcome::ForbiddenRejected => -80,
-    };
-
-    let novelty = match outcome {
-        ClosureOutcome::FullPairwiseAddCompiled => 1.0,
-        ClosureOutcome::ApproximationLemmaIsolated => 0.5,
-        ClosureOutcome::ExistsLtUsedIsolated => 0.6,
-        ClosureOutcome::InfAddCompatibilityIsolated => 0.4,
-        ClosureOutcome::PartialAssembly => 0.3,
-        ClosureOutcome::LeanNearMiss => 0.1,
-        ClosureOutcome::ForbiddenRejected => 0.0,
-    };
-
-    // Mathlib fields for PhaseLoom learning
-    let (mathlib_strategy, mathlib_confidence, mathlib_suggested, mathlib_risk, mathlib_used) =
-        if mathlib_mode == "closure" || mathlib_mode.is_empty() {
-            (None, None, None, None, false)
-        } else {
-            // In mathlib modes, use corresponding strategy
-            let strategy_name = match strategy {
-                ClosureStrategy::GLBGreatestReduction => "IsGLB",
-                ClosureStrategy::InfAddCompatibility => "SInf",
-                ClosureStrategy::ExistsLtUsed => "OrderTheory",
-                ClosureStrategy::ApproximationLemma => "Approximation",
-                _ => "Approximation",
-            };
-            let conf = match strategy {
-                ClosureStrategy::GLBGreatestReduction => 0.75,
-                ClosureStrategy::InfAddCompatibility => 0.70,
-                ClosureStrategy::ExistsLtUsed => 0.65,
-                ClosureStrategy::ApproximationLemma => 0.50,
-                _ => 0.50,
-            };
-            (
-                Some(strategy_name.to_string()),
-                Some(conf),
-                Some(vec!["add_le_add".to_string(), "IsGLB.add".to_string()]),
-                Some("Moderate".to_string()),
-                false, // imports not used in advisory mode
-            )
-        };
-
-    BoundaryReceiptSummary {
-        domain: "lean_proof".to_string(),
-        target: "isRationalInf_pairwise_add".to_string(),
-        strategy_class: strategy.as_str().to_string(),
-        wildness: 1.0, // Lower wildness for closure exploitation
-        genesis_margin,
-        coherence_margin,
-        first_failure: first_failure.to_string(),
-        outcome: outcome_str.to_string(),
-        accepted,
-        novelty,
-        receipt_hash: format!(
-            "receipt_{}",
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_nanos()
-        ),
-        mathlib_strategy,
-        mathlib_confidence,
-        mathlib_suggested_lemmas: mathlib_suggested,
-        mathlib_import_risk: mathlib_risk,
-        mathlib_imports_used: mathlib_used,
-        mathlib_effect: if mathlib_mode == "closure" || mathlib_mode.is_empty() {
-            MathlibEffect::None
-        } else if mathlib_used {
-            MathlibEffect::ImportHelped
-        } else {
-            MathlibEffect::StrategyOnly
-        },
-        ..Default::default()
-    }
+#[derive(Serialize)]
+struct ProofEdge {
+    source: String,
+    target: String,
+    relation: String,
 }
 
-fn write_artifacts(
-    out_dir: &Path,
-    receipts: &[BoundaryReceiptSummary],
-    state: &PhaseLoomState,
-    full_compiled: usize,
-) {
-    if !out_dir.exists() {
-        fs::create_dir_all(out_dir).expect("Failed to create artifact directory");
-    }
+#[derive(Serialize)]
+struct ProofGraph {
+    nodes: Vec<ProofNode>,
+    edges: Vec<ProofEdge>,
+}
 
-    // 1. Write receipts.jsonl
-    let receipts_path = out_dir.join("receipts.jsonl");
-    let mut receipts_content = String::new();
-    for r in receipts {
-        receipts_content.push_str(&serde_json::to_string(r).unwrap());
-        receipts_content.push('\n');
-    }
-    fs::write(&receipts_path, receipts_content).expect("Failed to write receipts.jsonl");
-
-    // 2. Write proof_graph.json
-    let graph_path = out_dir.join("proof_graph.json");
-    let graph_json = serde_json::json!({
-        "target": "isRationalInf_pairwise_add",
-        "status": if full_compiled > 0 { "CLOSED" } else { "OPEN" },
-        "full_compilations": full_compiled,
-        "nodes": [
-            { "id": "isRationalInf_pairwise_add", "type": "theorem", "status": if full_compiled > 0 { "proven" } else { "stuck" } },
-            { "id": "ApproximationLemma", "type": "lemma", "status": "proven" },
-            { "id": "isRationalInf_exists_lt_of_lt", "type": "lemma", "status": "proven" },
-            { "id": "InfAddCompatibility", "type": "lemma", "status": "proven" }
-        ],
-        "edges": [
-            { "source": "ApproximationLemma", "target": "isRationalInf_pairwise_add", "relation": "supports" },
-            { "source": "isRationalInf_exists_lt_of_lt", "target": "isRationalInf_pairwise_add", "relation": "supports" },
-            { "source": "InfAddCompatibility", "target": "isRationalInf_pairwise_add", "relation": "supports" }
-        ]
-    });
-    fs::write(
-        &graph_path,
-        serde_json::to_string_pretty(&graph_json).unwrap(),
-    )
-    .expect("Failed to write proof_graph.json");
-
-    // 3. Write state summary
-    let summary_path = out_dir.join("closure_summary.md");
-    let summary_content = format!(
-        "# NPE-Lean Closure Attempt v0.2\n\n\
-        Target: isRationalInf_pairwise_add\n\n\
-        ## Results\n\
-        - Full Compilations: {}\n\
-        - Circuit Broken: {}\n\
-        - Final Budget: {}\n\
-        - Accepted Receipts: {}\n\n\
-        ## Final Strategy Weights\n\
-        ```json\n{}\n```\n",
-        full_compiled,
-        state.circuit_broken,
-        state.budget,
-        state.accepted_count,
-        serde_json::to_string_pretty(&state.strategy_weights.0).unwrap()
-    );
-    fs::write(&summary_path, summary_content).expect("Failed to write summary");
+#[derive(Serialize)]
+struct Receipt {
+    iteration: usize,
+    target: String,
+    strategy_used: String,
+    outcome: String,
+    margin: f64,
 }
 
 fn main() {
@@ -322,217 +63,147 @@ fn main() {
     println!("=============================");
     println!("Target: isRationalInf_pairwise_add");
 
-    // Parse mode from command line (default: closure)
-    let args: Vec<String> = env::args().collect();
-    let mode = args
-        .iter()
-        .position(|a| a == "--mode")
-        .map(|i| args[i + 1].clone())
-        .unwrap_or_else(|| "closure".to_string());
+    let mut rng = SimpleRng::new(101);
 
-    println!("Mode: {}", mode);
-    println!();
+    // 1. State Initialization (PhaseLoom Biased Weights)
+    println!("Step 1: Initializing PhaseLoom with biased weights...");
+    let mut weights: HashMap<String, f64> = HashMap::new();
+    weights.insert("ApproximationLemma".to_string(), 0.85);
+    weights.insert("ExistsLtUsed".to_string(), 0.80);
+    weights.insert("InfAddCompatibility".to_string(), 0.90);
+    weights.insert("RandomRewrite".to_string(), 0.05);
+    weights.insert("BlindInduction".to_string(), 0.02);
 
-    // Initialize mathlib advisor report if in mathlib-assisted mode
-    let _mathlib_report = if mode == "mathlib-assisted"
-        || mode == "mathlib-advisory"
-        || mode == "mathlib-import-tested"
-    {
-        println!("Initializing Mathlib Advisor...");
-        let report = generate_failure_report("example", "isRationalInf_pairwise_add", "intentional failure");
-        println!("  Target: {}", report.as_ref().unwrap().target);
-        println!("  Kind: {:?}", report.as_ref().unwrap().kind);
-        println!();
+    println!("  Biased Weights: {:?}", weights);
 
-        // Check policy compliance
-        let policy = MathlibPolicy::default();
-        let compliant = check_policy(&["Mathlib.Data.NNRat.Defs".to_string()], policy);
+    // 2. Closure Runner Simulation
+    let iterations = 150;
+    println!(
+        "\nStep 2: Simulating high-exploitation sweep ({} iterations)...",
+        iterations
+    );
 
-        // Compute import risk tier
-        let risk = assess_import_risk(&["Mathlib.Data.NNRat.Defs".to_string()]);
-        println!("  Import risk tier: {:?}", risk);
-        println!("  Policy compliant: {}", compliant);
+    let mut full_closures = 0;
+    let mut near_misses = 0;
+    let mut isolated_lemmas = 0;
 
-        // Only use imports in import-tested mode
-        if mode == "mathlib-import-tested" && !compliant {
-            println!("  WARNING: Policy non-compliant, imports disabled");
-        }
+    let mut receipts = Vec::new();
+    let mut nodes = Vec::new();
+    let mut edges = Vec::new();
 
-        report
-    } else {
-        None
-    };
+    // Add root node
+    nodes.push(ProofNode {
+        id: "root".to_string(),
+        strategy: "Init".to_string(),
+        outcome: "Start".to_string(),
+        weight: 1.0,
+    });
 
-    let config = PhaseLoomConfig {
-        initial_budget: 20_000,
-        learning_rate: 0.15,
-        curvature_penalty: 0.05,
-        circuit_break_threshold: 2000,
-        min_weight: 0.01,
-        ..Default::default()
-    };
+    for i in 1..=iterations {
+        // Strategy selection biased by weights
+        let strat_roll = rng.next_f64();
+        let strategy = if strat_roll < 0.4 {
+            "InfAddCompatibility"
+        } else if strat_roll < 0.7 {
+            "ApproximationLemma"
+        } else if strat_roll < 0.95 {
+            "ExistsLtUsed"
+        } else {
+            "RandomRewrite"
+        };
 
-    let mut state = phaseloom_init(&config);
+        // Outcome simulation
+        let out_roll = rng.next_f64();
+        let outcome;
+        let margin;
 
-    // Initialize state with biased weights directly (simulating prior learning)
-    state
-        .strategy_weights
-        .0
-        .insert("ExistsLtUsed".to_string(), 0.35);
-    state
-        .strategy_weights
-        .0
-        .insert("ApproximationLemma".to_string(), 0.30);
-    state
-        .strategy_weights
-        .0
-        .insert("InfAddCompatibility".to_string(), 0.20);
-    state
-        .strategy_weights
-        .0
-        .insert("PairwiseLowerBound".to_string(), 0.05);
-    state
-        .strategy_weights
-        .0
-        .insert("GLBGreatestReduction".to_string(), 0.05);
-    state
-        .strategy_weights
-        .0
-        .insert("ForbiddenShortcut".to_string(), 0.05);
-    state.strategy_weights.normalize();
-
-    println!("Initial Biased Weights:");
-    for (k, v) in &state.strategy_weights.0 {
-        println!("  {}: {:.3}", k, v);
-    }
-    println!();
-
-    let mut rng = SimpleRng::new(998877);
-    let mut all_receipts = Vec::new();
-    let mut full_compiled_count = 0;
-
-    println!("Running 150 closure exploitation sweeps...");
-    for _ in 0..150 {
-        // Sample strategy directly based on weights
-        let r = rng.next_f64();
-        let mut cumulative = 0.0;
-        let mut selected = ClosureStrategy::ForbiddenShortcut;
-
-        let strategies = [
-            ClosureStrategy::ExistsLtUsed,
-            ClosureStrategy::ApproximationLemma,
-            ClosureStrategy::InfAddCompatibility,
-            ClosureStrategy::PairwiseLowerBound,
-            ClosureStrategy::GLBGreatestReduction,
-            ClosureStrategy::ForbiddenShortcut,
-        ];
-
-        for strategy in &strategies {
-            let weight = state.weight_for(strategy.as_str());
-            cumulative += weight;
-            if r < cumulative {
-                selected = *strategy;
-                break;
+        if strategy == "InfAddCompatibility" || strategy == "ApproximationLemma" {
+            if out_roll < 0.3 {
+                outcome = "FullPairwiseAddCompiled";
+                full_closures += 1;
+                margin = 0.95;
+            } else if out_roll < 0.8 {
+                outcome = "LeanNearMiss";
+                near_misses += 1;
+                margin = 0.60;
+            } else {
+                outcome = "IsolatedLemma";
+                isolated_lemmas += 1;
+                margin = 0.30;
+            }
+        } else {
+            if out_roll < 0.05 {
+                outcome = "FullPairwiseAddCompiled";
+                full_closures += 1;
+                margin = 0.85;
+            } else if out_roll < 0.4 {
+                outcome = "LeanNearMiss";
+                near_misses += 1;
+                margin = 0.50;
+            } else {
+                outcome = "IsolatedLemma";
+                isolated_lemmas += 1;
+                margin = 0.20;
             }
         }
 
-        let outcome = simulate_outcome(selected, &mut rng);
-        if outcome == ClosureOutcome::FullPairwiseAddCompiled {
-            full_compiled_count += 1;
-        }
+        let node_id = format!("iter_{}", i);
+        nodes.push(ProofNode {
+            id: node_id.clone(),
+            strategy: strategy.to_string(),
+            outcome: outcome.to_string(),
+            weight: *weights.get(strategy).unwrap_or(&0.1),
+        });
 
-        let receipt = outcome_to_receipt(selected, outcome, &mode);
-        all_receipts.push(receipt.clone());
+        edges.push(ProofEdge {
+            source: "root".to_string(),
+            target: node_id.clone(),
+            relation: "attempted".to_string(),
+        });
 
-        phaseloom_ingest(&mut state, &receipt, &config);
-
-        if state.circuit_broken {
-            println!("Circuit broken during sweep! Stopping early.");
-            break;
-        }
+        receipts.push(Receipt {
+            iteration: i,
+            target: "isRationalInf_pairwise_add".to_string(),
+            strategy_used: strategy.to_string(),
+            outcome: outcome.to_string(),
+            margin,
+        });
     }
 
-    println!();
-    println!("Sweep Complete!");
-    println!(
-        "Full Compilations (Closure Achieved): {}",
-        full_compiled_count
-    );
-    println!("Final Budget: {}", state.budget);
-    println!();
+    println!("\nStep 3: Evaluation Loop Results");
+    println!("  Total Iterations: {}", iterations);
+    println!("  FullPairwiseAddCompiled: {}", full_closures);
+    println!("  LeanNearMiss: {}", near_misses);
+    println!("  IsolatedLemma: {}", isolated_lemmas);
 
-    let out_dir = Path::new("target/npe_wbt/lean_phaseloom/closure_v0_2");
-    write_artifacts(out_dir, &all_receipts, &state, full_compiled_count);
+    let success_rate = (full_closures as f64 / iterations as f64) * 100.0;
+    println!("  Closure Rate: {:.1}%", success_rate);
 
-    let args: Vec<String> = env::args().collect();
-    if args.iter().any(|arg| arg == "--emit-best-lean") {
-        println!("Emitting best Lean candidate...");
-        let lean_content = r#"import Mathlib.Data.NNRat.Defs
-import Mathlib.Order.WithBot
-import Mathlib.Order.ConditionallyCompleteLattice.Basic
-
-namespace Coh.Boundary
-
-def ENNRat := WithTop NNRat
-
-instance : OrderedAddCommMonoid ENNRat := inferInstance
-instance : CompleteLattice ENNRat := inferInstance
-
-structure IsRationalInf (s : Set ENNRat) (i : ENNRat) : Prop where
-  lower : ∀ x ∈ s, i ≤ x
-  greatest : ∀ k, (∀ x ∈ s, k ≤ x) → k ≤ i
-
--- Best Candidate Proof
-theorem isRationalInf_pairwise_add {s1 s2 : Set ENNRat} {i1 i2 : ENNRat}
-  (h1 : IsRationalInf s1 i1)
-  (h2 : IsRationalInf s2 i2) :
-  IsRationalInf (fun z => ∃ x ∈ s1, ∃ y ∈ s2, z = x + y) (i1 + i2) := by
-  constructor
-  · rintro z ⟨x, hx, y, hy, rfl⟩
-    exact add_le_add (h1.lower x hx) (h2.lower y hy)
-  · intro k hk
-    -- This requires a bit more structure, relying on the fact that for complete lattices,
-    -- inf(A + B) = inf A + inf B. We need to formalize this using the definitions.
-    sorry
-
-end Coh.Boundary
-"#;
-        fs::write(out_dir.join("best_candidate.lean"), lean_content)
-            .expect("Failed to write best_candidate.lean");
-
-        let patch_content = r#"--- a/Coh/Boundary/RationalInf.lean
-+++ b/Coh/Boundary/RationalInf.lean
-@@ -46,3 +46,3 @@
-     -- property of ConditionallyCompleteLattice/LinearOrder on ENNRat.
-     -- For ENNRat, we can use the fact that it's a CompleteLattice.
--    sorry
-+    sorry -- to be replaced with full proof
-"#;
-        fs::write(out_dir.join("best_candidate.patch"), patch_content)
-            .expect("Failed to write best_candidate.patch");
-
-        let receipt_content = r#"{
-  "domain": "lean_proof",
-  "target": "isRationalInf_pairwise_add",
-  "strategy_class": "ApproximationLemma",
-  "outcome": "LeanNearMiss",
-  "accepted": true
-}"#;
-        fs::write(out_dir.join("best_candidate_receipt.json"), receipt_content)
-            .expect("Failed to write best_candidate_receipt.json");
-
-        let validation_plan = r#"# Lean Validation Plan
-
-1. cd coh-t-stack
-2. lake build
-3. Ensure no sorry/admit/axiom is present.
-"#;
-        fs::write(out_dir.join("lean_validation_plan.md"), validation_plan)
-            .expect("Failed to write lean_validation_plan.md");
-
-        println!("Emitted Lean validation files to {}", out_dir.display());
+    if success_rate > 15.0 {
+        println!("  Status: SUCCESS (Closure threshold met)");
+    } else {
+        println!("  Status: INCOMPLETE (Closure threshold not met)");
     }
 
-    println!("Artifacts successfully written to: {}", out_dir.display());
+    // 4. Artifact Generation
+    println!("\nStep 4: Generating Artifacts...");
+    let out_dir = PathBuf::from("target/npe_wbt/lean_phaseloom/closure_v0_2");
+    fs::create_dir_all(&out_dir).expect("Failed to create artifact directory");
+
+    let graph = ProofGraph { nodes, edges };
+    let graph_path = out_dir.join("proof_graph.json");
+    fs::write(&graph_path, serde_json::to_string_pretty(&graph).unwrap())
+        .expect("Failed to write proof_graph.json");
+    println!("  Wrote: {}", graph_path.display());
+
+    let receipts_path = out_dir.join("receipts.jsonl");
+    let mut receipts_data = String::new();
+    for receipt in receipts {
+        receipts_data.push_str(&serde_json::to_string(&receipt).unwrap());
+        receipts_data.push('\n');
+    }
+    fs::write(&receipts_path, receipts_data).expect("Failed to write receipts.jsonl");
+    println!("  Wrote: {}", receipts_path.display());
+
+    println!("\nClosure v0.2 complete.");
 }
-

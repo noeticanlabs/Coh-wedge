@@ -32,4 +32,30 @@ pub fn gamma1() -> Matrix4 {
     ]
 }
 
-// gamma2, gamma3 would follow
+/// Gamma 2: standard Dirac gamma2
+pub fn gamma2() -> Matrix4 {
+    let zero = Complex64::new(0.0, 0.0);
+    let i = Complex64::new(0.0, 1.0);
+    let neg_i = Complex64::new(0.0, -1.0);
+    
+    [
+        [zero, zero, zero, neg_i],
+        [zero, zero, i, zero],
+        [zero, i, zero, zero],
+        [neg_i, zero, zero, zero],
+    ]
+}
+
+/// Gamma 3: standard Dirac gamma3
+pub fn gamma3() -> Matrix4 {
+    let zero = Complex64::new(0.0, 0.0);
+    let one = Complex64::new(1.0, 0.0);
+    let neg_one = Complex64::new(-1.0, 0.0);
+    
+    [
+        [zero, zero, one, zero],
+        [zero, zero, zero, neg_one],
+        [neg_one, zero, zero, zero],
+        [zero, one, zero, zero],
+    ]
+}

@@ -1,8 +1,10 @@
+use coh_genesis::lean_proof::ProofCandidate;
+use coh_genesis::phaseloom_lite::{BoundaryReceiptSummary, PhaseLoomConfig, PhaseLoomState};
+use coh_npe::tools::mathlib_advisor::{
+    generate_report as generate_failure_report, MathlibLakeQuery,
+};
 use std::env;
 use std::path::PathBuf;
-use coh_genesis::mathlib_advisor::{MathlibLakeQuery, generate_failure_report};
-use coh_genesis::lean_proof::{ProofCandidate};
-use coh_genesis::phaseloom_lite::{PhaseLoomConfig, PhaseLoomState, BoundaryReceiptSummary};
 
 fn main() {
     println!("NPE Law of Genesis Production Loop");
@@ -10,9 +12,15 @@ fn main() {
 
     // 1. Setup paths
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
-    let root_dir = manifest_dir.parent().unwrap().parent().unwrap().parent().unwrap();
+    let root_dir = manifest_dir
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap();
     let project_path = root_dir.join("coh-t-stack");
-    
+
     let mut query = MathlibLakeQuery::new(project_path.clone());
     if !query.available {
         println!("Lake not available.");
@@ -24,13 +32,14 @@ fn main() {
 
     // --- Strategy: MonotoneAdd ---
     println!("\n[Sweep 1] Targeting 'genesis_composition' with MonotoneAdd strategy...");
-    
+
     // Search for required lemmas
-    let search_query = "(_ + _ ≤ _ + _)"; 
+    let search_query = "(_ + _ ≤ _ + _)";
     println!("Searching Mathlib for pattern '{}'...", search_query);
     let results = query.search_lemmas(search_query);
-    
-    let add_le_add = results.iter()
+
+    let add_le_add = results
+        .iter()
         .find(|m| m.name == "add_le_add")
         .map(|m| m.name.clone())
         .unwrap_or_else(|| "add_le_add".to_string());
@@ -51,7 +60,12 @@ fn main() {
         wildness: 0.5,
         target_theorem: "genesis_composition".to_string(),
         proof_text: full_proof.to_string(),
-        proof_tactics: vec!["unfold".into(), "obtain".into(), "rw".into(), "refine".into()],
+        proof_tactics: vec![
+            "unfold".into(),
+            "obtain".into(),
+            "rw".into(),
+            "refine".into(),
+        ],
         tactic_count: 7,
         helper_lemmas: 0,
         imports: vec!["Mathlib.Algebra.Order.Monoid.Defs".into()],
@@ -59,7 +73,7 @@ fn main() {
     };
 
     println!("\nVerifying candidate proof...");
-    
+
     // Assemble verify file
     let temp_file = project_path.join("_genesis_verify.lean");
     let lean_code = format!(
@@ -79,13 +93,17 @@ fn main() {
         .current_dir(&project_path)
         .output()
         .unwrap();
-    
+
     let _ = std::fs::remove_file(&temp_file);
-    let combined = format!("{}{}", String::from_utf8_lossy(&output.stdout), String::from_utf8_lossy(&output.stderr));
-    
+    let combined = format!(
+        "{}{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
     if output.status.success() && !combined.contains("sorry") {
         println!("SUCCESS: Law of Genesis Composition fully produced and verified!");
-        
+
         let receipt = BoundaryReceiptSummary {
             domain: "LawOfGenesis".to_string(),
             target: candidate.target_theorem.clone(),
@@ -97,7 +115,11 @@ fn main() {
         state.ingest(&receipt, &config);
     } else {
         println!("FAILED: Proof does not close or contains sorry.");
-        if let Some(report) = generate_failure_report(candidate.id.as_str(), candidate.target_theorem.as_str(), &combined) {
+        if let Some(report) = generate_failure_report(
+            candidate.id.as_str(),
+            candidate.target_theorem.as_str(),
+            &combined,
+        ) {
             println!("Failure Report: {:?}", report.kind);
             let receipt = BoundaryReceiptSummary {
                 domain: "LawOfGenesis".to_string(),

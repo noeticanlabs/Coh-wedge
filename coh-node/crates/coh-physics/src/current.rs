@@ -17,29 +17,24 @@ impl CoherenceCurrent {
     pub fn compute(psi: &CohSpinor) -> Self {
         let bar_psi = psi.adjoint();
         
-        // J0 = bar{psi} gamma0 psi = psi† psi (density)
-        let j0 = psi.density();
+        // J^mu = bar{psi} gamma^mu psi
+        let j0 = compute_bilinear(&bar_psi, &gamma::gamma0(), psi);
+        let j1 = compute_bilinear(&bar_psi, &gamma::gamma1(), psi);
+        let j2 = compute_bilinear(&bar_psi, &gamma::gamma2(), psi);
+        let j3 = compute_bilinear(&bar_psi, &gamma::gamma3(), psi);
         
-        // J1 = bar{psi} gamma1 psi
-        let g1 = gamma::gamma1();
-        let mut j1_complex = Complex64::new(0.0, 0.0);
-        
-        for i in 0..4 {
-            let mut row_sum = Complex64::new(0.0, 0.0);
-            for j in 0..4 {
-                row_sum += g1[i][j] * psi.components[j];
-            }
-            j1_complex += bar_psi[i] * row_sum;
-        }
-        
-        // J1 must be real for a Dirac current
-        let j1 = j1_complex.re;
-        
-        Self {
-            j0,
-            j1,
-            j2: 0.0, // Placeholder
-            j3: 0.0, // Placeholder
-        }
+        Self { j0, j1, j2, j3 }
     }
+}
+
+fn compute_bilinear(bar_psi: &[Complex64; 4], g: &gamma::Matrix4, psi: &CohSpinor) -> f64 {
+    let mut val = Complex64::new(0.0, 0.0);
+    for i in 0..4 {
+        let mut row_sum = Complex64::new(0.0, 0.0);
+        for j in 0..4 {
+            row_sum += g[i][j] * psi.components[j];
+        }
+        val += bar_psi[i] * row_sum;
+    }
+    val.re // Current components are real for Dirac current
 }

@@ -20,9 +20,9 @@ fn main() {
 
     println!("Carrier Density: {}", psi.density());
     
-    // 2. Compute Coherence Current
+    // 2. Compute Full Coherence Current
     let current = CoherenceCurrent::compute(&psi);
-    println!("Coherence Current J_C^mu: [J0: {}, J1: {}, J2: {}, J3: {}]", 
+    println!("Coherence Current J_C^mu: [J0: {:.4}, J1: {:.4}, J2: {:.4}, J3: {:.4}]", 
         current.j0, current.j1, current.j2, current.j3);
 
     // 3. Initialize GMI Atom with Spinor Carrier
@@ -67,27 +67,26 @@ fn main() {
         Some(psi.clone()),
     );
 
-    println!("GMI Atom initialized with Spinor carrier.");
+    println!("GMI Atom initialized with Spinor carrier (Spin-Coh Atom v0.2).");
 
-    // 4. Project onto Record Channels
-    let projector_0 = SpinorProjector { component_index: 0 };
-    let projector_1 = SpinorProjector { component_index: 1 };
-
-    let weight_0 = projector_0.born_weight(&psi);
-    let weight_1 = projector_1.born_weight(&psi);
-
-    println!("Record Channel 0 (Component 0) Born Weight: {}", weight_0);
-    println!("Record Channel 1 (Component 1) Born Weight: {}", weight_1);
+    // 4. Matrix Projector Gate Demo
+    let projector = coh_physics::measurement::SpinorProjector::coordinate(0);
+    println!("Testing Projector Lawfulness: {}", projector.validate(1e-10));
 
     // 5. Emit a Spinor CohBit
     println!("Attempting Atomic Transition (CohBit Emission)...");
+    
+    // NOTE: In a real system, formal_status would be computed by a scanner.
+    // For this demo, we assume the formal targets are accepted.
+    let formal_status = FormalStatus::ProofCertified;
+
     let (success, trace) = atom.emit_cohbit(
-        "spinor_step_0", 
+        "spinor_step_v0_2", 
         "Spinor Measurement", 
         Rational64::new(1, 1), 
         Rational64::new(1, 1), 
         Rational64::new(1, 1), 
-        FormalStatus::ProofCertified
+        formal_status
     );
 
     if success {
@@ -101,9 +100,9 @@ fn main() {
     }
 
     if let Some(ref psi) = atom.carrier {
-        println!("  Final Spinor Density: {}", psi.density());
+        println!("  Final Spinor Density: {:.4}", psi.density());
     }
 
     println!();
-    println!("Coh Spinor Current & Atom Demo Completed.");
+    println!("Coh Spinor Current & Atom v0.2 Demo Completed.");
 }

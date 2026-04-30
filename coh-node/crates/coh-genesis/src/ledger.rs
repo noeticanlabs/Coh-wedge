@@ -13,6 +13,19 @@ pub struct ReceiptPayload {
     pub decision: RvDecision,
     pub timestamp: u64,
     pub sequence: u64,
+    
+    // Lexicon Canon Compliance
+    pub lexicon_terms_used: Vec<String>,
+    pub namespaces: Vec<String>,
+    pub layers: Vec<String>,
+    pub residuals: serde_json::Value,
+    pub failure_class: Option<String>,
+    
+    // Physical/GMI Context
+    pub budget_deltas: serde_json::Value,
+    pub causal_class: Option<String>,
+    pub branch_weight: Option<f64>,
+    pub post_state_hash: Option<Hash32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -50,6 +63,16 @@ impl SimpleLedger {
                 .map_err(|e| e.to_string())?
                 .as_secs(),
             sequence: self.sequence,
+            
+            lexicon_terms_used: vec![],
+            namespaces: vec![],
+            layers: vec![],
+            residuals: serde_json::Value::Null,
+            failure_class: None,
+            budget_deltas: serde_json::Value::Null,
+            causal_class: None,
+            branch_weight: None,
+            post_state_hash: None,
         };
 
         // Canonical hash of the payload

@@ -32,13 +32,33 @@ def gamma1 : GammaMatrix := !![
   -1, 0, 0, 0
 ]
 
--- ... gamma2, gamma3 would follow similarly
+/--
+## Gamma 2 (Dirac Representation)
+[[0, 0, 0, -i], [0, 0, i, 0], [0, i, 0, 0], [-i, 0, 0, 0]]
+-/
+def gamma2 : GammaMatrix := !![
+  0, 0, 0, -Complex.I;
+  0, 0, Complex.I, 0;
+  0, Complex.I, 0, 0;
+  -Complex.I, 0, 0, 0
+]
+
+/--
+## Gamma 3 (Dirac Representation)
+[[0, 0, 1, 0], [0, 0, 0, -1], [-1, 0, 0, 0], [0, 1, 0, 0]]
+-/
+def gamma3 : GammaMatrix := !![
+  0, 0, 1, 0;
+  0, 0, 0, -1;
+  -1, 0, 0, 0;
+  0, 1, 0, 0
+]
 
 /--
 ## Dirac Adjoint
 psi_bar = psi† gamma0
 -/
 noncomputable def adjoint (psi : SpinorSpace) : Matrix (Fin 1) (Fin 4) (Complex ℝ) :=
-  (Matrix.row (Fin 1) psi.get).conjTranspose * gamma0
+  (Matrix.col (Fin 1) psi.get).conjTranspose * gamma0
 
 end Coh.Physics.Spinor
