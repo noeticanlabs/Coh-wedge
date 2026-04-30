@@ -2,7 +2,7 @@ import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.InnerProductSpace.Projection
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Complex.Basic
-import Mathlib.Algebra.BigOperators.Group.Finset
+import Mathlib.Algebra.BigOperators.Basic
 
 namespace Coh.Physics.Spinor
 

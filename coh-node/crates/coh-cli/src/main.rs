@@ -218,6 +218,8 @@ fn decision_to_text(d: &Decision) -> String {
         Decision::TerminalSuccess => "TERMINAL_SUCCESS".to_string(),
         Decision::TerminalFailure => "TERMINAL_FAILURE".to_string(),
         Decision::AbortBudget => "ABORT_BUDGET".to_string(),
+        Decision::Pending => "PENDING".to_string(),
+        Decision::Queued => "QUEUED".to_string(),
     }
 }
 

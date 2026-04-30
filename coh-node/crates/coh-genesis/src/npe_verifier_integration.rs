@@ -6,7 +6,7 @@
 use crate::proof_receipt::{
     GoalEmbedding, ProofAttemptReceipt, SearchBudget,
 };
-use coh_core::verify_micro_v3::{verify_micro_v3, VerifyMicroV3Result};
+use coh_core::verify_micro_v3::verify_micro_v3;
 use coh_core::types_v3::{MicroReceiptV3Wire, TieredConfig, SequenceGuard, PolicyGovernance};
 use coh_core::auth::VerifierContext;
 use coh_core::types::{Decision, MetricsWire};

@@ -13,12 +13,12 @@ theorem coh_compose_linear
     (hf : vy + sf ≤ vx + df + af)
     (hg : vz + sg ≤ vy + dg + ag) :
     vz + (sf + sg) ≤ vx + (df + dg) + (af + ag) := by
-  have h1 := add_le_add_right hg sf
-  rw [add_assoc, add_comm sg sf, ← add_assoc] at h1
-  have h2 := add_le_add_right hf (dg + ag)
-  have h3 := le_trans h1 h2
-  simp [add_assoc, add_comm] at h3 ⊢
-  exact h3
+  calc
+    vz + (sf + sg) = (vz + sg) + sf := by ac_rfl
+    _ ≤ (vy + dg + ag) + sf := add_le_add_right hg sf
+    _ = vy + sf + (dg + ag) := by ac_rfl
+    _ ≤ (vx + df + af) + (dg + ag) := add_le_add_right hf (dg + ag)
+    _ = vx + (df + dg) + (af + ag) := by ac_rfl
 
 /--
 Template 2: Identity Certification
@@ -39,8 +39,8 @@ theorem coh_envelope_subadd
     {α : Type u}
     [OrderedAddCommMonoid α]
     {df dg dtot : α}
-    (hf : df ≥ 0)
-    (hg : dg ≥ 0)
+    (_hf : df ≥ 0)
+    (_hg : dg ≥ 0)
     (hsub : dtot ≤ df + dg) :
     dtot ≤ df + dg := by
   exact hsub

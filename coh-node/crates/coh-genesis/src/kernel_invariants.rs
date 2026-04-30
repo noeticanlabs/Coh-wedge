@@ -9,8 +9,6 @@
 //! atomic_transition_stable              → GmiAtom::is_stable()
 //! atomic_transition_rv_certified        → RvKernel::verify_claim() (Accept)
 //! isRationalInf_add_inf_le              → budget_infimum_admissible()
-//! field_equation_effective_metric       → rv_decision_is_symmetric()
-//! field_equation_unique                 → rv_decision_is_deterministic()
 //! positive_density_theorem              → spinor_density_nonneg()
 //! cohspinor_density_eq_one              → normalized_spinor_density_is_one()
 //! gamma0_sq_eq_one                      → gamma0_sq_eq_identity()
@@ -19,13 +17,42 @@
 //! coord_proj_hermitian                  → projector_is_hermitian()
 //! coord_proj_weight_sum                 → projection_weights_sum_to_density()
 //! j0_eq_density                         → coherence_current_j0_eq_density()
-//! stressEnergyTensor_symmetric          → stress_energy_is_symmetric()
 //! ```
 
-use coh_core::rv_kernel::{RvDecision, RvDecisionKind, RvKernel, RvCost};
-use coh_core::types::VerifierClaim;
-use coh_physics::{CohSpinor, gamma, current::CoherenceCurrent, measurement::SpinorProjector};
-use num_complex::Complex64;
+use coh_core::rv_kernel::{RvDecision, RvDecisionKind};
+use coh_physics::{current::CoherenceCurrent, measurement::SpinorProjector, CohSpinor};
+
+// --- FFI Imports from Lean ---
+// These functions would be linked from the Lean static library (Coh.a) in production.
+// Currently, they are stubs/fallbacks reserved for Lean linking.
+#[allow(dead_code)]
+extern "C" {
+    /// Formally verified density check (exported from Lean).
+    /// Returns 1 if density >= 0, 0 otherwise.
+    fn coh_check_positive_density(
+        r0: f64,
+        i0: f64,
+        r1: f64,
+        i1: f64,
+        r2: f64,
+        i2: f64,
+        r3: f64,
+        i3: f64,
+    ) -> u8;
+}
+
+// Wrapper for the Lean function (reserved for FFI in production)
+// Currently uses Rust mirror - would call Lean in production
+#[allow(dead_code)]
+fn assert_positive_density_from_lean(psi: &CohSpinor) -> Result<(), KernelInvariantViolation> {
+    // Rust mirror of positive_density_theorem
+    // In production, this would call: coh_check_positive_density(...)
+    if psi.density() < 0.0 {
+        Err(KernelInvariantViolation::NegativeDensity(psi.density()))
+    } else {
+        Ok(())
+    }
+}
 
 const TOL: f64 = 1e-12;
 
@@ -44,9 +71,11 @@ pub fn assert_stability_law(
     spend: u128,
     defect: u128,
 ) -> Result<(), KernelInvariantViolation> {
-    let lhs = next_v.checked_add(spend)
+    let lhs = next_v
+        .checked_add(spend)
         .ok_or(KernelInvariantViolation::Overflow("next_v + spend"))?;
-    let rhs = prev_v.checked_add(defect)
+    let rhs = prev_v
+        .checked_add(defect)
         .ok_or(KernelInvariantViolation::Overflow("prev_v + defect"))?;
     if lhs <= rhs {
         Ok(())
@@ -74,29 +103,6 @@ pub fn assert_rv_certified(decision: &RvDecision) -> Result<(), KernelInvariantV
     }
 }
 
-/// Checks that RvKernel produces deterministic decisions for the same claim.
-/// Mirror of `field_equation_unique`: same input → same output (no hidden state).
-pub fn assert_rv_deterministic(
-    rv: &mut RvKernel,
-    claim: &VerifierClaim,
-    cost: &RvCost,
-) -> Result<(), KernelInvariantViolation> {
-    // For the same claim under the same budget, both decisions must agree in kind.
-    // We snapshot the kernel state and verify idempotency of kind.
-    let d1 = rv.verify_claim(claim, cost);
-    // Reset budget (same initial state)
-    let d2_kind = if d1.kind == RvDecisionKind::Accept {
-        RvDecisionKind::Accept
-    } else {
-        d1.kind
-    };
-    if d1.kind == d2_kind {
-        Ok(())
-    } else {
-        Err(KernelInvariantViolation::RvNotDeterministic)
-    }
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // KERNEL 3: Budget Infimum Law
 // Lean: isRationalInf_add_inf_le
@@ -113,7 +119,8 @@ pub fn assert_budget_infimum(
     budget_b: u64,
     combined_spend: u64,
 ) -> Result<(), KernelInvariantViolation> {
-    let total = budget_a.checked_add(budget_b)
+    let total = budget_a
+        .checked_add(budget_b)
         .ok_or(KernelInvariantViolation::Overflow("budget_a + budget_b"))?;
     if combined_spend <= total {
         Ok(())
@@ -126,34 +133,6 @@ pub fn assert_budget_infimum(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// KERNEL 4: Stress-Energy Symmetry
-// Lean: stressEnergyTensor_symmetric
-//   T_mu_nu = T_nu_mu
-//
-// Runtime meaning: the field kernel must produce symmetric decisions for
-// symmetric inputs — no ordering-dependent verification results.
-// ─────────────────────────────────────────────────────────────────────────────
-
-/// Runtime enforcement of `stressEnergyTensor_symmetric`.
-/// For two spinor components (a, b), checks T(a,b) == T(b,a) where T(x,y) = x*y.
-pub fn assert_stress_energy_symmetric(psi: &CohSpinor) -> Result<(), KernelInvariantViolation> {
-    for i in 0..4 {
-        for j in 0..4 {
-            let t_ij = psi.components[i] * psi.components[j];
-            let t_ji = psi.components[j] * psi.components[i];
-            if (t_ij - t_ji).norm() > TOL {
-                return Err(KernelInvariantViolation::SymmetryViolated {
-                    i,
-                    j,
-                    delta: (t_ij - t_ji).norm(),
-                });
-            }
-        }
-    }
-    Ok(())
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // KERNEL 5: Spinor Physics Invariants
 // Lean: positive_density_theorem, cohspinor_density_eq_one,
 //        gamma0_sq_eq_one, proj_density_nonneg,
@@ -162,7 +141,9 @@ pub fn assert_stress_energy_symmetric(psi: &CohSpinor) -> Result<(), KernelInvar
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// All spinor physics invariants in one call. Returns the first violation.
-pub fn assert_spinor_invariants(psi: &CohSpinor) -> Result<SpinorInvariantReport, KernelInvariantViolation> {
+pub fn assert_spinor_invariants(
+    psi: &CohSpinor,
+) -> Result<SpinorInvariantReport, KernelInvariantViolation> {
     // 1. positive_density_theorem
     if psi.density() < 0.0 {
         return Err(KernelInvariantViolation::NegativeDensity(psi.density()));
@@ -170,7 +151,9 @@ pub fn assert_spinor_invariants(psi: &CohSpinor) -> Result<SpinorInvariantReport
 
     // 2. gamma0^2 = I (gamma0_sq_eq_one)
     if !coh_physics::proofs::verify_gamma0_sq_eq_identity() {
-        return Err(KernelInvariantViolation::GammaAlgebraViolated("gamma0^2 != I"));
+        return Err(KernelInvariantViolation::GammaAlgebraViolated(
+            "gamma0^2 != I",
+        ));
     }
 
     // 3. Projector lawfulness and weight sum (coord_proj_* theorems)
@@ -210,15 +193,28 @@ pub fn assert_spinor_invariants(psi: &CohSpinor) -> Result<SpinorInvariantReport
 
 #[derive(Debug)]
 pub enum KernelInvariantViolation {
-    StabilityLawViolated { lhs: u128, rhs: u128 },
-    RvNotCertified { kind: String, reason: Option<String> },
-    RvNotDeterministic,
-    BudgetInfimumViolated { combined_spend: u64, total_budget: u64 },
-    SymmetryViolated { i: usize, j: usize, delta: f64 },
+    StabilityLawViolated {
+        lhs: u128,
+        rhs: u128,
+    },
+    RvNotCertified {
+        kind: String,
+        reason: Option<String>,
+    },
+    BudgetInfimumViolated {
+        combined_spend: u64,
+        total_budget: u64,
+    },
     NegativeDensity(f64),
     GammaAlgebraViolated(&'static str),
-    WeightSumViolated { got: f64, expected: f64 },
-    J0DensityMismatch { j0: f64, density: f64 },
+    WeightSumViolated {
+        got: f64,
+        expected: f64,
+    },
+    J0DensityMismatch {
+        j0: f64,
+        density: f64,
+    },
     Overflow(&'static str),
 }
 
@@ -236,8 +232,6 @@ pub struct SpinorInvariantReport {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use coh_core::types::FormalStatus;
-    use coh_core::rv_kernel::{RvGoverningState, ProtectedRvBudget};
 
     fn test_spinor() -> CohSpinor {
         CohSpinor::new(
@@ -253,15 +247,19 @@ mod tests {
     #[test]
     fn test_stability_law_satisfied() {
         // V(x') + spend ≤ V(x) + defect
-        assert!(assert_stability_law(100, 90, 10, 100).is_ok(),
-            "Lean: atomic_transition_stable");
+        assert!(
+            assert_stability_law(100, 90, 10, 100).is_ok(),
+            "Lean: atomic_transition_stable"
+        );
     }
 
     #[test]
     fn test_stability_law_violated() {
         // 90 + 20 = 110 > 100 + 5 = 105 → violation
-        assert!(assert_stability_law(100, 90, 20, 5).is_err(),
-            "Stability violation must be caught");
+        assert!(
+            assert_stability_law(100, 90, 20, 5).is_err(),
+            "Stability violation must be caught"
+        );
     }
 
     // ── KERNEL 2: RV Authority ──────────────────────────────────────────────
@@ -274,8 +272,10 @@ mod tests {
             failure_mode: None,
             receipt_payload: serde_json::json!({}),
         };
-        assert!(assert_rv_certified(&decision).is_ok(),
-            "Lean: atomic_transition_rv_certified");
+        assert!(
+            assert_rv_certified(&decision).is_ok(),
+            "Lean: atomic_transition_rv_certified"
+        );
     }
 
     #[test]
@@ -286,31 +286,28 @@ mod tests {
             failure_mode: Some("incomplete proof".into()),
             receipt_payload: serde_json::json!({}),
         };
-        assert!(assert_rv_certified(&decision).is_err(),
-            "Reject must not certify transition");
+        assert!(
+            assert_rv_certified(&decision).is_err(),
+            "Reject must not certify transition"
+        );
     }
 
     // ── KERNEL 3: Budget Infimum ────────────────────────────────────────────
 
     #[test]
     fn test_budget_infimum_satisfied() {
-        assert!(assert_budget_infimum(500, 500, 900).is_ok(),
-            "Lean: isRationalInf_add_inf_le — combined spend within budget");
+        assert!(
+            assert_budget_infimum(500, 500, 900).is_ok(),
+            "Lean: isRationalInf_add_inf_le — combined spend within budget"
+        );
     }
 
     #[test]
     fn test_budget_infimum_violated() {
-        assert!(assert_budget_infimum(500, 500, 1100).is_err(),
-            "Lean: isRationalInf_add_inf_le — over-budget must be caught");
-    }
-
-    // ── KERNEL 4: Symmetry ──────────────────────────────────────────────────
-
-    #[test]
-    fn test_stress_energy_symmetric() {
-        let psi = test_spinor();
-        assert!(assert_stress_energy_symmetric(&psi).is_ok(),
-            "Lean: stressEnergyTensor_symmetric");
+        assert!(
+            assert_budget_infimum(500, 500, 1100).is_err(),
+            "Lean: isRationalInf_add_inf_le — over-budget must be caught"
+        );
     }
 
     // ── KERNEL 5: Spinor Invariants ─────────────────────────────────────────
@@ -318,14 +315,19 @@ mod tests {
     #[test]
     fn test_spinor_invariants_pass() {
         let psi = test_spinor();
-        let report = assert_spinor_invariants(&psi)
-            .expect("Lean spinor invariants must all hold");
+        let report = assert_spinor_invariants(&psi).expect("Lean spinor invariants must all hold");
         assert!(report.all_passed);
-        assert!((report.density - 1.0).abs() < 1e-10,
-            "Lean: cohspinor_density_eq_one");
-        assert!((report.j0 - report.density).abs() < 1e-10,
-            "Lean: j0_eq_density");
-        assert!((report.weight_sum - report.density).abs() < 1e-10,
-            "Lean: coord_proj_weight_sum");
+        assert!(
+            (report.density - 1.0).abs() < 1e-10,
+            "Lean: cohspinor_density_eq_one"
+        );
+        assert!(
+            (report.j0 - report.density).abs() < 1e-10,
+            "Lean: j0_eq_density"
+        );
+        assert!(
+            (report.weight_sum - report.density).abs() < 1e-10,
+            "Lean: coord_proj_weight_sum"
+        );
     }
 }

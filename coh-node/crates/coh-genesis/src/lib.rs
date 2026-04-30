@@ -106,6 +106,7 @@ pub mod kernel_invariants;
 
 // Re-export PhaseLoomLite types and functions
 pub use fusion_wedge::verify_governed_step;
+pub use coh_phaseloom as phaseloom_lite;
 pub use coh_phaseloom::{
     phaseloom_circuit_broken, phaseloom_ingest, phaseloom_init, phaseloom_sample,
     phaseloom_serialize, PhaseLoomConfig, PhaseLoomState,
@@ -116,20 +117,24 @@ pub use coh_npe::{
     BoundaryReceiptSummary, MathlibEffect, StrategyWeights, LeanClosureStatus,
     NpeError, NpeProposal, ProposalStatus, NpeConfig, NpeEngine, NpeState,
 };
+pub mod npe {
+    pub use coh_npe::*;
+}
 pub use coh_npe::kernel::{NpeKernel, NpeGoverningState, NpeBudget};
 pub use coh_core::rv_kernel::{RvKernel, RvGoverningState, ProtectedRvBudget};
+pub mod rv {
+    pub use coh_core::rv_kernel::*;
+}
 
-// Re-export MathlibAdvisor types and functions
-pub use coh_npe::tools::mathlib_advisor::{
-    assess_import_risk, check_policy, generate_report, ImportRisk, MathlibAdvisorReport,
-    MathlibPolicy, MathlibStrategy,
-};
+pub use coh_npe::tools::code_patch;
+pub use coh_npe::tools::mathlib_advisor;
+pub use coh_npe::tools::lean_proof;
 
 // Re-export key types for convenience
-// Note: GenesisCandidate is already defined in this module, so use a prefix
 pub use coh_npe::candidate::{
     GenesisCandidate as NpeGenesisCandidate, ProjectedCohClaim, WildnessLevel, WildnessResult,
 };
+
 pub use coh_npe::tools::code_patch::{
     build_formation_result, check_hard_gates, compute_coherence_metrics, compute_genesis_metrics,
     compute_patch_scores, is_formation_admissible, patch_type_for_wildness, CodePatchCandidate,
@@ -152,7 +157,7 @@ pub use sweep::{
 };
 
 use coh_core::rv_kernel::RvDecisionKind;
-use coh_core::types::{VerifierClaim, AuthorityTag, FormalStatus, Hash32};
+use coh_core::types::FormalStatus;
 pub use causal_cone::*;
 
 /// Level 0: Environmental Envelope (Outer physical limits)

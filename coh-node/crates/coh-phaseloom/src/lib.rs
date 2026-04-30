@@ -22,9 +22,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use coh_npe::weights::StrategyWeights;
-use coh_npe::receipt::{BoundaryReceiptSummary, MathlibEffect};
+use coh_npe::receipt::BoundaryReceiptSummary;
 use coh_npe::closure::LeanClosureStatus;
-use coh_npe::failure_taxonomy;
 
 pub mod kernel;
 pub mod knowledge;

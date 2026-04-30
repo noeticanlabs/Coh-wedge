@@ -245,7 +245,7 @@ impl MathlibLakeQuery {
 
     /// Search for lemmas matching a term pattern
     /// Returns empty if lake unavailable (fallback to heuristics)
-    pub fn search_lemmas(&mut self, query: &str) -> Vec<LemmaMatch> {
+    pub fn search_lemmas(&mut self, _query: &str) -> Vec<LemmaMatch> {
         if !self.available {
             return Vec::new();
         }

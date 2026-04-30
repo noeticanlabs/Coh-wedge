@@ -3,9 +3,8 @@
 //! A Coh Atom is the smallest bound system that can generate, verify, 
 //! receipt, remember, and continue CohBits.
 
-use serde::{Deserialize, Serialize};
 use crate::{
-    NpeKernel, RvKernel, PhaseLoomKernel, EnvironmentalEnvelope, SystemReserve, GlobalBudgets,
+    NpeKernel, RvKernel, PhaseLoomKernel, GlobalBudgets,
     GmiStepTrace, GmiStepOutcome, CausalClass, classify_gmi_interval,
 };
 use coh_core::types::{FormalStatus, VerifierClaim, Hash32, AuthorityTag};
@@ -96,31 +95,30 @@ impl GmiAtom {
         //    Lean theorems enforced: positive_density_theorem, gamma0_sq_eq_one,
         //    coord_proj_idem, coord_proj_hermitian, coord_proj_weight_sum, j0_eq_density
         let mut next_spinor = None;
-        let mut born_weight = None;
         if let Some(ref psi) = self.carrier {
             // Full spinor invariant check — enforces all proved Lean spinor theorems
             if let Err(e) = assert_spinor_invariants(psi) {
                 return (false, trace.with_reject(&format!("Spinor invariant violation: {:?}", e)));
             }
-
+ 
             let projector = SpinorProjector::coordinate(0);
             
             // RV Gate: idempotency + hermiticity (Lean: coord_proj_idem, coord_proj_hermitian)
             if !projector.validate(1e-10) {
                 return (false, trace.with_reject("Invalid projector (Lean: coord_proj_idem/hermitian)"));
             }
-
-            born_weight = Some(projector.born_weight(psi));
+ 
+            let born_weight = projector.born_weight(psi);
             next_spinor = projector.measurement_update(psi);
             
             if next_spinor.is_none() {
                 return (false, trace.with_reject("Zero-norm branch continuation"));
             }
-            trace.events.push(format!("Spinor PRE-CALC: Lüders update ready (Weight: {:.4})", born_weight.unwrap()));
+            trace.events.push(format!("Spinor PRE-CALC: Lüders update ready (Weight: {:.4})", born_weight));
         }
 
         // 4. Valuation Law 1
-        let prev_v = self.rv.state.valuation + self.npe.governing_state.disorder + (self.phaseloom.state.tension as u128);
+        let prev_v = self.rv.state.valuation + self.npe.governing_state.disorder + self.phaseloom.state.tension;
 
         // 5. NPE & RV (Imagination & Authority)
         if !self.npe.is_affordable(100, 1000, 50) {
@@ -145,7 +143,7 @@ impl GmiAtom {
 
         // 6. Global Stability Law Gate
         //    Lean: atomic_transition_stable — V(x') + spend ≤ V(x) + defect
-        let next_v = self.rv.state.valuation + self.npe.governing_state.disorder + (self.phaseloom.state.tension as u128);
+        let next_v = self.rv.state.valuation + self.npe.governing_state.disorder + self.phaseloom.state.tension;
         if let Err(e) = assert_stability_law(prev_v, next_v, 10, 100) {
             return (false, trace.with_reject(&format!("Stability law: {:?}", e)));
         }

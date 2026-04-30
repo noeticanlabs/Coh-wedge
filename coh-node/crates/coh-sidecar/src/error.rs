@@ -64,6 +64,10 @@ impl From<RejectCode> for CohErrorCode {
 
             // State link -> E004
             RejectCode::RejectStateHashLink => CohErrorCode::E004,
+            // New PhaseLoom variants
+            RejectCode::AuthorityExceeded
+            | RejectCode::PhaseLoomInsufficientBudget
+            | RejectCode::PhaseLoomEpistemicViolation => CohErrorCode::E003,
             RejectCode::GenesisMissing => CohErrorCode::E007,
             RejectCode::GenesisViolation => CohErrorCode::E008,
             RejectCode::ProjectionMismatch => CohErrorCode::E009,

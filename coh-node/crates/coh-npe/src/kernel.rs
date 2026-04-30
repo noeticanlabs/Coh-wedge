@@ -4,7 +4,6 @@
 
 use serde::{Deserialize, Serialize};
 use crate::loop_engine::NpeState;
-use crate::engine::{NpeProposal, NpeError};
 
 /// G_N: NPE governing state
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
@@ -88,7 +87,7 @@ impl NpeKernel {
     pub fn is_affordable(&self, cpu_cost: u64, mem_cost: u64, token_cost: u64) -> bool {
         self.budget.cpu_ms >= cpu_cost && 
         self.budget.memory_bytes >= mem_cost && 
-        self.budget.token_budget.map_or(true, |limit| limit >= (token_cost as u64))
+        self.budget.token_budget.is_none_or(|limit| limit >= token_cost)
     }
 
     /// Charge the NPE budget

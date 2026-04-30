@@ -2,7 +2,7 @@ import Mathlib.Data.NNRat.Defs
 import Mathlib.Algebra.Order.Monoid.WithTop
 import Mathlib.Order.WithBot
 import Mathlib.Order.CompleteLattice
-import Mathlib.Algebra.Order.Monoid.Canonical
+import Mathlib.Algebra.Order.Monoid.Canonical.Defs
 
 abbrev ENNRat := WithTop NNRat
 

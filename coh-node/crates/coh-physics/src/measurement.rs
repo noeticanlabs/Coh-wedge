@@ -1,8 +1,8 @@
 //! Spinor Measurement & Record Channels
 
 use crate::CohSpinor;
-use serde::{Deserialize, Serialize};
 use num_complex::Complex64;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct RecordChannel {
@@ -32,10 +32,10 @@ impl SpinorProjector {
 
     pub fn project(&self, psi: &CohSpinor) -> CohSpinor {
         let mut components = [Complex64::new(0.0, 0.0); 4];
-        for i in 0..4 {
+        for (i, row) in self.matrix.iter().enumerate() {
             let mut sum = Complex64::new(0.0, 0.0);
-            for j in 0..4 {
-                sum += self.matrix[i][j] * psi.components[j];
+            for (j, psi_j) in psi.components.iter().enumerate() {
+                sum += row[j] * psi_j;
             }
             components[i] = sum;
         }

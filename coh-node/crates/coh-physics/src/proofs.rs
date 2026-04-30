@@ -11,8 +11,8 @@
 //!   coord_proj_weight_sum     -> test_coord_proj_weight_sum
 //!   positive_density_theorem  -> CohSpinor::density() >= 0 (always, by f64)
 
-use crate::{CohSpinor, gamma};
 use crate::measurement::SpinorProjector;
+use crate::{gamma, CohSpinor};
 use num_complex::Complex64;
 
 const TOL: f64 = 1e-12;
@@ -23,17 +23,21 @@ pub fn verify_gamma0_sq_eq_identity() -> bool {
     let g0 = gamma::gamma0();
     // Multiply g0 * g0
     let mut result = [[Complex64::new(0.0, 0.0); 4]; 4];
-    for i in 0..4 {
-        for j in 0..4 {
-            for k in 0..4 {
-                result[i][j] += g0[i][k] * g0[k][j];
+    for (i, row) in result.iter_mut().enumerate() {
+        for (j, cell) in row.iter_mut().enumerate() {
+            for (k, _) in g0[i].iter().enumerate() {
+                *cell += g0[i][k] * g0[k][j];
             }
         }
     }
     // Check result == I_4
-    for i in 0..4 {
-        for j in 0..4 {
-            let expected = if i == j { Complex64::new(1.0, 0.0) } else { Complex64::new(0.0, 0.0) };
+    for (i, row) in result.iter().enumerate() {
+        for (j, _cell) in row.iter().enumerate() {
+            let expected = if i == j {
+                Complex64::new(1.0, 0.0)
+            } else {
+                Complex64::new(0.0, 0.0)
+            };
             if (result[i][j] - expected).norm() > TOL {
                 return false;
             }
@@ -125,8 +129,10 @@ mod tests {
 
     #[test]
     fn test_gamma0_sq_eq_identity() {
-        assert!(verify_gamma0_sq_eq_identity(),
-            "gamma0^2 must equal I_4 (Lean: gamma0_sq_eq_one)");
+        assert!(
+            verify_gamma0_sq_eq_identity(),
+            "gamma0^2 must equal I_4 (Lean: gamma0_sq_eq_one)"
+        );
     }
 
     #[test]
@@ -134,52 +140,66 @@ mod tests {
         let psi = test_spinor();
         for k in 0..4 {
             let p = SpinorProjector::coordinate(k);
-            assert!(verify_proj_density_nonneg(&psi, &p),
-                "Projection weight must be non-negative (Lean: proj_density_nonneg)");
+            assert!(
+                verify_proj_density_nonneg(&psi, &p),
+                "Projection weight must be non-negative (Lean: proj_density_nonneg)"
+            );
         }
     }
 
     #[test]
     fn test_coord_proj_idempotent() {
         for k in 0..4 {
-            assert!(verify_coord_proj_idempotent(k),
-                "P_k^2 = P_k must hold (Lean: coord_proj_idem)");
+            assert!(
+                verify_coord_proj_idempotent(k),
+                "P_k^2 = P_k must hold (Lean: coord_proj_idem)"
+            );
         }
     }
 
     #[test]
     fn test_coord_proj_hermitian() {
         for k in 0..4 {
-            assert!(verify_coord_proj_hermitian(k),
-                "P_k† = P_k must hold (Lean: coord_proj_hermitian)");
+            assert!(
+                verify_coord_proj_hermitian(k),
+                "P_k† = P_k must hold (Lean: coord_proj_hermitian)"
+            );
         }
     }
 
     #[test]
     fn test_coord_proj_weight_sum() {
         let psi = test_spinor();
-        assert!(verify_coord_proj_weight_sum(&psi),
-            "sum_k |P_k psi|^2 = density(psi) (Lean: coord_proj_weight_sum)");
+        assert!(
+            verify_coord_proj_weight_sum(&psi),
+            "sum_k |P_k psi|^2 = density(psi) (Lean: coord_proj_weight_sum)"
+        );
     }
 
     #[test]
     fn test_positive_density() {
         let psi = test_spinor();
-        assert!(verify_positive_density(&psi),
-            "density >= 0 (Lean: positive_density_theorem)");
+        assert!(
+            verify_positive_density(&psi),
+            "density >= 0 (Lean: positive_density_theorem)"
+        );
     }
 
     #[test]
     fn test_normalized_density_is_one() {
         let psi = test_spinor();
-        assert!(verify_normalized_density_is_one(&psi),
-            "normalized density == 1 (Lean: cohspinor_density_eq_one)");
+        assert!(
+            verify_normalized_density_is_one(&psi),
+            "normalized density == 1 (Lean: cohspinor_density_eq_one)"
+        );
     }
 
     #[test]
     fn test_j0_eq_density() {
         let psi = test_spinor();
-        assert!(verify_j0_eq_density(&psi),
-            "J0 == density(psi) (Lean: j0_eq_density)");
+        assert!(
+            verify_j0_eq_density(&psi),
+            "J0 == density(psi) (Lean: j0_eq_density)"
+        );
     }
 }

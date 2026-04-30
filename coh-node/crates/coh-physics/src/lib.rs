@@ -51,7 +51,6 @@ impl CohSpinor {
 
     /// Dirac Adjoint: bar{psi} = psi† gamma0
     pub fn adjoint(&self) -> [Complex64; 4] {
-        let g0 = gamma::gamma0();
         let mut adj = [Complex64::new(0.0, 0.0); 4];
         
         // psi† gamma0

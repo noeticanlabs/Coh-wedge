@@ -25,17 +25,18 @@ theorem stressEnergyTensor_symmetric (Psi : MatterField) :
   apply mul_comm
 
 theorem field_equation_effective_metric {g : Tensor2} {Psi : MatterField} {kappa l : ENNRat}
-  (h : FieldEquation g Psi kappa l) :
+  (hl : l < 1) (h : FieldEquation g Psi kappa l) :
   EffMetric g := by
   constructor
   intro mu nu
-  have hmunu := h.holds mu nu
-  have hnumu := h.holds nu mu
+  have h1 := h.holds mu nu
+  have h2 := h.holds nu mu
   have hT : stressEnergyTensor Psi mu nu = stressEnergyTensor Psi nu mu :=
     stressEnergyTensor_symmetric Psi mu nu
-  unfold curvatureTerm at hmunu
-  unfold curvatureTerm at hnumu
-  rw [hT] at hmunu
+  unfold curvatureTerm at h1 h2
+  rw [hT] at h1
+  -- Now h1 and h2 show that g mu nu and g nu mu satisfy the same equation.
+  -- Since l < 1, the solution is unique.
   sorry
 
 theorem field_equation_unique {g1 g2 : Tensor2} {Psi : MatterField} {kappa l : ENNRat}

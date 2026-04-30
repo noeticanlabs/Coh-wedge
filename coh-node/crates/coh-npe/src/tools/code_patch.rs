@@ -709,9 +709,9 @@ fn parse_toml_dep_line(line: &str) -> Option<(String, String)> {
         let name = line[..eq_pos].trim().to_string();
         let value = line[eq_pos + 1..].trim();
 
-        if value.starts_with('\"') {
+        if let Some(stripped) = value.strip_prefix('\"') {
             // Simple string version
-            if let Some(end_quote) = value[1..].find('"') {
+            if let Some(end_quote) = stripped.find('"') {
                 let version = value[1..=end_quote].to_string();
                 return Some((name, version));
             }
@@ -721,7 +721,7 @@ fn parse_toml_dep_line(line: &str) -> Option<(String, String)> {
                 let v_part = &value[v_start..];
                 if let Some(eq) = v_part.find('=') {
                     let v_value = v_part[eq + 1..].trim();
-                    if v_value.starts_with('"') {
+                    if let Some(_stripped) = v_value.strip_prefix('"') {
                         if let Some(end_quote) = v_value[1..].find('"') {
                             let version = v_value[1..=end_quote].to_string();
                             return Some((name, version));

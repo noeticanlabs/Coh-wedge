@@ -454,6 +454,7 @@ pub fn verify_with_mode(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::auth::VerifierContext;
 
     fn build_valid_wire() -> MicroReceiptV3Wire {
         let mut wire = MicroReceiptV3Wire {

@@ -142,7 +142,7 @@ fn test_differential_valid_receipts_accepted() {
         let v3_wire = build_v3_wire(v_pre, v_post, spend, defect);
 
         let v1_result = verify_micro(v1_wire);
-        let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None);
+        let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None, &coh_core::auth::VerifierContext::fixture_default());
 
         // Both should make the same decision
         assert_eq!(
@@ -170,7 +170,7 @@ fn test_differential_policy_violation() {
         let v3_wire = build_v3_wire(v_pre, v_post, spend, defect);
 
         let v1_result = verify_micro(v1_wire);
-        let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None);
+        let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None, &coh_core::auth::VerifierContext::fixture_default());
 
         // Both should reject
         assert_eq!(
@@ -207,7 +207,7 @@ fn test_differential_boundary_cases() {
     let policy_gov = PolicyGovernance::default();
 
     let v1_result = verify_micro(v1_wire);
-    let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None);
+    let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None, &coh_core::auth::VerifierContext::fixture_default());
 
     // Both should accept at exact boundary
     assert_eq!(v1_result.decision, Decision::Accept);
@@ -225,6 +225,7 @@ fn test_differential_boundary_cases() {
         &policy_gov,
         None,
         None,
+        &coh_core::auth::VerifierContext::fixture_default(),
     );
 
     assert_eq!(v1_result_over.decision, Decision::Reject);
@@ -248,7 +249,7 @@ fn test_differential_schema_validation() {
     let mut v3_wire = build_v3_wire("100", "50", "25", "0");
     v3_wire.schema_id = "invalid.schema".to_string();
     // We are deliberately causing a schema reject so hash might not match, but schema checks happen before hash.
-    let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None);
+    let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None, &coh_core::auth::VerifierContext::fixture_default());
 
     // Both should reject
     assert_eq!(v1_result.decision, Decision::Reject);
@@ -266,7 +267,7 @@ fn test_differential_vacuous_zero() {
     let v3_wire = build_v3_wire("0", "0", "0", "0");
 
     let v1_result = verify_micro(v1_wire);
-    let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None);
+    let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None, &coh_core::auth::VerifierContext::fixture_default());
 
     // Both should reject vacuous zero
     assert_eq!(v1_result.decision, Decision::Reject);
@@ -293,7 +294,7 @@ fn test_consistency_large_values() {
     let v3_wire = build_v3_wire(large, "0", "0", large);
 
     let v1_result = verify_micro(v1_wire);
-    let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None);
+    let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None, &coh_core::auth::VerifierContext::fixture_default());
 
     // Both should make a decision (either accept or reject consistently)
     match (v1_result.decision, v3_result.decision) {
@@ -315,7 +316,7 @@ fn test_consistency_overflow() {
     let v3_wire = build_v3_wire("1000", &max, "1000", "0");
 
     let v1_result = verify_micro(v1_wire);
-    let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None);
+    let v3_result = verify_micro_v3(v3_wire, &config, &sequence_guard, &policy_gov, None, None, &coh_core::auth::VerifierContext::fixture_default());
 
     // Both should reject (with numeric parse or overflow or policy violation)
     assert_eq!(v1_result.decision, Decision::Reject);

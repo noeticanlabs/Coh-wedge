@@ -2,8 +2,7 @@
 //! 
 //! "RV has authority without imagination."
 
-use crate::types::{Hash32, Decision, ToolAuthorityMode, VerifierClaim, FormalStatus};
-use crate::reject::RejectCode;
+use crate::types::{Hash32, ToolAuthorityMode, VerifierClaim, FormalStatus};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]

@@ -25,10 +25,10 @@ instance : LT Provenance where
   lt p1 p2 := authority p1 < authority p2
 
 instance : DecidableRel (LE.le : Provenance → Provenance → Prop) :=
-  fun p1 p2 => inferInstance
+  fun _ _ => inferInstance
 
 instance : DecidableRel (LT.lt : Provenance → Provenance → Prop) :=
-  fun p1 p2 => inferInstance
+  fun _ _ => inferInstance
 
 end Provenance
 
@@ -51,16 +51,16 @@ structure MemoryRecord (α : Type u) [OrderedAddCommMonoid α] where
 /-- Theorem 1A: Convex Viability (Existence and Forward Invariance) -/
 theorem convex_viability
     {E : Type u} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [CompleteSpace E]
-    (K : Set E) (hK_conv : Convex ℝ K) (hK_closed : IsClosed K)
-    (f : E → E) (hf_lipschitz : LipschitzWith 1 f) :
-    ∀ (x0 : E), x0 ∈ K → True := by
-  intros x0 hx0
+    (_K : Set E) (_hK_conv : Convex ℝ _K) (_hK_closed : IsClosed _K)
+    (_f : E → E) (_hf_lipschitz : LipschitzWith 1 _f) :
+    ∀ (x0 : E), x0 ∈ _K → True := by
+  intros _ _
   trivial
 
 /-- Theorem 1B: Budget Boundary Absorption (The Hard Safety Law) -/
 theorem budget_boundary_absorption
     {α : Type u} [OrderedAddCommGroup α] [Module ℝ α]
-    (B : ℝ) (V : ℝ) (hB_zero : B = 0) :
+    (_B : ℝ) (_V : ℝ) (_hB_zero : _B = 0) :
     True := by
   trivial
 
@@ -69,7 +69,7 @@ theorem budget_boundary_absorption
 /-- Theorem 6: Local Nonlinear Absorption -/
 theorem local_nonlinear_absorption
     {E : Type u} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
-    (JR HV : E →L[ℝ] E) (gamma wx wc : ℝ) :
+    (_JR _HV : E →L[ℝ] E) (_gamma _wx _wc : ℝ) :
     True := by
   trivial
 
@@ -90,7 +90,7 @@ theorem lawful_recall
     {α : Type u} [OrderedAddCommGroup α] [Module ℝ α]
     (state : PhaseLoomState α)
     (record : MemoryRecord α)
-    (alpha_tau alpha_d alpha_p : ℝ)
+    (_alpha_tau _alpha_d _alpha_p : ℝ)
     (h_tau : state.tau ≥ record.tau) :
     let dt : ℝ := (state.tau - record.tau : ℕ)
     dt ≥ 0 := by
@@ -99,8 +99,8 @@ theorem lawful_recall
 /-- Theorem E2: Forgetting Necessity (Metabolic Forgetting) -/
 theorem forgetting_necessity
     {α : Type u} [OrderedAddCommGroup α]
-    (utility maintenance : ℝ)
-    (h_decay : utility < maintenance) :
+    (_utility _maintenance : ℝ)
+    (_h_decay : _utility < _maintenance) :
     True := by
   trivial
 

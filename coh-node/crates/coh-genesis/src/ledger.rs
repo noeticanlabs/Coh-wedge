@@ -55,7 +55,7 @@ impl SimpleLedger {
             schema_version: "GMI_V1".into(),
             domain_tag: "GMI_RECEIPT".into(),
             proposal_id: proposal_id.to_string(),
-            prev_tip: self.tip.clone(),
+            prev_tip: self.tip,
             claim,
             decision,
             timestamp: std::time::SystemTime::now()
@@ -81,12 +81,12 @@ impl SimpleLedger {
         hasher.update(&payload_bytes);
         
         let new_tip = Hash32::from_slice(&hasher.finalize());
-        self.tip = new_tip.clone();
+        self.tip = new_tip;
         self.sequence = self.sequence.saturating_add(1);
         
         self.history.push(Receipt {
             payload,
-            hash: new_tip.clone(),
+            hash: new_tip,
         });
 
         Ok(new_tip)
