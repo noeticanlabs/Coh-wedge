@@ -21,6 +21,15 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use coh_npe::weights::StrategyWeights;
+use coh_npe::receipt::{BoundaryReceiptSummary, MathlibEffect};
+use coh_npe::closure::LeanClosureStatus;
+use coh_npe::failure_taxonomy;
+
+pub mod kernel;
+pub mod knowledge;
+pub mod budget;
+
 /// Configuration for PhaseLoom initialization
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PhaseLoomConfig {
@@ -50,6 +59,8 @@ pub struct PhaseLoomConfig {
     pub alpha_t: f64,
     /// Time dilation coefficient for Curvature
     pub alpha_c: f64,
+    /// [LORENTZ] Time dilation coefficient for Gamma (alpha_gamma)
+    pub alpha_gamma: f64,
     /// [ECOLOGY] Temporal Depth coefficient (alpha_tau)
     pub alpha_tau: f64,
     /// [ECOLOGY] Semantic Distance coefficient (alpha_d)
@@ -76,6 +87,7 @@ impl Default for PhaseLoomConfig {
             alpha_v: 0.1,
             alpha_t: 0.2,
             alpha_c: 0.05,
+            alpha_gamma: 1.0,
             alpha_tau: 0.01,
             alpha_d: 1.0,
             alpha_p: 5.0,
@@ -84,38 +96,7 @@ impl Default for PhaseLoomConfig {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, Default)]
-pub struct StrategyWeights(pub HashMap<String, f64>);
-
-impl StrategyWeights {
-    /// Normalize weights to sum = 1.0 (probability distribution)
-    pub fn normalize(&mut self) {
-        let sum: f64 = self.0.values().sum();
-        if sum > 0.0 {
-            for value in self.0.values_mut() {
-                *value /= sum;
-            }
-        }
-    }
-
-    /// Get normalized weight for a class
-    pub fn get(&self, class: &str) -> f64 {
-        self.0.get(class).copied().unwrap_or(0.0)
-    }
-
-    /// Increment weight for a class by delta
-    pub fn increment(&mut self, class: &str, delta: f64) {
-        self.0
-            .entry(class.to_string())
-            .and_modify(|w| *w = (*w + delta).max(0.0))
-            .or_insert(delta.max(0.0));
-    }
-
-    /// Get all strategy classes
-    pub fn classes(&self) -> Vec<String> {
-        self.0.keys().cloned().collect()
-    }
-}
+// StrategyWeights moved to crate::npe::weights
 
 /// PhaseLoom state: adaptive memory for NPE strategy selection
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -348,16 +329,14 @@ impl PhaseLoomState {
     /// Process a boundary receipt and update internal state
     /// This implements the PhaseLoom Framework update laws
     pub fn ingest(&mut self, receipt: &BoundaryReceiptSummary, config: &PhaseLoomConfig) {
-        // [PHASELOOM: PART III] Intrinsic Time Dilation
-        // d tau / dt = 1 + alpha_V V + alpha_T T + alpha_C C
-        let v_norm = receipt.genesis_margin.abs() as f64 / 1000.0;
-        let t_norm = receipt.tension_score as f64 / 100.0;
-        let c_norm = self.curvature as f64 / 1000.0;
-        
-        let d_tau = 1.0 + (config.alpha_v * v_norm) + (config.alpha_t * t_norm) + (config.alpha_c * c_norm);
+        // [PHASELOOM: PART III] Lorentzian Intrinsic Time Dilation
+        // d tau / dt = 1 / gamma
+        // alpha_gamma scales the coordinate step size
+        let d_tau = (1.0 / receipt.gamma.max(1.0)) * config.alpha_gamma;
         self.tau_f += d_tau;
-        self.tau = self.tau_f as u64;
+        self.tau = self.tau.saturating_add(1);
 
+        let t_norm = receipt.tension_score as f64 / 100.0;
         if t_norm > 0.0 {
             self.dilation_events += 1;
             self.max_tension = self.max_tension.max(receipt.tension_score);
@@ -370,29 +349,28 @@ impl PhaseLoomState {
             .or_insert(1);
 
         // [PHASELOOM: PART I] Tension Injection
-        self.tension = self.tension.saturating_add(receipt.tension_score);
+        let gamma_pressure = if receipt.gamma > 1.0 { (receipt.gamma - 1.0) * 10.0 } else { 0.0 };
+        self.tension = self.tension.saturating_add(receipt.tension_score).saturating_add(gamma_pressure as u128);
 
         // [PHASELOOM: PART VI] Weight Reinforcement
         // Implement the "ClosedNoSorry" policy
         let weight_delta = if receipt.accepted {
-            if !receipt.sorry_detected && receipt.outcome == "accepted" {
-                self.closed_proofs += 1;
-                5.0 // ClosedNoSorry
-            } else if receipt.sorry_detected {
-                self.build_passed_with_sorry += 1;
-                0.5 // BuildPassedWithSorry
-            } else {
-                self.near_misses += 1;
-                1.0 // NearMiss
+            match receipt.closure_status {
+                LeanClosureStatus::ClosedNoSorry => {
+                    self.closed_proofs += 1;
+                    receipt.closure_status.weight_delta()
+                }
+                LeanClosureStatus::BuildPassedWithSorry => {
+                    self.build_passed_with_sorry += 1;
+                    receipt.closure_status.weight_delta()
+                }
+                _ => {
+                    self.near_misses += 1;
+                    1.0 // NearMiss fallback
+                }
             }
         } else {
-            if receipt.outcome == "rejected" {
-                -1.0
-            } else if receipt.outcome == "erroneous" {
-                -2.0 // Malformed
-            } else {
-                -0.5 // Timeout or other
-            }
+            receipt.closure_status.weight_delta()
         };
 
         if let Some(template) = receipt.coh_template {
@@ -400,7 +378,7 @@ impl PhaseLoomState {
             self.template_weights.increment(&t_name, weight_delta);
             
             let stats = self.template_stats.entry(t_name).or_insert((0, 0));
-            if receipt.accepted && !receipt.sorry_detected && receipt.outcome == "accepted" {
+            if receipt.accepted && receipt.closure_status == LeanClosureStatus::ClosedNoSorry {
                 stats.0 += 1; // Success
             } else if !receipt.accepted {
                 stats.1 += 1; // Failure
@@ -479,8 +457,8 @@ impl PhaseLoomState {
 
         // [NPE-Rust Advances NPE-Lean] Trigger synthesis on warm proof failure
         if let Some(report) = &receipt.failure_report {
-            if let crate::failure_taxonomy::FailureKind::LeanProof(
-                crate::failure_taxonomy::LeanProofFailure::UnsolvedGoals,
+            if let coh_npe::failure_taxonomy::FailureKind::LeanProof(
+                coh_npe::failure_taxonomy::LeanProofFailure::UnsolvedGoals,
             ) = &report.kind
             {
                 if reward > 0.0 {
@@ -514,105 +492,12 @@ impl PhaseLoomState {
     }
 }
 
-/// Boundary receipt summary consumed by PhaseLoom
-#[derive(Clone, Debug, Serialize, Deserialize, Default)]
-pub struct BoundaryReceiptSummary {
-    /// Domain (e.g., "code", "test", "docs")
-    pub domain: String,
-    /// Target (e.g., "function foo", "module bar")
-    pub target: String,
-    /// Strategy class used (e.g., "synthesize", "refine", "debug")
-    pub strategy_class: String,
-    /// Coh Template used (e.g., "CertifiedComposition")
-    pub coh_template: Option<crate::npe::templates::CohTemplateKind>,
-    /// Wildness parameter (0.0 = conservative, 1.0 = aggressive)
-    pub wildness: f64,
-    /// Genesis margin: M(g') + C(p) - M(g) - D(p)
-    pub genesis_margin: i128,
-    /// Coherence margin: V_post + spend - V_pre - defect
-    pub coherence_margin: i128,
-    /// Projection Defect: Coarse-graining slack accounted for in memory
-    pub projection_defect: u128,
-    /// Algebraic Tension Score (0-100)
-    pub tension_score: u128,
-    /// Epistemic Provenance: "EXT", "DER", "REP", "SIM"
-    pub provenance: String,
-    /// [ECOLOGY] Tau of the original record being accessed
-    pub record_tau: u64,
-    /// [ECOLOGY] Semantic distance to the record
-    pub semantic_distance: f64,
-    /// Accuracy (Fiber Diameter): lower is more precise
-    pub accuracy: f64,
-    /// Utility Score for metabolic forgetting
-    pub utility: f64,
-    /// Whether sorry or admit was detected in the proof
-    pub sorry_detected: bool,
-    /// First failure reason if rejected
-    pub first_failure: String,
-    /// Outcome: "accepted", "rejected", "erroneous"
-    pub outcome: String,
-    /// Accepted: true/false
-    pub accepted: bool,
-    /// Novelty score (0.0 = repeat, 1.0 = novel)
-    pub novelty: f64,
-    /// Receipt hash for audit trail
-    pub receipt_hash: String,
-    /// Detailed failure report from the NPE pipeline
-    pub failure_report: Option<crate::failure_taxonomy::FailureReport>,
-    // ==== Mathlib fields for PhaseLoom learning ====
-    /// Mathlib strategy used (e.g., "IsGLB", "SInf", "OrderTheory")
-    pub mathlib_strategy: Option<String>,
-    /// Mathlib confidence (0.0 - 1.0)
-    pub mathlib_confidence: Option<f64>,
-    /// Suggested lemmas from mathlib
-    pub mathlib_suggested_lemmas: Option<Vec<String>>,
-    /// Mathlib import risk tier
-    pub mathlib_import_risk: Option<String>,
-    /// Were imports actually used in proof?
-    pub mathlib_imports_used: bool,
-    /// What mathlib effect was observed
-    pub mathlib_effect: MathlibEffect,
-}
-
-impl BoundaryReceiptSummary {
-    /// Convert to a simulation vector for the dynamic visualization layer.
-    pub fn to_simulation_vector(&self) -> serde_json::Value {
-        serde_json::json!({
-            "target": self.target,
-            "strategy": self.strategy_class,
-            "accepted": self.accepted,
-            "novelty": self.novelty,
-            "spend": self.genesis_margin.abs() as f64 / 1000.0, // Scaled for viz
-            "defect": self.coherence_margin.abs() as f64 / 1000.0,
-            "hash": self.receipt_hash,
-            "failure_layer": self.failure_report.as_ref().map(|r| format!("{:?}", r.layer)),
-            "failure_kind": self.failure_report.as_ref().map(|r| format!("{:?}", r.kind)),
-        })
-    }
-}
-
-/// Effect of mathlib on the proof attempt
-#[derive(Clone, Debug, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
-pub enum MathlibEffect {
-    /// No mathlib used
-    #[default]
-    None,
-    /// Strategy guidance only, no imports
-    StrategyOnly,
-    /// Imports helped the proof
-    ImportHelped,
-    /// Policy rejected the imports
-    ImportRejected,
-    /// Imports neither helped nor hurt
-    ImportNeutral,
-}
+// BoundaryReceiptSummary and MathlibEffect moved to crate::npe::receipt
 
 
-impl BoundaryReceiptSummary {
-    /// Create a test receipt for unit testing
-    #[cfg(test)]
-    pub fn test_accepted(strategy_class: &str, novelty: f64) -> Self {
-        Self {
+#[cfg(test)]
+pub fn test_accepted(strategy_class: &str, novelty: f64) -> BoundaryReceiptSummary {
+        BoundaryReceiptSummary {
             domain: "test".to_string(),
             target: "test_fn".to_string(),
             strategy_class: strategy_class.to_string(),
@@ -633,6 +518,7 @@ impl BoundaryReceiptSummary {
             novelty,
             receipt_hash: "test_hash".to_string(),
             coh_template: None,
+            closure_status: LeanClosureStatus::ClosedNoSorry,
             mathlib_strategy: None,
             mathlib_confidence: None,
             mathlib_suggested_lemmas: None,
@@ -640,12 +526,13 @@ impl BoundaryReceiptSummary {
             mathlib_imports_used: false,
             mathlib_effect: MathlibEffect::None,
             failure_report: None,
+            gamma: 1.0,
         }
     }
 
     #[cfg(test)]
-    pub fn test_rejected(strategy_class: &str, failure: &str) -> Self {
-        Self {
+    pub fn test_rejected(strategy_class: &str, failure: &str) -> BoundaryReceiptSummary {
+        BoundaryReceiptSummary {
             domain: "test".to_string(),
             target: "test_fn".to_string(),
             strategy_class: strategy_class.to_string(),
@@ -666,29 +553,30 @@ impl BoundaryReceiptSummary {
             novelty: 0.0,
             receipt_hash: "test_hash".to_string(),
             coh_template: None,
+            closure_status: LeanClosureStatus::BuildFailed,
             mathlib_strategy: None,
             mathlib_confidence: None,
             mathlib_suggested_lemmas: None,
             mathlib_import_risk: None,
             mathlib_imports_used: false,
             mathlib_effect: MathlibEffect::None,
-            failure_report: Some(crate::failure_taxonomy::FailureReport {
+            failure_report: Some(failure_taxonomy::FailureReport {
                 candidate_id: "test".to_string(),
                 target: "test_fn".to_string(),
-                layer: crate::failure_taxonomy::FailureLayer::CohPost,
-                kind: crate::failure_taxonomy::FailureKind::Governance(
-                    crate::failure_taxonomy::GovernanceFailure::ProofCostTooHigh,
+                layer: failure_taxonomy::FailureLayer::CohPost,
+                kind: failure_taxonomy::FailureKind::Governance(
+                    failure_taxonomy::GovernanceFailure::ProofCostTooHigh,
                 ),
                 raw_error: "test error".to_string(),
                 normalized_message: "test error".to_string(),
                 retryable: false,
-                severity: crate::failure_taxonomy::FailureSeverity::HardInvalid,
+                severity: failure_taxonomy::FailureSeverity::HardInvalid,
                 suggested_repairs: vec![],
                 blocks_publication: true,
             }),
+            gamma: 1.0,
         }
     }
-}
 
 /// Public API functions
 /// Initialize PhaseLoom state
@@ -749,7 +637,7 @@ mod tests {
         let config = PhaseLoomConfig::default();
         let mut state = PhaseLoomState::new(&config);
 
-        let receipt = BoundaryReceiptSummary::test_accepted("synthesize", 0.8);
+        let receipt = test_accepted("synthesize", 0.8);
         state.ingest(&receipt, &config);
 
         assert_eq!(state.tau, 1);
@@ -763,7 +651,7 @@ mod tests {
         let config = PhaseLoomConfig::default();
         let mut state = PhaseLoomState::new(&config);
 
-        let receipt = BoundaryReceiptSummary::test_rejected("synthesize", "policy_violation");
+        let receipt = test_rejected("synthesize", "policy_violation");
         state.ingest(&receipt, &config);
 
         assert_eq!(state.tau, 1);
@@ -778,15 +666,15 @@ mod tests {
 
         // Ingest multiple receipts
         state.ingest(
-            &BoundaryReceiptSummary::test_accepted("synthesize", 0.5),
+            &test_accepted("synthesize", 0.5),
             &config,
         );
         state.ingest(
-            &BoundaryReceiptSummary::test_accepted("refine", 0.5),
+            &test_accepted("refine", 0.5),
             &config,
         );
         state.ingest(
-            &BoundaryReceiptSummary::test_rejected("debug", "error"),
+            &test_rejected("debug", "error"),
             &config,
         );
 
@@ -805,7 +693,7 @@ mod tests {
         // Reject enough to trigger circuit break (curvature = 4 > 3)
         for _ in 0..4 {
             state.ingest(
-                &BoundaryReceiptSummary::test_rejected("test", "error"),
+                &test_rejected("test", "error"),
                 &config,
             );
         }
@@ -942,5 +830,33 @@ mod tests {
         assert!(state.validate_memory_transition("EXT", "SIM"));
         // DER can overwrite REP
         assert!(state.validate_memory_transition("DER", "REP"));
+    }
+
+    #[test]
+    fn test_lorentz_time_dilation() {
+        let config = PhaseLoomConfig::default();
+        let mut state = PhaseLoomState::new(&config);
+
+        // Base step with gamma = 1.0 (no dilation)
+        let mut receipt1 = test_accepted("synthesize", 1.0);
+        receipt1.gamma = 1.0;
+        state.ingest(&receipt1, &config);
+        let tau_f1 = state.tau_f;
+        assert!(tau_f1 > 0.0);
+
+        // Second step with gamma = 10.0 (dilation)
+        let mut receipt2 = test_accepted("synthesize", 1.0);
+        receipt2.gamma = 10.0;
+        state.ingest(&receipt2, &config);
+        let tau_f2 = state.tau_f;
+        
+        let delta = tau_f2 - tau_f1;
+        println!("tau_f1: {}, tau_f2: {}, delta: {}", tau_f1, tau_f2, delta);
+        // delta should be (1/10) * alpha_gamma = 0.1
+        assert!(delta < 0.2); 
+        assert!(delta > 0.05);
+        
+        // Compared to no dilation (delta would be 1.0)
+        assert!(delta < 1.0);
     }
 }

@@ -48,7 +48,7 @@ Theorem: If a metric satisfies the field equation, it is uniquely determined
 by the matter field and coupling constants.
 -/
 /-- Synthesized by NPE-Rust --/
-theorem sub_eq_of_add_eq {a b c : ENNRat} (h1 : a = b + c) : a - c = b := by rw [h1, add_tsub_cancel_right]
+theorem sub_eq_of_add_eq {a b c : ENNRat} (h1 : a = b + c) (h2 : b < 1) : a - c = b := by exact sub_eq_of_add_eq h1' (hl.trans_le (by simp))
 
 theorem field_equation_unique {g1 g2 : Tensor2} {Psi : MatterField} {kappa l : ENNRat}
   (h1 : FieldEquation g1 Psi kappa l)

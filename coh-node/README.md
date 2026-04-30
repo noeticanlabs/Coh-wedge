@@ -25,10 +25,16 @@ Out of scope for this V1 surface: networking protocols, distributed consensus, s
 
 | Path | Role |
 |---|---|
-| `crates/coh-core/` | Core verification logic and data types |
+| `crates/coh-core/` | Core verification logic and data types, including `RvKernel` |
 | `crates/coh-cli/` | `coh-validator` command-line interface |
 | `crates/coh-python/` | Python bindings for verifier integration |
 | `crates/coh-sidecar/` | Axum-based HTTP service exposing verification routes |
+| `crates/coh-genesis/` | Unified `GmiGovernor` and law of genesis closure |
+| `crates/coh-npe/` | `NpeKernel` for Noetic Proposal Engine logic |
+| `crates/coh-phaseloom/` | `PhaseLoomKernel` for boundary strategy ecology |
+| `crates/coh-gccp/` | Governed Compute Control Plane logic |
+| `crates/coh-time/` | Time and probability engines |
+| `crates/coh-fuzz/` | Fuzzing tools and adversarial vectors |
 | `docs/` | Purpose, data model, ordering, laws, Merkle flow, CLI, and test-vector docs |
 | `vectors/` | Valid and adversarial chain fixtures used for testing and demos |
 | `examples/` | Demo assets and integration-oriented sample material |
@@ -118,13 +124,13 @@ cargo run --release -p coh-core --example enterprise_benchmark
 | Concurrency | Multi-threaded stress testing |
 | Sidecar overhead | HTTP vs in-process latency |
 
-### Key results (Ryzen 9 7950X)
+### Key results (Ryzen 9 7950X / Reference Hardware)
 
-- **Throughput**: 50k-96k ops/sec (single-threaded)
-- **Concurrency**: 320k ops/sec (500 threads)
+- **Throughput**: ~175k verifications/sec (single-threaded)
+- **Concurrency**: >300k ops/sec (multi-threaded)
 - **False Accept Rate**: 0% (invalid receipts rejected)
 - **False Reject Rate**: 0% (valid receipts accepted)
-- **Latency p99**: < 130µs under load
+- **Latency p99**: ~5.7µs/verification under load
 
 ## Sidecar API
 
@@ -163,6 +169,8 @@ See [`../plans/SIDECAR_API.md`](../plans/SIDECAR_API.md) for the route contract 
 | Merkle challenge flow | [`docs/04-merkle-challenge-flow.md`](docs/04-merkle-challenge-flow.md) |
 | CLI usage | [`docs/05-cli-usage.md`](docs/05-cli-usage.md) |
 | Test vectors | [`docs/06-test-vectors.md`](docs/06-test-vectors.md) |
+| Kernel Architecture (NPE, PhaseLoom, RV) | [`docs/07-kernel-architecture.md`](docs/07-kernel-architecture.md) |
+| Dashboard Integration | [`docs/08-dashboard-integration.md`](docs/08-dashboard-integration.md) |
 | Case study | [`docs/CASE_STUDY.md`](docs/CASE_STUDY.md) |
 
 ## Determinism Notes

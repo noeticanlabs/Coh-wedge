@@ -9,30 +9,36 @@ use serde::{Deserialize, Serialize};
 pub enum CohTemplateKind {
     /// V(z) + (s1 + s2) <= V(x) + (d1 + d2) + (a1 + a2)
     CertifiedComposition,
+    /// M(g3) + (C1 + C2) <= M(g1) + (D1 + D2)
+    GenesisComposition,
     /// V(x) + 0 <= V(x) + 0 + 0
     IdentityCertification,
-    /// d_total <= d1 + d2
+    /// d_total <= d1 + d2 (Semantic envelope)
     EnvelopeDomination,
-    /// df <= dg, dg <= dh => df <= dh
-    HomPreorder,
+    /// df <= dg, dg <= dh => df <= dh (Transitivity)
+    HomPreorderTransitivity,
     /// df1 <= df2, dg1 <= dg2 => df1 + dg1 <= df2 + dg2
     MonotoneComposition,
-    /// d(x,z) <= d(x,y) + d(y,z)
-    LawvereTriangle,
     /// Induction-based budget tracking over multiple steps
     BudgetTelescoping,
+    /// d(x,z) <= d(x,y) + d(y,z)
+    LawvereTriangle,
+    /// Fallback for unrecognized patterns
+    GenericFallback,
 }
 
 impl CohTemplateKind {
     pub fn as_str(&self) -> &'static str {
         match self {
             CohTemplateKind::CertifiedComposition => "CertifiedComposition",
+            CohTemplateKind::GenesisComposition => "GenesisComposition",
             CohTemplateKind::IdentityCertification => "IdentityCertification",
             CohTemplateKind::EnvelopeDomination => "EnvelopeDomination",
-            CohTemplateKind::HomPreorder => "HomPreorder",
+            CohTemplateKind::HomPreorderTransitivity => "HomPreorderTransitivity",
             CohTemplateKind::MonotoneComposition => "MonotoneComposition",
-            CohTemplateKind::LawvereTriangle => "LawvereTriangle",
             CohTemplateKind::BudgetTelescoping => "BudgetTelescoping",
+            CohTemplateKind::LawvereTriangle => "LawvereTriangle",
+            CohTemplateKind::GenericFallback => "GenericFallback",
         }
     }
 
@@ -40,19 +46,25 @@ impl CohTemplateKind {
     pub fn preferred_tactics(&self) -> Vec<&'static str> {
         match self {
             CohTemplateKind::CertifiedComposition => vec!["linarith", "nlinarith", "calc"],
+            CohTemplateKind::GenesisComposition => vec!["linarith", "nlinarith", "exact"],
             CohTemplateKind::IdentityCertification => vec!["simp", "rfl"],
             CohTemplateKind::EnvelopeDomination => vec!["linarith", "exact"],
-            CohTemplateKind::HomPreorder => vec!["exact le_trans", "linarith"],
+            CohTemplateKind::HomPreorderTransitivity => vec!["exact le_trans", "linarith"],
             CohTemplateKind::MonotoneComposition => vec!["exact add_le_add", "linarith"],
-            CohTemplateKind::LawvereTriangle => vec!["by_cases", "linarith", "exact"],
             CohTemplateKind::BudgetTelescoping => vec!["induction", "simp", "linarith"],
+            CohTemplateKind::LawvereTriangle => vec!["by_cases", "linarith", "exact"],
+            CohTemplateKind::GenericFallback => vec!["aesop", "linarith", "exact"],
         }
     }
 }
 
 /// Classify a Lean goal into a Coh template
 pub fn classify_coh_template(goal: &str) -> Option<CohTemplateKind> {
-    // Structural pattern matching (simplified heuristics)
+    // Structural pattern matching (refined heuristics)
+    if goal.contains("GenesisObject") || goal.contains("GenesisAdmissible") || goal.contains("M(") {
+        return Some(CohTemplateKind::GenesisComposition);
+    }
+
     if goal.contains(" + ")
         && goal.contains(" ≤ ")
         && (goal.contains('x') || goal.contains('y') || goal.contains('z'))
@@ -70,14 +82,18 @@ pub fn classify_coh_template(goal: &str) -> Option<CohTemplateKind> {
     }
 
     if goal.contains("le_trans") || (goal.contains("<=") && goal.matches("<=").count() >= 2) {
-        return Some(CohTemplateKind::HomPreorder);
+        return Some(CohTemplateKind::HomPreorderTransitivity);
     }
 
     if goal.contains("induction") || goal.contains("trace") || goal.contains("sum") {
         return Some(CohTemplateKind::BudgetTelescoping);
     }
+    
+    if goal.contains("Dist") || goal.contains("Distance") || goal.contains("Triangle") {
+        return Some(CohTemplateKind::LawvereTriangle);
+    }
 
-    None
+    Some(CohTemplateKind::GenericFallback)
 }
 
 #[cfg(test)]

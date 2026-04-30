@@ -3,9 +3,9 @@
 //! Runs the Genesis Wildness Sweep: measures how much generative diversity
 //! the NPE can produce while remaining Genesis-admissible and Coherence-safe.
 
-use crate::candidate::WildnessResult;
+use coh_npe::candidate::WildnessResult;
 
-use crate::generator::SyntheticNpeGenerator;
+use coh_npe::generator::SyntheticNpeGenerator;
 
 /// Run a wildness sweep across multiple wildness levels
 ///
@@ -31,7 +31,7 @@ fn run_sweep_one_level(
     wildness: f64,
     count: usize,
 ) -> WildnessResult {
-    use crate::candidate::FirstFailure;
+    use coh_npe::candidate::FirstFailure;
 
     let candidates = generator.generate(wildness, count);
 

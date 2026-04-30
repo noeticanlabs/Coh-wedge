@@ -484,6 +484,32 @@ name = "coh-genesis"
 version = "0.1.0"
 dependencies = [
  "coh-core",
+ "coh-npe",
+ "coh-phaseloom",
+ "egg",
+ "hex",
+ "nalgebra",
+ "ndarray",
+ "num-rational",
+ "petgraph",
+ "rand 0.8.6",
+ "rand_chacha 0.3.1",
+ "rayon",
+ "rusqlite",
+ "schemars",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror 2.0.18",
+ "tracing",
+ "z3",
+]
+
+[[package]]
+name = "coh-npe"
+version = "0.1.0"
+dependencies = [
+ "coh-core",
  "egg",
  "hex",
  "nalgebra",
@@ -500,6 +526,16 @@ dependencies = [
  "thiserror 2.0.18",
  "tracing",
  "z3",
+]
+
+[[package]]
+name = "coh-phaseloom"
+version = "0.1.0"
+dependencies = [
+ "coh-npe",
+ "rand 0.8.6",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

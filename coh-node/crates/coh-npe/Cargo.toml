@@ -1,19 +1,16 @@
 [package]
-name = "coh-genesis"
+name = "coh-npe"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 [dependencies]
 coh-core = { path = "../coh-core" }
-coh-npe = { path = "../coh-npe" }
-coh-phaseloom = { path = "../coh-phaseloom" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 schemars = "0.8"
 thiserror = { workspace = true }
 tracing = { workspace = true }
-num-rational = "0.4"
 
 # Deterministic NPE mutation
 rand = "0.8"
@@ -34,26 +31,12 @@ z3 = { version = "0.9", optional = true }
 
 [features]
 default = []
-
-# NPE Search & Graph
 npe-graph = ["petgraph"]
-
-# NPE Rewrite / Equivalence
 npe-rewrite = ["egg"]
-
-# NPE Memory / Storage
 npe-store = ["rusqlite"]
-
-# NPE Parallel Execution
 npe-parallel = ["rayon"]
-
-# NPE Numeric Scoring
 npe-numeric = ["nalgebra", "ndarray"]
-
-# NPE SMT Adviser
 npe-smt = ["z3"]
-
-# All NPE features
 npe-all = [
     "npe-graph",
     "npe-rewrite",
@@ -62,5 +45,3 @@ npe-all = [
     "npe-numeric",
     "npe-smt",
 ]
-
-[dev-dependencies]

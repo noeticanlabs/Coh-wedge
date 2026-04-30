@@ -13,7 +13,12 @@ theorem coh_compose_linear
     (hf : vy + sf ≤ vx + df + af)
     (hg : vz + sg ≤ vy + dg + ag) :
     vz + (sf + sg) ≤ vx + (df + dg) + (af + ag) := by
-  sorry
+  have h1 := add_le_add_right hg sf
+  rw [add_assoc, add_comm sg sf, ← add_assoc] at h1
+  have h2 := add_le_add_right hf (dg + ag)
+  have h3 := le_trans h1 h2
+  simp [add_assoc, add_comm] at h3 ⊢
+  exact h3
 
 /--
 Template 2: Identity Certification

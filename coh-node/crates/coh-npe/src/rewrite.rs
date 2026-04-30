@@ -4,7 +4,7 @@
 //! allowing the NPE to avoid exploring redundant paths.
 
 #[cfg(feature = "npe-rewrite")]
-use {crate::npe::engine::NpeProposal, egg::*, std::fmt::Display};
+use {crate::engine::NpeProposal, egg::*, std::fmt::Display};
 
 // A simple mathematical language for NPE proposal equivalence
 #[cfg(feature = "npe-rewrite")]
@@ -119,7 +119,7 @@ mod tests {
             content_hash: "hash".to_string(),
             depth: 0,
             parent_id: None,
-            status: crate::npe::engine::ProposalStatus::Generated,
+            status: crate::engine::ProposalStatus::Generated,
             ..Default::default()
         };
 

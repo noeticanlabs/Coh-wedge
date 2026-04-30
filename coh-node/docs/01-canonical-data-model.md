@@ -99,3 +99,22 @@ Result structs are serializable to JSON via `--format json` for pipeline integra
 | `metrics.v_post` | Decimal string | u128 | Post-step potential |
 | `metrics.spend` | Decimal string | u128 | Work consumed |
 | `metrics.defect` | Decimal string | u128 | Allowed slack |
+| `metrics.authority` | Decimal string | u128 | Systemic override capacity (default: 0) |
+
+## V3 Schema Additions (Transition Contract)
+
+V3 receipts (`coh.receipt.micro.v3`) extend the base model with additional formation and objective fields:
+
+| Field | Type (Wire) | Type (Runtime) | Description |
+|---|---|---|---|
+| `objective_result` | Object (Optional) | `ObjectiveResult` | Outcome of the transition objective (`satisfied`, `violated`, `not_applicable`) |
+| `sequence_valid` | Boolean | bool | Cryptographic sequence guard |
+| `override_applied` | Boolean | bool | Policy override indicator |
+| `metrics.m_pre` | Decimal string | u128 | Pre-step mass (Genesis Law) |
+| `metrics.m_post` | Decimal string | u128 | Post-step mass (Genesis Law) |
+| `metrics.c_cost` | Decimal string | u128 | Cost of proposal (Genesis Law) |
+| `metrics.d_slack` | Decimal string | u128 | Slack allowance (Genesis Law) |
+| `metrics.projection_hash` | Hex string | Hash32 | Content projection identifier |
+| `metrics.pl_tau` | Decimal string | u128 | PhaseLoom temperature/tension |
+| `metrics.pl_budget` | Decimal string | u128 | PhaseLoom computation budget |
+| `metrics.pl_provenance` | String | String | Strategy provenance identifier |

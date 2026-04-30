@@ -6,7 +6,8 @@
 
 use coh_core::types_v3::MicroReceiptV3Wire;
 use coh_core::verify_micro_v3::{verify_micro_v3, VerifyMicroV3Result};
-use crate::phaseloom_lite::{PhaseLoomState, PhaseLoomConfig, BoundaryReceiptSummary};
+use coh_phaseloom::{PhaseLoomState, PhaseLoomConfig};
+use coh_npe::receipt::BoundaryReceiptSummary;
 
 /// Governed Micro-Step Verification
 /// Wraps coh-core's verifier with PhaseLoom state injection and ingestion.

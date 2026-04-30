@@ -1,4 +1,4 @@
-use crate::failure_taxonomy::{
+use coh_npe::failure_taxonomy::{
     AnalyticalFailure, DyadicBKMFailure, FailureKind, FailureLayer, FailureReport, FailureSeverity,
     MathematicalFailure, MetricAnalyticFailure, ProbabilityLimitFailure, RepairStrategy,
     SpectralFluxFailure,

@@ -1,4 +1,4 @@
-use crate::candidate::WildnessResult;
+use coh_npe::candidate::WildnessResult;
 use crate::sweep::find_optimal_wildness;
 use std::fs::File;
 use std::io::{self, Write};

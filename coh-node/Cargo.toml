@@ -8,6 +8,8 @@ members = [
     "crates/coh-time",
     "crates/coh-gccp",
     "crates/coh-genesis",
+    "crates/coh-npe",
+    "crates/coh-phaseloom",
 ]
 resolver = "2"
 

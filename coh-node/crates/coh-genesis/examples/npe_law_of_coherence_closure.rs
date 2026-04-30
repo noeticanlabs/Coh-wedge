@@ -1,8 +1,9 @@
 use std::env;
 use std::path::PathBuf;
 use coh_genesis::mathlib_advisor::{MathlibLakeQuery, generate_report};
-use coh_genesis::phaseloom_lite::{PhaseLoomConfig, PhaseLoomState, BoundaryReceiptSummary};
-use coh_genesis::npe::{NpeProposalGraph, NpeProposal, ProposalStatus};
+use coh_genesis::phaseloom_lite::{PhaseLoomConfig, PhaseLoomState};
+use coh_genesis::npe::BoundaryReceiptSummary;
+use coh_genesis::npe::{NpeProposalGraph, NpeProposal, ProposalStatus, LeanClosureStatus};
 
 fn main() {
     println!("NPE PhaseLoom Loop: Law of Coherence [Milestone Audit Run]");
@@ -59,6 +60,8 @@ fn main() {
                 content_hash: format!("hash-{}", sweep),
                 depth: sweep as u32,
                 parent_id: root_id.clone(),
+                tau: 0,
+                provenance: "EXT".to_string(),
                 status: ProposalStatus::Generated,
             };
 
@@ -113,6 +116,7 @@ fn main() {
                     strategy_class: "TemplateGuided".to_string(),
                     coh_template: Some(template),
                     accepted: true,
+                    closure_status: LeanClosureStatus::ClosedNoSorry,
                     novelty: 1.0 / (sweep as f64),
                     tension_score: tension, 
                     sorry_detected: false,

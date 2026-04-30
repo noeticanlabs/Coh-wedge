@@ -23,6 +23,9 @@ pub mod verify_micro;
 pub mod verify_micro_v3;
 pub mod verify_slab;
 
+pub mod rv_kernel;
+pub mod tools;
+
 pub use build_slab::build_slab;
 pub use fixtures::finalize_micro_receipt;
 pub use types::Decision;

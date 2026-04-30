@@ -55,7 +55,9 @@ cargo run --manifest-path coh-node/Cargo.toml -p coh-validator --release -- \
 ## Next Steps
 
 - [ ] Inspect the [Formation Boundary](coh-dashboard/README.md) in the dashboard.
+- [ ] Explore [coh-genesis](coh-node/crates/coh-genesis/) for the unified GMI Governor.
 - [ ] Explore [coh-npe](coh-node/crates/coh-npe/) for forward generation logic.
+- [ ] Explore [coh-phaseloom](coh-node/crates/coh-phaseloom/) for the boundary strategy ecology.
 - [ ] Explore [coh-t-stack/](coh-t-stack/) for formal proofs.
 
 ## License
